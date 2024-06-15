@@ -1,20 +1,26 @@
+# 本地环境的分库分表配置
 dataSources:
+  # 数据源0配置
   ds_0:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://www.cookframe.com:3306/damai_user_0?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/damai_user_0?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
     username: root
-    password: qazxsw890
+    password: root
+  # 数据源1配置
   ds_1:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://www.cookframe.com:3306/damai_user_1?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/damai_user_1?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
     username: root
-    password: qazxsw890
+    password: root
 
+# 分片和加密规则配置
 rules:
+  # 分片规则配置
   - !SHARDING
     tables:
+      # d_user_mobile表的分片策略
       d_user_mobile:
         actualDataNodes: ds_${0..1}.d_user_mobile_${0..1}
         databaseStrategy:
@@ -25,6 +31,7 @@ rules:
           standard:
             shardingColumn: mobile
             shardingAlgorithmName: tableUserMobileHashMod
+      # d_user_email表的分片策略
       d_user_email:
         actualDataNodes: ds_${0..1}.d_user_email_${0..1}
         databaseStrategy:
@@ -35,6 +42,7 @@ rules:
           standard:
             shardingColumn: email
             shardingAlgorithmName: tableUserEmailHashMod
+      # d_user表的分片策略
       d_user:
         actualDataNodes: ds_${0..1}.d_user_${0..1}
         databaseStrategy:
@@ -45,6 +53,7 @@ rules:
           standard:
             shardingColumn: id
             shardingAlgorithmName: tableUserModModel
+      # d_ticket_user表的分片策略
       d_ticket_user:
         actualDataNodes: ds_${0..1}.d_ticket_user_${0..1}
         databaseStrategy:
@@ -55,6 +64,7 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: tableTicketUserModModel
+    # 分片算法配置
     shardingAlgorithms:
       databaseUserMobileHashModModel:
         type: HASH_MOD
@@ -88,8 +98,10 @@ rules:
         type: MOD
         props:
           sharding-count: 2
+  # 加密规则配置
   - !ENCRYPT
     tables:
+      # d_user表的加密策略
       d_user:
         columns:
           mobile:
@@ -101,11 +113,13 @@ rules:
           id_number:
             cipherColumn: id_number
             encryptorName: user_encryption_algorithm
+      # d_user_mobile表的加密策略
       d_user_mobile:
         columns:
           mobile:
             cipherColumn: mobile
             encryptorName: user_encryption_algorithm
+    # 加密算法配置
     encryptors:
       user_encryption_algorithm:
         type: SM4
@@ -114,5 +128,7 @@ rules:
           sm4-mode: CBC
           sm4-iv: 1afc7fdce9ebc393f693cd3d23e35ed2
           sm4-padding: PKCS7Padding
+# 是否显示SQL日志
 props:
   sql-show: true
+
