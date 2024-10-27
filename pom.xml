@@ -17,198 +17,264 @@
   ~
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.example</groupId>
-	<artifactId>damai</artifactId>
-	<version>${revision}</version>
-	<packaging>pom</packaging>
+    <groupId>com.example</groupId>
+    <artifactId>damai</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
 
-	<name>${project.artifactId}</name>
-	<description>
-		诚意推荐!!   真实还原生产环境的微服务企业级高并发项目!!
-		SpringBoot + SpringCloudAlibaba + 多线程 + Redis + Kafka + ELK + Docker + Sentinel 等技术
-		包括完整的各种组件配置、高并发下的支付订单解决方案、使用设计模式进行解耦、完整的配套文档和视频
-	</description>
+    <name>${project.artifactId}</name>
+    <description>
+        诚意推荐!! 真实还原生产环境的微服务企业级高并发项目!!
+        SpringBoot + SpringCloudAlibaba + 多线程 + Redis + Kafka + ELK + Docker + Sentinel 等技术
+        包括完整的各种组件配置、高并发下的支付订单解决方案、使用设计模式进行解耦、完整的配套文档和视频
+    </description>
 
-	<modules>
-		<module>damai-common</module>
-		<module>damai-redis-tool-framework</module>
-		<module>damai-elasticsearch-framework</module>
-		<module>damai-id-generator-framework</module>
-		<module>damai-spring-cloud-framework</module>
-		<module>damai-thread-pool-framework</module>
-		<module>damai-redisson-framework</module>
-		<module>damai-server</module>
-		<module>damai-server-client</module>
-		<module>damai-captcha-manage-framework</module>
-	</modules>
+    <!-- 定义项目模块列表 -->
+    <modules>
+        <!-- 公共基础包 -->
+        <module>damai-common</module>
+        <!-- Redis相关组件 -->
+        <module>damai-redis-tool-framework</module>
+        <!-- Elasticsearch封装组件 -->
+        <module>damai-elasticsearch-framework</module>
+        <!-- 分布式ID生成器 -->
+        <module>damai-id-generator-framework</module>
+        <!-- 微服务相关封装组件 -->
+        <module>damai-spring-cloud-framework</module>
+        <!-- 线程池封装组件 -->
+        <module>damai-thread-pool-framework</module>
+        <!-- Redisson封装组件 -->
+        <module>damai-redisson-framework</module>
+        <!-- 业务服务模块 -->
+        <module>damai-server</module>
+        <!-- 业务服务的Feign调用模块 -->
+        <module>damai-server-client</module>
+        <!-- 验证码组件模块 -->
+        <module>damai-captcha-manage-framework</module>
+    </modules>
 
-	<properties>
-		<revision>0.0.1-SNAPSHOT</revision>
-		<java.version>17</java.version>
-		<project.sourceEncoding>UTF-8</project.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<spring-boot.version>3.3.0</spring-boot.version>
-		<spring-cloud.version>2023.0.2</spring-cloud.version>
-		<spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
-		<fastjson.version>1.2.83</fastjson.version>
-		<oshi-core.version>6.2.2</oshi-core.version>
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<jdk.version>17</jdk.version>
-		<nacos.version>2.0.3</nacos.version>
-		<jasypt.version>3.0.5</jasypt.version>
-		<maven-compiler.version>3.8.1</maven-compiler.version>
-		<maven-resources.version>3.2.0</maven-resources.version>
-		<maven-source.version>3.2.1</maven-source.version>
-		<flatten-maven.version>1.4.1</flatten-maven.version>
-		<fastjson.version>2.0.9</fastjson.version>
-		<oshi-core.version>6.2.2</oshi-core.version>
-		<commons-lang.version>2.6</commons-lang.version>
-		<jjwt.version>0.9.1</jjwt.version>
-		<hutool.version>5.8.25</hutool.version>
-		<log4j.version>2.17.0</log4j.version>
-		<pagehelper.version>5.2.0</pagehelper.version>
-		<commons-collections.version>3.2.2</commons-collections.version>
-		<spring-boot-admin-starter-server.version>3.3.0</spring-boot-admin-starter-server.version>
-		<mybatis-plus.version>3.5.7</mybatis-plus.version>
-		<mybatis-plus-generator.version>3.5.7</mybatis-plus-generator.version>
-		<freemarker.version>2.3.29</freemarker.version>
-		<druid.version>1.1.10</druid.version>
-		<spring-boot-admin-starter-client.version>2.3.1</spring-boot-admin-starter-client.version>
-		<knife4j.version>4.3.0</knife4j.version>
-		<openapi.swagger.version>2.2.0</openapi.swagger.version>
-		<redisson.version>3.32.0</redisson.version>
-		<qps-helper.version>1.1.3-RELEASE</qps-helper.version>
-		<alipay-sdk-java-version>4.38.197.ALL</alipay-sdk-java-version>
-		<shardingsphere.version>5.3.2</shardingsphere.version>
-		<snakeyaml.version>1.33</snakeyaml.version>
-		<spring-boot-starter-captcha.version>1.3.0</spring-boot-starter-captcha.version>
-		<caffeine.version>2.9.3</caffeine.version>
-		<jaxb.version>2.3.0</jaxb.version>
-		<activation.version>1.1.1</activation.version>
-		<spotless-maven-plugin.version>2.22.1</spotless-maven-plugin.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
-	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${spring-boot.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.alibaba.cloud</groupId>
-				<artifactId>spring-cloud-alibaba-dependencies</artifactId>
-				<version>${spring-cloud-alibaba.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <properties>
+        <!-- 当前项目的修订版本号 -->
+        <revision>0.0.1-SNAPSHOT</revision>
+        <!-- 项目使用的Java版本 -->
+        <java.version>17</java.version>
+        <!-- 项目源代码的编码格式 -->
+        <project.sourceEncoding>UTF-8</project.sourceEncoding>
+        <!-- 设置项目报告的输出编码为UTF-8 -->
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- 定义Spring Boot的版本 -->
+        <spring-boot.version>3.3.0</spring-boot.version>
+        <!-- 定义Spring Cloud的版本 -->
+        <spring-cloud.version>2023.0.2</spring-cloud.version>
+        <!-- 定义Spring Cloud Alibaba的版本 -->
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
+        <!-- 定义fastjson的版本 -->
+        <fastjson.version>1.2.83</fastjson.version>
+        <!-- 定义oshi-core的版本 -->
+        <oshi-core.version>6.2.2</oshi-core.version>
+        <!-- 定义Maven编译插件的版本 -->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <!-- 定义JDK的版本 -->
+        <jdk.version>17</jdk.version>
+        <!-- 定义Nacos的版本 -->
+        <nacos.version>2.0.3</nacos.version>
+        <!-- 定义jasypt的版本 -->
+        <jasypt.version>3.0.5</jasypt.version>
+        <!-- 定义Maven编译的版本 -->
+        <maven-compiler.version>3.8.1</maven-compiler.version>
+        <!-- 定义Maven资源插件的版本 -->
+        <maven-resources.version>3.2.0</maven-resources.version>
+        <!-- 定义Maven源码插件的版本 -->
+        <maven-source.version>3.2.1</maven-source.version>
+        <!-- 定义flatten-maven插件的版本 -->
+        <flatten-maven.version>1.4.1</flatten-maven.version>
+        <!-- 重新定义fastjson的版本 -->
+        <fastjson.version>2.0.9</fastjson.version>
+        <!-- 重新定义oshi-core的版本 -->
+        <oshi-core.version>6.2.2</oshi-core.version>
+        <!-- 定义commons-lang的版本 -->
+        <commons-lang.version>2.6</commons-lang.version>
+        <!-- 定义jjwt的版本 -->
+        <jjwt.version>0.9.1</jjwt.version>
+        <!-- 定义hutool的版本 -->
+        <hutool.version>5.8.25</hutool.version>
+        <!-- 定义log4j的版本 -->
+        <log4j.version>2.17.0</log4j.version>
+        <!-- 定义pagehelper的版本 -->
+        <pagehelper.version>5.2.0</pagehelper.version>
+        <!-- 定义commons-collections的版本 -->
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <!-- 定义spring-boot-admin-starter-server的版本 -->
+        <spring-boot-admin-starter-server.version>3.3.0</spring-boot-admin-starter-server.version>
+        <!-- 定义mybatis-plus的版本 -->
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <!-- 定义mybatis-plus-generator的版本 -->
+        <mybatis-plus-generator.version>3.5.7</mybatis-plus-generator.version>
+        <!-- 定义freemarker的版本 -->
+        <freemarker.version>2.3.29</freemarker.version>
+        <!-- 定义druid的版本 -->
+        <druid.version>1.1.10</druid.version>
+        <!-- 定义spring-boot-admin-starter-client的版本 -->
+        <spring-boot-admin-starter-client.version>2.3.1</spring-boot-admin-starter-client.version>
+        <!-- 定义knife4j的版本 -->
+        <knife4j.version>4.3.0</knife4j.version>
+        <!-- 定义OpenAPI Swagger的版本 -->
+        <openapi.swagger.version>2.2.0</openapi.swagger.version>
+        <!-- 定义redisson的版本 -->
+        <redisson.version>3.32.0</redisson.version>
+        <!-- 定义qps-helper的版本 -->
+        <qps-helper.version>1.1.3-RELEASE</qps-helper.version>
+        <!-- 定义Alipay SDK Java的版本 -->
+        <alipay-sdk-java-version>4.38.197.ALL</alipay-sdk-java-version>
+        <!-- 定义ShardingSphere的版本 -->
+        <shardingsphere.version>5.3.2</shardingsphere.version>
+        <!-- 定义SnakeYAML的版本 -->
+        <snakeyaml.version>1.33</snakeyaml.version>
+        <!-- 定义spring-boot-starter-captcha的版本 -->
+        <spring-boot-starter-captcha.version>1.3.0</spring-boot-starter-captcha.version>
+        <!-- 定义caffeine的版本 -->
+        <caffeine.version>2.9.3</caffeine.version>
+        <!-- 定义JAXB的版本 -->
+        <jaxb.version>2.3.0</jaxb.version>
+        <!-- 定义activation的版本 -->
+        <activation.version>1.1.1</activation.version>
+        <!-- 定义spotless-maven-plugin的版本 -->
+        <spotless-maven-plugin.version>2.22.1</spotless-maven-plugin.version>
+    </properties>
+    <!-- 定义项目依赖 -->
+    <dependencies>
+        <!-- 使用Lombok进行代码简化 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+    <!-- 管理项目依赖的版本 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot依赖管理 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud依赖管理 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud Alibaba依赖管理 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler.version}</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<encoding>${project.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-<!--			<plugin>-->
-<!--				<groupId>com.diffplug.spotless</groupId>-->
-<!--				<artifactId>spotless-maven-plugin</artifactId>-->
-<!--				<version>${spotless-maven-plugin.version}</version>-->
-<!--				<configuration>-->
-<!--					<java>-->
-<!--						<eclipse>-->
-<!--							<file>${project.basedir}/spotless/spotless.xml</file>-->
-<!--						</eclipse>-->
-<!--						<licenseHeader>-->
-<!--							<file>${project.basedir}/spotless/license-header</file>-->
-<!--						</licenseHeader>-->
-<!--					</java>-->
-<!--				</configuration>-->
-<!--				&lt;!&ndash;绑定maven生命周期，在compile时会执行apply &ndash;&gt;-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<goals>-->
-<!--							<goal>apply</goal>-->
-<!--						</goals>-->
-<!--						<phase>compile</phase>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>${maven-resources.version}</version>
-				<configuration>
-					<encoding>${project.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>${maven-source.version}</version>
-				<configuration>
-					<!--install、deploy时会上传源码jar包到仓库，默认是true-->
-					<attach>true</attach>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-source</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<version>${flatten-maven.version}</version>
-				<configuration>
-					<updatePomFile>true</updatePomFile>
-				</configuration>
-				<executions>
-					<!-- enable flattening -->
-					<execution>
-						<id>flatten</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>flatten</goal>
-						</goals>
-					</execution>
-					<!-- ensure proper cleanup -->
-					<execution>
-						<id>flatten.clean</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <!-- 构建配置 -->
+    <build>
+        <plugins>
+            <!-- 配置Maven编译插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <!--        配置spotless-maven-plugin进行代码格式化 -->
+            <!--        <plugin>-->
+            <!--            <groupId>com.diffplug.spotless</groupId>-->
+            <!--            <artifactId>spotless-maven-plugin</artifactId>-->
+            <!--            <version>${spotless-maven-plugin.version}</version>-->
+            <!--            <configuration>-->
+            <!--                <java>-->
+            <!--                    <eclipse>-->
+            <!--                        <file>${project.basedir}/spotless/spotless.xml</file>-->
+            <!--                    </eclipse>-->
+            <!--                    <licenseHeader>-->
+            <!--                        <file>${project.basedir}/spotless/license-header</file>-->
+            <!--                    </licenseHeader>-->
+            <!--                </java>-->
+            <!--            </configuration>-->
+            <!--            绑定Maven生命周期，在compile时会执行apply -->
+            <!--            <executions>-->
+            <!--                <execution>-->
+            <!--                    <goals>-->
+            <!--                        <goal>apply</goal>-->
+            <!--                    </goals>-->
+            <!--                    <phase>compile</phase>-->
+            <!--                </execution>-->
+            <!--            </executions>-->
+            <!--        </plugin>-->
+            <!-- 配置Maven资源插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources.version}</version>
+                <configuration>
+                    <encoding>${project.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <!-- 配置Maven源码插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source.version}</version>
+                <configuration>
+                    <!-- install、deploy时会上传源码jar包到仓库，默认是true -->
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-source</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 配置flatten-maven插件 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                </configuration>
+                <executions>
+                    <!-- 启用flattening -->
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <!-- 确保适当的清理 -->
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
