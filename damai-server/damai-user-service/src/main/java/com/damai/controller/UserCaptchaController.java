@@ -14,33 +14,53 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 验证码 控制层
- * @author: 阿星不是程序员
- **/
+ * 用户验证码控制器
+ * 提供与用户验证码相关的接口，包括检查是否需要验证码、获取验证码和验证验证码
+ */
 @RestController
 @RequestMapping("/user/captcha")
 @Tag(name = "captcha", description = "验证码")
 public class UserCaptchaController {
-    
+
+    /**
+     * 自动注入用户验证码服务
+     * 用于处理验证码相关的业务逻辑
+     */
     @Autowired
     private UserCaptchaService userCaptchaService;
-    
-    @Operation(summary  = "检查是否需要验证码")
+
+    /**
+     * 检查是否需要验证码
+     *
+     * @return 返回检查结果，包括是否需要验证码及可能的验证码类型等信息
+     */
+    @Operation(summary = "检查是否需要验证码")
     @PostMapping(value = "/check/need")
-    public ApiResponse<CheckNeedCaptchaDataVo> checkNeedCaptcha(){
+    public ApiResponse<CheckNeedCaptchaDataVo> checkNeedCaptcha() {
         return ApiResponse.ok(userCaptchaService.checkNeedCaptcha());
     }
-    
-    @Operation(summary  = "获取验证码")
+
+    /**
+     * 获取验证码
+     *
+     * @param captchaVO 包含获取验证码所需信息的实体，如手机号等
+     * @return 返回获取验证码的结果，包括验证码图片、唯一标识等信息
+     */
+    @Operation(summary = "获取验证码")
     @PostMapping(value = "/get")
-    public ResponseModel getCaptcha(@RequestBody CaptchaVO captchaVO){
+    public ResponseModel getCaptcha(@RequestBody CaptchaVO captchaVO) {
         return userCaptchaService.getCaptcha(captchaVO);
     }
-    
-    @Operation(summary  = "验证验证码")
+
+    /**
+     * 验证验证码
+     *
+     * @param captchaVO 包含验证验证码所需信息的实体，如验证码唯一标识和用户输入的验证码值
+     * @return 返回验证码验证结果，包括验证是否成功等信息
+     */
+    @Operation(summary = "验证验证码")
     @PostMapping(value = "/verify")
-    public ResponseModel verifyCaptcha(@RequestBody CaptchaVO captchaVO){
+    public ResponseModel verifyCaptcha(@RequestBody CaptchaVO captchaVO) {
         return userCaptchaService.verifyCaptcha(captchaVO);
     }
 }

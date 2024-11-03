@@ -11,18 +11,18 @@ import java.util.Objects;
 import java.util.Properties;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 限流
  * @author: 阿星不是程序员
  **/
 public interface FrequencyLimitHandler {
 
     String LIMIT_KEY = "AJ.CAPTCHA.REQ.LIMIT-%s-%s";
-    
+
     String ONE_HUNDRED_AND_TWENTY = "120";
-    
+
     String FIVE = "5";
-    
+
     String SIX_HUNDRED = "600";
 
     /**
@@ -121,10 +121,6 @@ public interface FrequencyLimitHandler {
 			if(StringUtils.isEmpty(d.getClientUid())){
 				return null;
 			}
-            /*String getKey = getClientCId(d, "GET");
-            if(Objects.isNull(cacheService.get(getKey))){
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_INVALID);
-            }*/
             String key = getClientCid(d, "CHECK");
             String v = cacheService.get(key);
             if (Objects.isNull(v)) {
@@ -140,10 +136,6 @@ public interface FrequencyLimitHandler {
 
         @Override
         public ResponseModel validateVerify(CaptchaVO d) {
-            /*String getKey = getClientCId(d, "GET");
-            if(Objects.isNull(cacheService.get(getKey))){
-                return ResponseModel.errorMsg(RepCodeEnum.API_REQ_INVALID);
-            }*/
             String key = getClientCid(d, "VERIFY");
             String v = cacheService.get(key);
             if (Objects.isNull(v)) {

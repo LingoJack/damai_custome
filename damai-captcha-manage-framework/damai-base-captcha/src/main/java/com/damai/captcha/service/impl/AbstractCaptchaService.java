@@ -1,8 +1,8 @@
 /*
- *Copyright © 2018 anji-plus
- *安吉加加信息技术有限公司
- *http://www.anji-plus.com
- *All rights reserved.
+ * Copyright © 2018 anji-plus
+ * 安吉加加信息技术有限公司
+ * http://www.anji-plus.com
+ * All rights reserved.
  */
 package com.damai.captcha.service.impl;
 
@@ -28,26 +28,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Properties;
 
-/**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 抽象层
- * @author: 阿星不是程序员
- **/
 public abstract class AbstractCaptchaService implements CaptchaService {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected static final String IMAGE_TYPE_PNG = "png";
 
-	protected static int HAN_ZI_SIZE = 25;
+    protected static int HAN_ZI_SIZE = 25;
 
-	protected static int HAN_ZI_SIZE_HALF = HAN_ZI_SIZE / 2;
-    
+    protected static int HAN_ZI_SIZE_HALF = HAN_ZI_SIZE / 2;
+
     /**
      * check校验坐标
      */
     protected static String REDIS_CAPTCHA_KEY = "RUNNING:CAPTCHA:%s";
-    
+
     /**
      * 后台二次校验坐标
      */
@@ -63,7 +58,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
 
     /**
      * 水印字体
-     * */
+     */
     protected Font waterMarkFont;
 
     protected static String slipOffset = "5";
@@ -75,46 +70,55 @@ public abstract class AbstractCaptchaService implements CaptchaService {
     protected static String cacheType = "local";
 
     protected static int captchaInterferenceOptions = 0;
-    
+
     protected static String local = "local";
-    
+
     protected static String one = "1";
-    
+
     protected static String zero = "0";
-    
+
     protected static String ttf = ".ttf";
-    
+
     protected static String ttc = ".ttc";
+
     /**
-     * 判断应用是否实现了自定义缓存，没有就使用内存
+     * 初始化验证码配置
+     * 该方法在验证码服务启动时被调用，用于初始化一些配置参数和资源
+     * 主要包括底图缓存、水印、字体、缓存类型等的初始化
+     *
+     * @param config 配置属性，包含了验证码服务的各种配置参数
      */
-    
     @Override
     public void init(final Properties config) {
-        //初始化底图
+        // 初始化底图
         boolean aBoolean = Boolean.parseBoolean(config.getProperty(Const.CAPTCHA_INIT_ORIGINAL));
         if (!aBoolean) {
             ImageUtils.cacheImage(config.getProperty(Const.ORIGINAL_PATH_JIGSAW),
                     config.getProperty(Const.ORIGINAL_PATH_PIC_CLICK), config.getProperty(Const.ORIGINAL_PATH_ROTATE));
         }
         logger.info("--->>>初始化验证码底图<<<---" + captchaType());
+
+        // 从配置中获取水印、字体、缓存类型等参数
         waterMark = config.getProperty(Const.CAPTCHA_WATER_MARK, "我的水印");
         slipOffset = config.getProperty(Const.CAPTCHA_SLIP_OFFSET, "5");
         waterMarkFontStr = config.getProperty(Const.CAPTCHA_WATER_FONT, "WenQuanZhengHei.ttf");
         captchaAesStatus = Boolean.parseBoolean(config.getProperty(Const.CAPTCHA_AES_STATUS, "true"));
         clickWordFontStr = config.getProperty(Const.CAPTCHA_FONT_TYPE, "WenQuanZhengHei.ttf");
         cacheType = config.getProperty(Const.CAPTCHA_CACHETYPE, "local");
-        captchaInterferenceOptions = Integer.parseInt(
-                config.getProperty(Const.CAPTCHA_INTERFERENCE_OPTIONS, "0"));
+        captchaInterferenceOptions = Integer.parseInt(config.getProperty(Const.CAPTCHA_INTERFERENCE_OPTIONS, "0"));
 
         // 部署在linux中，如果没有安装中文字段，水印和点选文字，中文无法显示，
         // 通过加载resources下的font字体解决，无需在linux中安装字体
         loadWaterMarkFont();
+
+        // 如果缓存类型为local，初始化本地缓存
         if (local.equals(cacheType)) {
             logger.info("初始化local缓存...");
             CacheUtil.init(Integer.parseInt(config.getProperty(Const.CAPTCHA_CACAHE_MAX_NUMBER, "1000")),
                     Long.parseLong(config.getProperty(Const.CAPTCHA_TIMING_CLEAR_SECOND, "180")));
         }
+
+        // 如果历史数据清除开关为开启状态，设置系统关闭时清除历史资源
         if (one.equals(config.getProperty(Const.HISTORY_DATA_CLEAR_ENABLE, zero))) {
             logger.info("历史资源清除开关...开启..." + captchaType());
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -124,6 +128,8 @@ public abstract class AbstractCaptchaService implements CaptchaService {
                 }
             }));
         }
+
+        // 如果接口限流开关为开启状态，初始化限流处理器
         if (one.equals(config.getProperty(Const.REQ_FREQUENCY_LIMIT_ENABLE, zero))) {
             if (limitHandler == null) {
                 logger.info("接口分钟内限流开关...开启...");
@@ -180,17 +186,17 @@ public abstract class AbstractCaptchaService implements CaptchaService {
         return resp == null || resp.isSuccess();
     }
 
-	protected String getValidateClientId(CaptchaVO req){
-    	// 以服务端获取的客户端标识 做识别标志
-		if(StringUtils.isNotEmpty(req.getBrowserInfo())){
-			return Md5Util.md5(req.getBrowserInfo());
-		}
-		// 以客户端Ui组件id做识别标志
-		if(StringUtils.isNotEmpty(req.getClientUid())){
-			return req.getClientUid();
-		}
-    	return null;
-	}
+    protected String getValidateClientId(CaptchaVO req) {
+        // 以服务端获取的客户端标识 做识别标志
+        if (StringUtils.isNotEmpty(req.getBrowserInfo())) {
+            return Md5Util.md5(req.getBrowserInfo());
+        }
+        // 以客户端Ui组件id做识别标志
+        if (StringUtils.isNotEmpty(req.getClientUid())) {
+            return req.getClientUid();
+        }
+        return null;
+    }
 
     protected void afterValidateFail(CaptchaVO data) {
         if (limitHandler != null) {
@@ -214,13 +220,15 @@ public abstract class AbstractCaptchaService implements CaptchaService {
             if (waterMarkFontStr.toLowerCase().endsWith(ttf) || waterMarkFontStr.toLowerCase().endsWith(ttc)
                     || waterMarkFontStr.toLowerCase().endsWith(".otf")) {
                 this.waterMarkFont = Font.createFont(Font.TRUETYPE_FONT,
-                        getClass().getResourceAsStream("/fonts/" + waterMarkFontStr))
+                                getClass().getResourceAsStream("/fonts/" + waterMarkFontStr))
                         .deriveFont(Font.BOLD, HAN_ZI_SIZE / 2);
-            } else {
+            }
+            else {
                 this.waterMarkFont = new Font(waterMarkFontStr, Font.BOLD, HAN_ZI_SIZE / 2);
             }
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error("load font error:{}", e);
         }
     }
@@ -250,7 +258,8 @@ public abstract class AbstractCaptchaService implements CaptchaService {
             out.flush();
             out.close();
             return true;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return false;
         }
     }
@@ -273,7 +282,8 @@ public abstract class AbstractCaptchaService implements CaptchaService {
             int length = String.valueOf(s.charAt(i)).getBytes(StandardCharsets.UTF_8).length;
             if (length > 1) {
                 chCount++;
-            } else {
+            }
+            else {
                 enCount++;
             }
         }
@@ -281,6 +291,4 @@ public abstract class AbstractCaptchaService implements CaptchaService {
         int enOffset = enCount * 8;
         return chOffset + enOffset;
     }
-
-
 }
