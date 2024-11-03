@@ -19,7 +19,7 @@ public abstract class AbstractApplicationExecute {
 
     /**
      * 执行初始化处理
-     * 该方法从应用程序上下文中获取所有InitializeHandler类型的bean，
+     * 该方法从应用程序上下文中获取所有{@link InitializeHandler}类型的bean，
      * 过滤出与当前执行类型匹配的handler，
      * 并按照执行顺序（executeOrder）排序，然后依次调用它们的executeInit方法进行初始化
      */

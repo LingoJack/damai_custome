@@ -238,6 +238,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             // 获取用户ID
             userId = userMobile.getUserId();
         }
+        // 如果提供了邮箱
         else {
             // 获取邮箱错误尝试次数
             String errorCountStr = redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.LOGIN_USER_EMAIL_ERROR, email), String.class);
@@ -274,35 +275,75 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
 
         // 将用户信息存入Redis缓存，设置过期时间
-        redisCache.set(RedisKeyBuild.createRedisKey(RedisKeyManage.USER_LOGIN, code, user.getId()), user,
-                tokenExpireTime, TimeUnit.MINUTES);
+        RedisKeyBuild redisKey = RedisKeyBuild.createRedisKey(RedisKeyManage.USER_LOGIN, code, userId);
+        redisCache.set(redisKey, user, tokenExpireTime, TimeUnit.MINUTES);
+
+        // 根据渠道码获取渠道数据信息
+        GetChannelDataVo channelDataVo = getChannelDataByCode(code);
+        // 从渠道数据中获取密钥用于生成令牌
+        String tokenSecret = channelDataVo.getTokenSecret();
+        // 使用用户ID和密钥生成安全令牌
+        String token = createToken(userId, tokenSecret);
 
         // 设置返回的用户ID和Token
         userLoginVo.setUserId(userId);
-        userLoginVo.setToken(createToken(user.getId(), getChannelDataByCode(code).getTokenSecret()));
+        userLoginVo.setToken(token);
 
         // 返回用户登录信息
         return userLoginVo;
     }
 
+    /**
+     * 通过Redis获取渠道数据
+     *
+     * @param code 渠道标识码，用于在Redis中查找对应的渠道数据
+     * @return GetChannelDataVo 返回获取到的渠道数据对象，如果找不到则返回null
+     */
     private GetChannelDataVo getChannelDataByRedis(String code) {
         return redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.CHANNEL_DATA, code), GetChannelDataVo.class);
     }
 
+    /**
+     * 通过客户端接口获取渠道数据
+     * 当Redis中没有缓存数据时调用此方法，从远程服务获取渠道数据
+     *
+     * @param code 渠道标识码，用于请求特定的渠道数据
+     * @return GetChannelDataVo 返回获取到的渠道数据对象
+     * @throws DaMaiFrameException 如果请求失败或找不到对应的渠道数据，则抛出此异常
+     */
     private GetChannelDataVo getChannelDataByClient(String code) {
+        // 创建一个GetChannelDataByCodeDto对象，用于后续查询渠道数据
         GetChannelDataByCodeDto getChannelDataByCodeDto = new GetChannelDataByCodeDto();
+        // 设置查询条件，即渠道代码
         getChannelDataByCodeDto.setCode(code);
+        // 通过RPC调用baseDataClient的getByCode方法，根据渠道代码获取渠道数据
         ApiResponse<GetChannelDataVo> getChannelDataApiResponse = baseDataClient.getByCode(getChannelDataByCodeDto);
+        // 检查API响应的状态码是否表示成功
         if (Objects.equals(getChannelDataApiResponse.getCode(), BaseCode.SUCCESS.getCode())) {
+            // 如果成功，返回渠道数据
             return getChannelDataApiResponse.getData();
         }
+        // 如果响应状态码不表示成功，抛出异常提示未找到ChannelData
         throw new DaMaiFrameException("没有找到ChannelData");
     }
 
+    /**
+     * 创建用户令牌
+     *
+     * @param userId      用户ID，用于标识令牌的拥有者
+     * @param tokenSecret 令牌的密钥，用于保证令牌的安全性
+     * @return 返回生成的用户令牌字符串
+     */
     public String createToken(Long userId, String tokenSecret) {
+        // 创建一个HashMap用于存储令牌的负载信息
         Map<String, Object> map = new HashMap<>(4);
+        // 将用户ID放入负载中，以便在令牌中携带用户信息
         map.put("userId", userId);
-        return TokenUtil.createToken(String.valueOf(uidGenerator.getUid()), JSON.toJSONString(map), tokenExpireTime * 60 * 1000, tokenSecret);
+        // 使用TokenUtil工具类生成令牌，传递用户ID、负载信息、令牌过期时间和密钥
+        String id = String.valueOf(uidGenerator.getUid());
+        String info = JSON.toJSONString(map);
+        long expiration = tokenExpireTime * 60 * 1000;
+        return TokenUtil.createToken(id, info, expiration, tokenSecret);
     }
 
     public Boolean logout(UserLogoutDto userLogoutDto) {
@@ -316,9 +357,19 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return true;
     }
 
+    /**
+     * 根据渠道码获取渠道数据信息
+     * 首先尝试从Redis中获取数据，如果未找到，则通过客户端请求获取
+     * 这种方式旨在提高数据获取效率，减少对外部服务的依赖
+     *
+     * @param code 渠道码，用于标识特定的渠道
+     * @return GetChannelDataVo 渠道数据信息的封装对象，如果找不到对应数据，则返回null
+     */
     public GetChannelDataVo getChannelDataByCode(String code) {
+        // 尝试从Redis中获取渠道数据信息
         GetChannelDataVo channelDataVo = getChannelDataByRedis(code);
         if (Objects.isNull(channelDataVo)) {
+            // 如果Redis中不存在该渠道数据，则通过客户端请求获取
             channelDataVo = getChannelDataByClient(code);
         }
         return channelDataVo;

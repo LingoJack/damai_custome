@@ -66,83 +66,130 @@ import static com.damai.constant.GatewayConstant.USER_ID;
 import static com.damai.constant.GatewayConstant.V2;
 import static com.damai.constant.GatewayConstant.VERIFY_VALUE;
 
-/**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
- * @description: 请求过滤器
- * @author: 阿星不是程序员
- **/
-
 @Component
 @Slf4j
 public class RequestValidationFilter implements GlobalFilter, Ordered {
 
+    /**
+     * 用于配置服务器编解码器，以便在数据传输时进行编码和解码
+     */
     @Resource
     private ServerCodecConfigurer serverCodecConfigurer;
 
+    /**
+     * 管理频道数据的服务，提供与频道相关的数据操作
+     */
     @Autowired
     private ChannelDataService channelDataService;
 
+    /**
+     * 提供API访问限制的服务，用于防止未经授权的API调用
+     */
     @Autowired
     private ApiRestrictService apiRestrictService;
 
+    /**
+     * 负责生成和验证令牌的服务，通常用于身份验证和授权
+     */
     @Autowired
     private TokenService tokenService;
 
+    /**
+     * 网关属性配置，包含网关运行所需的各种配置信息
+     */
     @Autowired
     private GatewayProperty gatewayProperty;
 
+    /**
+     * 全局唯一标识符生成器，用于生成唯一的UID
+     */
     @Autowired
     private UidGenerator uidGenerator;
 
+    /**
+     * 速率限制属性配置，定义了速率限制的规则和参数
+     */
     @Autowired
     private RateLimiterProperty rateLimiterProperty;
 
+    /**
+     * 速率限制器，用于根据配置的规则限制请求的速率，防止过载
+     */
     @Autowired
     private RateLimiter rateLimiter;
 
+    /**
+     * 自定义网关过滤器的过滤方法
+     * 该方法用于处理进入网关的请求，可以在此处添加跨切面的逻辑，如日志记录、权限校验等
+     *
+     * @param exchange 服务器Web交换对象，包含请求和响应的信息
+     * @param chain    网关过滤链，用于将请求传递到下一个过滤器或最终的目标服务
+     * @return Mono<Void> 表示异步操作的完成
+     */
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
+        // 判断是否开启速率限制功能
         if (rateLimiterProperty.getRateSwitch()) {
             try {
+                // 尝试获取速率限制许可，如果获取成功则继续执行过滤逻辑
                 rateLimiter.acquire();
                 return doFilter(exchange, chain);
             }
             catch (InterruptedException e) {
+                // 如果获取许可时被中断，则记录错误日志并抛出自定义异常
                 log.error("interrupted error", e);
                 throw new DaMaiFrameException(BaseCode.THREAD_INTERRUPTED);
             }
             finally {
+                // 释放速率限制许可，确保公平性
                 rateLimiter.release();
             }
         }
         else {
+            // 如果未开启速率限制，则直接执行过滤逻辑
             return doFilter(exchange, chain);
         }
     }
 
+    /**
+     * 实际执行过滤逻辑的方法
+     * 该方法主要负责处理请求头的传递和请求体的读取
+     *
+     * @param exchange 服务器Web交换对象，包含请求和响应的信息
+     * @param chain    网关过滤链，用于将请求传递到下一个过滤器或最终的目标服务
+     * @return Mono<Void> 表示异步操作的完成
+     */
     public Mono<Void> doFilter(final ServerWebExchange exchange, final GatewayFilterChain chain) {
+        // 获取请求对象
         ServerHttpRequest request = exchange.getRequest();
+        // 从请求头中获取跟踪ID、灰度参数和免验证参数
         String traceId = request.getHeaders().getFirst(TRACE_ID);
         String gray = request.getHeaders().getFirst(GRAY_PARAMETER);
         String noVerify = request.getHeaders().getFirst(NO_VERIFY);
+        // 如果跟踪ID为空，则生成新的跟踪ID
         if (StringUtil.isEmpty(traceId)) {
             traceId = String.valueOf(uidGenerator.getUid());
         }
+        // 将跟踪ID放入日志上下文中，便于后续的日志追踪
         MDC.put(TRACE_ID, traceId);
+        // 创建一个映射，用于存储需要传递的请求头信息
         Map<String, String> headMap = new HashMap<>(8);
         headMap.put(TRACE_ID, traceId);
         headMap.put(GRAY_PARAMETER, gray);
         if (StringUtil.isNotEmpty(noVerify)) {
             headMap.put(NO_VERIFY, noVerify);
         }
+        // 将跟踪ID和灰度参数存入基础参数持有者中，以便在后续处理中使用
         BaseParameterHolder.setParameter(TRACE_ID, traceId);
         BaseParameterHolder.setParameter(GRAY_PARAMETER, gray);
+        // 获取请求的内容类型
         MediaType contentType = request.getHeaders().getContentType();
-        // application json请求
+        // 如果是application/json类型的请求，则需要读取请求体
         if (Objects.nonNull(contentType) && contentType.toString().toLowerCase().contains(MediaType.APPLICATION_JSON_VALUE.toLowerCase())) {
             return readBody(exchange, chain, headMap);
         }
         else {
+            // 对于非JSON请求，执行请求，并将之前保存的头部信息添加到请求中
             Map<String, String> map = doExecute("", exchange);
             map.remove(REQUEST_BODY);
             map.putAll(headMap);

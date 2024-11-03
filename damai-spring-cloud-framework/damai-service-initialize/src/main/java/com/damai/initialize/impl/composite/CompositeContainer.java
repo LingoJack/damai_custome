@@ -23,26 +23,30 @@ import java.util.stream.Collectors;
  */
 public class CompositeContainer<T> {
 
-    // 存储所有组件接口的映射，键是组件类型，值是该类型的组件树的根节点。
+    // 存储所有组件接口的映射，键是组件类型(type)，值是该类型的组件树的根节点(root)。
     private final Map<String, AbstractComposite> allCompositeInterfaceMap = new HashMap<>();
 
     /**
-     * 初始化方法，从Spring应用上下文中获取所有AbstractComposite类型的bean，
-     * 并根据它们的类型分组，构建组件树，并存储在allCompositeInterfaceMap中。
+     * 初始化方法，从Spring应用上下文中获取所有{@link AbstractComposite}类型的bean，
+     * 并根据它们的类型分组，构建组件树，并存储在{@link CompositeContainer#allCompositeInterfaceMap}中。
      *
      * @param applicationEvent Spring的ConfigurableApplicationContext，用于获取bean。
      */
     public void init(ConfigurableApplicationContext applicationEvent) {
-        // 获取所有AbstractComposite类型的bean。
+        // 获取所有 AbstractComposite 类型的 Bean
         Map<String, AbstractComposite> compositeInterfaceMap = applicationEvent.getBeansOfType(AbstractComposite.class);
+        // 查找出AbstractComposite类型，然后根据type进行分组
+        Map<String, List<AbstractComposite>> map = compositeInterfaceMap.values()
+                .stream()
+                .collect(Collectors.groupingBy(AbstractComposite::type));
 
-        // 根据组件的类型对组件进行分组。
-        Map<String, List<AbstractComposite>> collect = compositeInterfaceMap.values().stream().collect(Collectors.groupingBy(AbstractComposite::type));
-        // 遍历分组后的组件，构建组件树，并存储在allCompositeInterfaceMap中。
-        collect.forEach((k, v) -> {
-            AbstractComposite root = build(v);
+        // 遍历每个类型的组件列表
+        map.forEach((type, list) -> {
+            // 构建组件树结构
+            AbstractComposite root = build(list);
+            // 如果根节点存在，则执行业务逻辑
             if (Objects.nonNull(root)) {
-                allCompositeInterfaceMap.put(k, root);
+                allCompositeInterfaceMap.put(type, root);
             }
         });
     }
@@ -66,45 +70,34 @@ public class CompositeContainer<T> {
     /**
      * 构建组件树的辅助方法。
      *
-     * @param groupedByTier 按层级组织的组件映射，键为层级编号，值为该层级的组件映射。
-     * @param currentTier   当前处理的层级编号。
+     * @param mapGroupedByTier 按层级组织的组件映射。Map<Tier, Map<Order, Component>>
+     * @param currentTier   当前处理的层级。
      */
-    private static void buildTree(Map<Integer, Map<Integer, AbstractComposite>> groupedByTier, int currentTier) {
-        // 获取当前层级的所有组件
-        Map<Integer, AbstractComposite> currentLevelComponents = groupedByTier.get(currentTier);
+    private static void buildTree(Map<Integer, Map<Integer, AbstractComposite>> mapGroupedByTier, int currentTier) {
+        Map<Integer, AbstractComposite> currentLevelComponents = mapGroupedByTier.get(currentTier);
+        Map<Integer, AbstractComposite> nextLevelComponents = mapGroupedByTier.get(currentTier + 1);
 
-        // 获取下一层级的所有组件
-        Map<Integer, AbstractComposite> nextLevelComponents = groupedByTier.get(currentTier + 1);
-
-        // 如果当前层级没有组件，直接返回
         if (currentLevelComponents == null) {
+            // 当前层级没有组件时，直接返回
             return;
         }
 
-        // 如果下一层级有组件，开始构建层级关系
         if (nextLevelComponents != null) {
-            // 遍历下一层级的所有组件
             for (AbstractComposite child : nextLevelComponents.values()) {
-                // 获取子组件的父组件顺序号
                 Integer parentOrder = child.executeParentOrder();
-
-                // 如果父组件顺序号为空或为0，跳过该子组件
                 if (parentOrder == null || parentOrder == 0) {
+                    // 跳过根节点
                     continue;
                 }
-
-                // 获取父组件
                 AbstractComposite parent = currentLevelComponents.get(parentOrder);
-
-                // 如果父组件存在，将子组件添加到父组件中
                 if (parent != null) {
+                    // 将子节点添加到父节点的子列表中
                     parent.add(child);
                 }
             }
         }
-
-        // 递归调用，处理下一层级
-        buildTree(groupedByTier, currentTier + 1);
+        // 递归构建下一层级的树结构
+        buildTree(mapGroupedByTier, currentTier + 1);
     }
 
     /**
@@ -114,28 +107,34 @@ public class CompositeContainer<T> {
      * @return 根节点。
      */
     private static AbstractComposite build(Collection<AbstractComposite> components) {
-        // 创建一个按层级组织的组件映射
-        Map<Integer, Map<Integer, AbstractComposite>> groupedByTier = new TreeMap<>();
+        // 创建一个按层级组织的组件映射，按层级和执行顺序组织组件
+        // key 为 层级，value 为该层级的组件映射 Map，该 Map 的 key 为执行顺序号，value 为组件对象
+        // Map<Tier, Map<Order, Component>>
+        Map<Integer, Map<Integer, AbstractComposite>> mapGroupedByTier = new TreeMap<>();
 
         // 遍历所有组件，按层级和顺序号进行分组
         for (AbstractComposite component : components) {
-            groupedByTier.computeIfAbsent(component.executeTier(), k -> new HashMap<>(16))
-                    .put(component.executeOrder(), component);
+            mapGroupedByTier
+                    .computeIfAbsent(component.executeTier(), k -> new HashMap<>(16))
+                    .put(component.executeOrder(), component); // 使用 executeOrder 作为键
         }
 
         // 获取最小的层级编号
-        Integer minTier = groupedByTier.keySet().stream().min(Integer::compare).orElse(null);
+        Integer minTier = mapGroupedByTier.keySet().stream().min(Integer::compare).orElse(null);
 
-        // 如果没有组件，返回null
+        // 如果没有组件，即最小层级不存在，返回null
         if (minTier == null) {
             return null;
         }
 
         // 从最小的层级开始构建组件树
-        buildTree(groupedByTier, minTier);
+        buildTree(mapGroupedByTier, minTier);
 
         // 返回根节点，根节点的父组件顺序号为null或0
-        return groupedByTier.get(minTier).values().stream()
+        return mapGroupedByTier
+                .get(minTier)
+                .values()
+                .stream()
                 .filter(c -> c.executeParentOrder() == null || c.executeParentOrder() == 0)
                 .findFirst()
                 .orElse(null);

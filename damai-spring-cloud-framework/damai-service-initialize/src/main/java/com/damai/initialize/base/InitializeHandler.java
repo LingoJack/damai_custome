@@ -4,6 +4,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * 初始化处理器顶级接口，用于在应用启动过程中执行特定的初始化逻辑
+ * 此接口在{@link com.damai.initialize.execute.base.AbstractApplicationExecute}中被使用
  */
 public interface InitializeHandler {
 
