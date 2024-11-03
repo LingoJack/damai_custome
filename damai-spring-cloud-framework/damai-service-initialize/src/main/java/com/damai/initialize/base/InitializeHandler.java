@@ -3,27 +3,29 @@ package com.damai.initialize.base;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 初始化执行 顶级抽象 接口
- * @author: 阿星不是程序员
- **/
+ * 初始化处理器顶级接口，用于在应用启动过程中执行特定的初始化逻辑
+ */
 public interface InitializeHandler {
+
     /**
-     * 初始化执行 类型
-     * @return 类型
-     * */
+     * 获取初始化执行的类型
+     *
+     * @return 类型字符串，表示初始化的类别
+     */
     String type();
-    
+
     /**
-     * 执行顺序
-     * @return 顺序
-     * */
+     * 获取执行顺序
+     *
+     * @return 顺序整数，值越小表示执行顺序越靠前
+     */
     Integer executeOrder();
-    
+
     /**
-     * 执行逻辑
-     * @param context 容器上下文
-     * */
+     * 执行具体的初始化逻辑
+     *
+     * @param context 容器上下文，用于访问Spring容器中的Bean和其他资源
+     */
     void executeInit(ConfigurableApplicationContext context);
-    
+
 }

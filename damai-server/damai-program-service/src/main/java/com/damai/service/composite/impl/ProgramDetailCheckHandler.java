@@ -1,6 +1,5 @@
 package com.damai.service.composite.impl;
 
-
 import com.damai.dto.ProgramGetDto;
 import com.damai.dto.ProgramOrderCreateDto;
 import com.damai.enums.BaseCode;
@@ -17,16 +16,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 节目检查
- * @author: 阿星不是程序员
- **/
+ * 节目详情检查处理器
+ * 继承自AbstractProgramCheckHandler，用于执行节目详情的验证逻辑
+ */
 @Component
 public class ProgramDetailCheckHandler extends AbstractProgramCheckHandler {
-    
+
     @Autowired
     private ProgramService programService;
-    
+
+    /**
+     * 执行节目详情的检查逻辑
+     * 主要验证座位选择权限和订单购票数量限制
+     *
+     * @param programOrderCreateDto 节目订单创建DTO，包含订单相关信息
+     */
     @Override
     protected void execute(final ProgramOrderCreateDto programOrderCreateDto) {
         ProgramGetDto programGetDto = new ProgramGetDto();
@@ -43,17 +47,32 @@ public class ProgramDetailCheckHandler extends AbstractProgramCheckHandler {
             throw new DaMaiFrameException(BaseCode.PER_ORDER_PURCHASE_COUNT_OVER_LIMIT);
         }
     }
-    
+
+    /**
+     * 执行父订单的逻辑
+     *
+     * @return 返回执行的顺序号
+     */
     @Override
     public Integer executeParentOrder() {
         return 1;
     }
-    
+
+    /**
+     * 执行层级的逻辑
+     *
+     * @return 返回执行的顺序号
+     */
     @Override
     public Integer executeTier() {
         return 2;
     }
-    
+
+    /**
+     * 执行订单的逻辑
+     *
+     * @return 返回执行的顺序号
+     */
     @Override
     public Integer executeOrder() {
         return 1;

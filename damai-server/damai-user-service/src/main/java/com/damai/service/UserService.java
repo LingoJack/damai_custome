@@ -106,8 +106,14 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * 用户注册功能
      * 此方法首先执行用户注册的复合检查，然后在用户表和用户手机表中插入新用户的信息，
      * 最后，将用户的手机号添加到布隆过滤器中，以用于快速存在性检查。
-     * 使用服务锁确保并发下用户注册的安全性。
+     * 使用分布式服务锁确保并发下用户注册的安全性。
      * 通过图形验证码 + 请求数限制 + 布隆过滤器 + 数据库索引 的方式来实现用户注册业务时的缓存穿透以及请求防刷。
+     * 1. 开启事务
+     * 2. 加分布式锁防止并发问题
+     * 3. 使用组合模式进行参数验证
+     * 4. 向用户表中添加数据
+     * 5. 向用户手机表中添加数据
+     * 6. 向布隆过滤器中添加数据
      *
      * @param userRegisterDto 用户注册所需的信息封装。
      * @return 注册成功返回true。
@@ -115,7 +121,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     @Transactional(rollbackFor = Exception.class)
     @ServiceLock(lockType = LockType.Write, name = REGISTER_USER_LOCK, keys = {"#userRegisterDto.mobile"})
     public Boolean register(UserRegisterDto userRegisterDto) {
-        // 执行用户注册的复合检查
+        // 执行用户注册的复合检查，比如布隆过滤器检查等
         compositeContainer.execute(CompositeCheckType.USER_REGISTER_CHECK.getValue(), userRegisterDto);
 
         // 记录注册的手机号
@@ -275,6 +281,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         userLoginVo.setUserId(userId);
         userLoginVo.setToken(createToken(user.getId(), getChannelDataByCode(code).getTokenSecret()));
 
+        // 返回用户登录信息
         return userLoginVo;
     }
 

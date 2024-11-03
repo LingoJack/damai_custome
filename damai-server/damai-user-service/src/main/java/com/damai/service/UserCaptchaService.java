@@ -89,13 +89,15 @@ public class UserCaptchaService {
         data[2] = String.valueOf(verifyCaptchaIdExpireTime);
         data[3] = String.valueOf(alwaysVerifyCaptcha);
 
-        // 调用检查是否需要验证码验证的操作
+        // 根据并发量计算是否需要验证码
         Boolean result = checkNeedCaptchaOperate.checkNeedCaptchaOperate(keys, data);
 
-        // 创建并准备返回对象，包含验证码ID和是否需要验证码验证的结果
+        // 将验证码ID以及是否需要验证码写入返回对象中
         CheckNeedCaptchaDataVo checkNeedCaptchaDataVo = new CheckNeedCaptchaDataVo();
         checkNeedCaptchaDataVo.setCaptchaId(id);
         checkNeedCaptchaDataVo.setVerifyCaptcha(result);
+
+        // 返回结果
         return checkNeedCaptchaDataVo;
     }
 
