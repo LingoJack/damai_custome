@@ -14,11 +14,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-/**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: redis方法抽象
- * @author: 阿星不是程序员
- **/
 public interface RedisCache {
 
     /**
@@ -30,7 +25,7 @@ public interface RedisCache {
      * @return T 普通对象
      */
     <T> T get(RedisKeyBuild redisKeyBuild, Class<T> clazz);
-    
+
     /**
      * 获取字符串对象(如果缓存中不存在，则执行给定的supplier接口)
      *
@@ -62,7 +57,7 @@ public interface RedisCache {
      * @return List<T>
      */
     <T> List<T> getValueIsList(RedisKeyBuild redisKeyBuild, Class<T> clazz);
-    
+
     /**
      * 获取字符串对象, 并且字符串中是集合内容(如果缓存中不存在，则执行给定的supplier接口)
      *
@@ -126,7 +121,7 @@ public interface RedisCache {
      * @return 超时时间
      */
     Long getExpire(RedisKeyBuild redisKeyBuild);
-    
+
     /**
      * 获取key超时时间
      *
@@ -391,7 +386,7 @@ public interface RedisCache {
      * @return
      */
     <T> List<T> getAllForHash(RedisKeyBuild redisKeyBuild, Class<T> clazz);
-    
+
     /**
      * 谨慎使用！
      * 获取 Hash Key 下所有值，返回值为map

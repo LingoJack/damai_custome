@@ -18,17 +18,25 @@ dataSources:
 
 rules:
   - !SHARDING
+    # 定义分片规则
     tables:
+      # 配置d_order表的分片策略
       d_order:
+        # 指定数据节点的实际分布
         actualDataNodes: ds_${0..1}.d_order_${0..3}
+        # 数据库级别的分片策略配置
         databaseStrategy:
           complex:
+            # 分片列名
             shardingColumns: order_number,user_id
+            # 分片算法名称
             shardingAlgorithmName: databaseOrderComplexGeneArithmetic
+        # 表级别的分片策略配置
         tableStrategy:
           complex:
             shardingColumns: order_number,user_id
             shardingAlgorithmName: tableOrderComplexGeneArithmetic
+      # 配置d_order_ticket_user表的分片策略
       d_order_ticket_user:
         actualDataNodes: ds_${0..1}.d_order_ticket_user_${0..3}
         databaseStrategy:
@@ -39,8 +47,10 @@ rules:
           complex:
             shardingColumns: order_number,user_id
             shardingAlgorithmName: tableOrderTicketUserComplexGeneArithmetic
+    # 绑定表配置，保持表之间的关联性
     bindingTables:
       - d_order,d_order_ticket_user
+    # 自定义分片算法配置
     shardingAlgorithms:
       databaseOrderComplexGeneArithmetic:
         type: CLASS_BASED
@@ -68,5 +78,6 @@ rules:
           sharding-count: 4
           strategy: complex
           algorithmClassName: com.damai.shardingsphere.TableOrderComplexGeneArithmetic
+    # 属性配置，显示SQL执行信息
 props:
   sql-show: true

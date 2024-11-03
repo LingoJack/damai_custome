@@ -28,44 +28,60 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 购票人 service
- * @author: 阿星不是程序员
- **/
+ * 这里是票务用户服务实现类，其中查询列表应用了缓存，一致性策略为旁路缓存
+ */
 @Service
 public class TicketUserService extends ServiceImpl<TicketUserMapper, TicketUser> {
-    
+
     @Autowired
     private TicketUserMapper ticketUserMapper;
-    
+
     @Autowired
     private UserMapper userMapper;
-    
+
     @Autowired
     private UidGenerator uidGenerator;
-    
+
     @Autowired
     private RedisCache redisCache;
-    
+
+    /**
+     * 查询票务用户列表
+     * 首先尝试从缓存中获取数据，如果缓存为空，则从数据库中查询，并返回结果
+     *
+     * @param ticketUserListDto 包含查询条件的DTO对象
+     * @return 票务用户信息列表
+     */
     public List<TicketUserVo> list(TicketUserListDto ticketUserListDto) {
-        //先从缓存中查询
+        // 先从缓存中查询
         List<TicketUserVo> ticketUserVoList = redisCache.getValueIsList(RedisKeyBuild.createRedisKey(
                 RedisKeyManage.TICKET_USER_LIST, ticketUserListDto.getUserId()), TicketUserVo.class);
         if (CollectionUtil.isNotEmpty(ticketUserVoList)) {
             return ticketUserVoList;
         }
+
+        // 如果缓存为空，则从数据库查询
         LambdaQueryWrapper<TicketUser> ticketUserLambdaQueryWrapper = Wrappers.lambdaQuery(TicketUser.class)
                 .eq(TicketUser::getUserId, ticketUserListDto.getUserId());
         List<TicketUser> ticketUsers = ticketUserMapper.selectList(ticketUserLambdaQueryWrapper);
-        return BeanUtil.copyToList(ticketUsers,TicketUserVo.class);
+        return BeanUtil.copyToList(ticketUsers, TicketUserVo.class);
     }
-    
+
+    /**
+     * 添加票务用户信息
+     * 首先检查用户是否存在，然后检查票务用户是否已存在，最后插入新的票务用户信息
+     *
+     * @param ticketUserDto 包含票务用户信息的DTO对象
+     */
     @Transactional(rollbackFor = Exception.class)
     public void add(TicketUserDto ticketUserDto) {
+        // 检查用户是否存在
         User user = userMapper.selectById(ticketUserDto.getUserId());
         if (Objects.isNull(user)) {
             throw new DaMaiFrameException(BaseCode.USER_EMPTY);
         }
+
+        // 检查票务用户是否已存在
         LambdaQueryWrapper<TicketUser> ticketUserLambdaQueryWrapper = Wrappers.lambdaQuery(TicketUser.class)
                 .eq(TicketUser::getUserId, ticketUserDto.getUserId())
                 .eq(TicketUser::getIdType, ticketUserDto.getIdType())
@@ -74,23 +90,44 @@ public class TicketUserService extends ServiceImpl<TicketUserMapper, TicketUser>
         if (Objects.nonNull(ticketUser)) {
             throw new DaMaiFrameException(BaseCode.TICKET_USER_EXIST);
         }
+
+        // 插入新的票务用户信息
         TicketUser addTicketUser = new TicketUser();
-        BeanUtil.copyProperties(ticketUserDto,addTicketUser);
+        BeanUtil.copyProperties(ticketUserDto, addTicketUser);
         addTicketUser.setId(uidGenerator.getUid());
         ticketUserMapper.insert(addTicketUser);
+
+        // 清除票务用户列表缓存
         delTicketUserVoListCache(String.valueOf(ticketUserDto.getUserId()));
     }
+
+    /**
+     * 删除票务用户信息
+     * 首先检查票务用户是否存在，然后删除，并清除缓存
+     *
+     * @param ticketUserIdDto 包含票务用户ID的DTO对象
+     */
     @Transactional(rollbackFor = Exception.class)
     public void delete(TicketUserIdDto ticketUserIdDto) {
+        // 检查票务用户是否存在
         TicketUser ticketUser = ticketUserMapper.selectById(ticketUserIdDto.getId());
         if (Objects.isNull(ticketUser)) {
             throw new DaMaiFrameException(BaseCode.TICKET_USER_EMPTY);
         }
+
+        // 删除票务用户信息
         ticketUserMapper.deleteById(ticketUserIdDto.getId());
+
+        // 清除票务用户列表缓存
         delTicketUserVoListCache(String.valueOf(ticketUser.getUserId()));
     }
-    
-    public void delTicketUserVoListCache(String userId){
+
+    /**
+     * 清除票务用户列表缓存
+     *
+     * @param userId 用户ID，用于构建缓存键
+     */
+    public void delTicketUserVoListCache(String userId) {
         redisCache.del(RedisKeyBuild.createRedisKey(RedisKeyManage.TICKET_USER_LIST, userId));
     }
 }

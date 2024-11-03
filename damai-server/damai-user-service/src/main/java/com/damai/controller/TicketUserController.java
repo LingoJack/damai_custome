@@ -17,32 +17,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 购票人 控制层
- * @author: 阿星不是程序员
- **/
 @RestController
 @RequestMapping("/ticket/user")
 @Tag(name = "ticket-user", description = "购票人")
 public class TicketUserController {
-    
+
     @Autowired
     private TicketUserService ticketUserService;
-    
+
     @Operation(summary  = "查询购票人列表")
     @PostMapping(value = "/list")
     public ApiResponse<List<TicketUserVo>> list(@Valid @RequestBody TicketUserListDto ticketUserListDto){
         return ApiResponse.ok(ticketUserService.list(ticketUserListDto));
     }
-    
+
     @Operation(summary  = "添加购票人")
     @PostMapping(value = "/add")
     public ApiResponse<Void> add(@Valid @RequestBody TicketUserDto ticketUserDto){
         ticketUserService.add(ticketUserDto);
         return ApiResponse.ok();
     }
-    
+
     @Operation(summary  = "删除购票人")
     @PostMapping(value = "/delete")
     public ApiResponse<Void> delete(@Valid @RequestBody TicketUserIdDto ticketUserIdDto){

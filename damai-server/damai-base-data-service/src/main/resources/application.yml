@@ -19,7 +19,7 @@ spring:
       date-format: yyyy-MM-dd HH:mm:ss
       generator:
         WRITE_NUMBERS_AS_STRINGS: true
-  data:      
+  data:
     redis:
       database: 0
       host: 127.0.0.1
@@ -73,7 +73,7 @@ jasypt:
   encryptor:
     password: bgtjkjl!%^sdc
     algorithm: PBEWithMD5AndDES
-      
+
 
 springdoc:
   swagger-ui:

@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 /**
+ * 自定义的分库算法
  * 实现基于数据库顺序的复杂基因算法类，用于处理订单相关的数据库分片。
  * 该类实现了ComplexKeysShardingAlgorithm接口，用于根据多个键值进行数据库分片。
  */
@@ -101,6 +102,11 @@ public class DatabaseOrderComplexGeneArithmetic implements ComplexKeysShardingAl
 
     /**
      * 计算给定表索引应分配到的数据库编号。
+     * 1 首先将分片键(订单编号或者用户id)转换成二进制字符串
+     * 2 找到被替换基因的长度，这里计算tableCount分表数量的log2n对数
+     * 3 获取到长度后，根据长度开始截取二进制的分片键，获得被替换后的基因
+     * 4 对截取到的基因字符串的hashcode进行优化，使其分布更加均匀
+     * 5 对分库数量进行取模
      *
      * @param databaseCount 数据库总数
      * @param splicingKey   分片键
@@ -112,15 +118,15 @@ public class DatabaseOrderComplexGeneArithmetic implements ComplexKeysShardingAl
         String splicingKeyBinary = Long.toBinaryString(splicingKey);
         // 计算表总数的对数，用于确定二进制字符串的截取长度
         long replacementLength = log2N(tableCount);
-        // 截取分片键二进制字符串的尾部，长度为表总数的对数
+        // 截取分片键二进制字符串的尾部，长度为表总数的以2为底的对数
         String geneBinaryStr = splicingKeyBinary.substring(splicingKeyBinary.length() - (int) replacementLength);
 
         // 如果截取到的二进制字符串不为空
         if (StringUtil.isNotEmpty(geneBinaryStr)) {
             int h;
-            // 计算字符串的哈希码，并进行优化以提高均匀分布
+            // 计算字符串的哈希码，右移十六位再进行异或运算，以优化以提高均匀分布
             int geneOptimizeHashCode = (h = geneBinaryStr.hashCode()) ^ (h >>> 16);
-            // 使用位运算根据数据库总数和优化后的哈希码计算数据库编号
+            // 使用按位与运算根据数据库总数和优化后的哈希码取模计算数据库编号
             return (databaseCount - 1) & geneOptimizeHashCode;
         }
 
