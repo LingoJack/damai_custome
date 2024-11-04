@@ -346,14 +346,27 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return TokenUtil.createToken(id, info, expiration, tokenSecret);
     }
 
+    /**
+     * 用户退出登录
+     * @param userLogoutDto 用户退出登录的请求参数，包括 code 和 token
+     * @return
+     */
     public Boolean logout(UserLogoutDto userLogoutDto) {
-        String userStr = TokenUtil.parseToken(userLogoutDto.getToken(), getChannelDataByCode(userLogoutDto.getCode())
-                .getTokenSecret());
+        // 从入参中解析出用户信息
+        String token = userLogoutDto.getToken();
+        String tokenSecret = getChannelDataByCode(userLogoutDto.getCode()).getTokenSecret();
+        String userStr = TokenUtil.parseToken(token, tokenSecret);
+
+        // 不存在用户信息则报异常
         if (StringUtil.isEmpty(userStr)) {
             throw new DaMaiFrameException(BaseCode.USER_EMPTY);
         }
+
+        // 从Redis中删除用户登录信息
         String userId = JSONObject.parseObject(userStr).getString("userId");
         redisCache.del(RedisKeyBuild.createRedisKey(RedisKeyManage.USER_LOGIN, userLogoutDto.getCode(), userId));
+
+        // 返回成功
         return true;
     }
 

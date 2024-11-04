@@ -6,14 +6,23 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 临时信息
- * @author: 阿星不是程序员
- **/
+ * 请求临时包装类
+ * 用于临时存储请求相关的数据，方便进行统一的处理和响应
+ * 主要包装了两部分数据：map用于存储请求参数或其他临时数据，
+ * apiResponse用于存储对请求的响应数据
+ */
 @Data
 public class RequestTemporaryWrapper {
-    
-    private Map<String,String> map;
-    
+
+    /**
+     * 存储请求参数或其他临时数据
+     * 使用Map结构以便于快速的插入和查询数据
+     */
+    private Map<String, String> map;
+
+    /**
+     * 存储对请求的响应数据
+     * 使用ApiResponse对象以便于统一响应格式和处理逻辑
+     */
     private ApiResponse<?> apiResponse;
 }
