@@ -3,14 +3,19 @@ package com.damai.exception;
 import lombok.Data;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 参数错误
- * @author: 阿星不是程序员
+ * 该类用于表示参数错误的信息
+ * 它包含了参数名和错误消息，用于在接口响应中指出参数错误的详细信息
  **/
 @Data
 public class ArgumentError {
-	
-	private String argumentName;
-	
-	private String message;
+
+    /**
+     * 参数名，用于标识发生错误的参数
+     **/
+    private String argumentName;
+
+    /**
+     * 错误消息，描述参数错误的详细信息
+     **/
+    private String message;
 }
