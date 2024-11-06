@@ -108,9 +108,7 @@ import static com.damai.core.RepeatExecuteLimitConstants.CANCEL_PROGRAM_ORDER;
 import static com.damai.util.DateUtils.FORMAT_DATE;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
- * @description: 节目 service
- * @author: 阿星不是程序员
+ * 节目Service
  **/
 @Slf4j
 @Service
@@ -228,75 +226,110 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
      * @return 执行后的结果
      */
     public List<ProgramHomeVo> selectHomeList(ProgramListDto programListDto) {
-
+        // 先从elasticsearch中查询
         List<ProgramHomeVo> programHomeVoList = programEs.selectHomeList(programListDto);
         if (CollectionUtil.isNotEmpty(programHomeVoList)) {
+            // elasticsearch中有查询到，直接返回
             return programHomeVoList;
         }
+        // 若es中没有查询到，则从数据库中查询
         return dbSelectHomeList(programListDto);
     }
 
     /**
      * 查询主页信息（数据库查询）
      *
-     * @param programPageListDto 查询节目数据的入参
+     * @param programPageListDto 查询节目数据的入参，包含地区ID、父节目ID列表
      * @return 执行后的结果
      */
     private List<ProgramHomeVo> dbSelectHomeList(ProgramListDto programPageListDto) {
+        // 定义返回的结果
         List<ProgramHomeVo> programHomeVoList = new ArrayList<>();
+
+        // 根据父节目类型id来查询节目类型map，key：节目类型id，value：节目类型名
         Map<Long, String> programCategoryMap = selectProgramCategoryMap(programPageListDto.getParentProgramCategoryIds());
 
+        // 查询节目列表
         List<Program> programList = programMapper.selectHomeList(programPageListDto);
+
+        // 如果节目列表为空，那么直接返回空map
         if (CollectionUtil.isEmpty(programList)) {
             return programHomeVoList;
         }
 
+        // 从节目列表中单独再映射出节目ID表
         List<Long> programIdList = programList.stream().map(Program::getId).collect(Collectors.toList());
+
+        // 根据节目id集合查询节目演出时间集合
         LambdaQueryWrapper<ProgramShowTime> programShowTimeLambdaQueryWrapper = Wrappers.lambdaQuery(ProgramShowTime.class)
                 .in(ProgramShowTime::getProgramId, programIdList);
         List<ProgramShowTime> programShowTimeList = programShowTimeMapper.selectList(programShowTimeLambdaQueryWrapper);
-        Map<Long, List<ProgramShowTime>> programShowTimeMap =
-                programShowTimeList.stream().collect(Collectors.groupingBy(ProgramShowTime::getProgramId));
 
+        // 按照节目ID将演出时间列表进行分组，获得以节目ID为键，演出时间集合为值的map
+        Map<Long, List<ProgramShowTime>> programShowTimeMap = programShowTimeList.stream().collect(Collectors.groupingBy(ProgramShowTime::getProgramId));
+
+        // 获得以节目ID为键，票档统计对象为值的map
         Map<Long, TicketCategoryAggregate> ticketCategorieMap = selectTicketCategorieMap(programIdList);
 
-        Map<Long, List<Program>> programMap = programList.stream()
-                .collect(Collectors.groupingBy(Program::getParentProgramCategoryId));
+        // 分为以父节目ID为键，节目集合为值的map
+        Map<Long, List<Program>> programMap = programList.stream().collect(Collectors.groupingBy(Program::getParentProgramCategoryId));
 
+        // 对于每个父节目ID-节目集合的项
         for (Entry<Long, List<Program>> programEntry : programMap.entrySet()) {
-            Long key = programEntry.getKey();
-            List<Program> value = programEntry.getValue();
+
+            // 主页节目VO所需要的节目列表VO列表对象
             List<ProgramListVo> programListVoList = new ArrayList<>();
+
+            // 父节目类型id
+            Long key = programEntry.getKey();
+
+            //节目集合
+            List<Program> value = programEntry.getValue();
+
+            // 对于当前父ID下的节目集合的每一个节目
             for (Program program : value) {
+                // 需要添加到节目列表VO列表的节目列表VO
                 ProgramListVo programListVo = new ProgramListVo();
+                // 复制基础信息到节目列表VO
                 BeanUtil.copyProperties(program, programListVo);
-
-                programListVo.setShowTime(Optional.ofNullable(programShowTimeMap.get(program.getId()))
-                        .filter(list -> !list.isEmpty())
-                        .map(list -> list.get(0))
-                        .map(ProgramShowTime::getShowTime)
-                        .orElse(null));
-                programListVo.setShowDayTime(Optional.ofNullable(programShowTimeMap.get(program.getId()))
-                        .filter(list -> !list.isEmpty())
-                        .map(list -> list.get(0))
-                        .map(ProgramShowTime::getShowDayTime)
-                        .orElse(null));
-                programListVo.setShowWeekTime(Optional.ofNullable(programShowTimeMap.get(program.getId()))
-                        .filter(list -> !list.isEmpty())
-                        .map(list -> list.get(0))
-                        .map(ProgramShowTime::getShowWeekTime)
-                        .orElse(null));
-
-                programListVo.setMaxPrice(Optional.ofNullable(ticketCategorieMap.get(program.getId()))
-                        .map(TicketCategoryAggregate::getMaxPrice).orElse(null));
-                programListVo.setMinPrice(Optional.ofNullable(ticketCategorieMap.get(program.getId()))
-                        .map(TicketCategoryAggregate::getMinPrice).orElse(null));
+                // 演出时间
+                programListVo.setShowTime(
+                        Optional.ofNullable(programShowTimeMap.get(program.getId()))
+                                .filter(list -> !list.isEmpty())
+                                .map(list -> list.get(0))
+                                .map(ProgramShowTime::getShowTime)
+                                .orElse(null));
+                // 演出时间(精确到天)
+                programListVo.setShowDayTime(
+                        Optional.ofNullable(programShowTimeMap.get(program.getId()))
+                                .filter(list -> !list.isEmpty())
+                                .map(list -> list.get(0))
+                                .map(ProgramShowTime::getShowDayTime)
+                                .orElse(null));
+                // 演出时间所在的星期
+                programListVo.setShowWeekTime(
+                        Optional.ofNullable(programShowTimeMap.get(program.getId()))
+                                .filter(list -> !list.isEmpty())
+                                .map(list -> list.get(0))
+                                .map(ProgramShowTime::getShowWeekTime)
+                                .orElse(null));
+                // 节目最高价
+                programListVo.setMaxPrice(
+                        Optional.ofNullable(ticketCategorieMap.get(program.getId()))
+                                .map(TicketCategoryAggregate::getMaxPrice).orElse(null));
+                // 节目最低价
+                programListVo.setMinPrice(
+                        Optional.ofNullable(ticketCategorieMap.get(program.getId()))
+                                .map(TicketCategoryAggregate::getMinPrice).orElse(null));
                 programListVoList.add(programListVo);
             }
             ProgramHomeVo programHomeVo = new ProgramHomeVo();
+            // 节目类型名
             programHomeVo.setCategoryName(programCategoryMap.get(key));
+            // 节目类型id
             programHomeVo.setCategoryId(key);
             programHomeVo.setProgramListVoList(programListVoList);
+            // 节目列表
             programHomeVoList.add(programHomeVo);
         }
         return programHomeVoList;
@@ -641,21 +674,43 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
         }
     }
 
+    /**
+     * 根据节目类别ID列表选择节目类别映射
+     * 以映射的形式返回，以便于在其他地方快速查找和使用这些信息
+     * 节目类别ID列表 => 以节目类别ID为键，节目类别名称为值的哈希表
+     *
+     * @param programCategoryIdList 节目类别ID列表，用于指定需要查询的节目类别的范围
+     * @return 返回一个映射，键为节目类别ID，值为节目类别名称
+     */
     public Map<Long, String> selectProgramCategoryMap(Collection<Long> programCategoryIdList) {
+        // 创建一个查询包装器，用于构建针对ProgramCategory表的查询条件
         LambdaQueryWrapper<ProgramCategory> pcLambdaQueryWrapper = Wrappers.lambdaQuery(ProgramCategory.class)
                 .in(ProgramCategory::getId, programCategoryIdList);
+
+        // 执行查询，获取符合条件的节目类别列表
         List<ProgramCategory> programCategoryList = programCategoryMapper.selectList(pcLambdaQueryWrapper);
+
+        // 将查询结果转换为映射返回，便于后续快速查找
         return programCategoryList
                 .stream()
                 .collect(Collectors.toMap(ProgramCategory::getId, ProgramCategory::getName, (v1, v2) -> v2));
     }
 
+    /**
+     * 根据节目ID列表选择票务类别映射
+     * 此方法通过查询数据库获取票务类别列表，并将其转换为一个映射，以便于根据节目ID快速查找票务类别信息
+     *
+     * @param programIdList 节目ID列表，用于查询票务类别信息
+     * @return 返回一个映射，键为节目ID，值为对应的票档统计对象
+     */
     public Map<Long, TicketCategoryAggregate> selectTicketCategorieMap(List<Long> programIdList) {
+        // 查询数据库，获取票务类别列表
         List<TicketCategoryAggregate> ticketCategorieList = ticketCategoryMapper.selectAggregateList(programIdList);
+
+        // 将票务类别列表转换为映射，便于根据节目ID快速查找
         return ticketCategorieList
                 .stream()
-                .collect(Collectors.toMap(TicketCategoryAggregate::getProgramId,
-                        ticketCategory -> ticketCategory, (v1, v2) -> v2));
+                .collect(Collectors.toMap(TicketCategoryAggregate::getProgramId, ticketCategory -> ticketCategory, (v1, v2) -> v2));
     }
 
     @RepeatExecuteLimit(name = CANCEL_PROGRAM_ORDER, keys = {"#programOperateDataDto.programId"})

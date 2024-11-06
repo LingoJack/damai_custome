@@ -64,6 +64,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.damai.constant.Constant.USER_ID;
 import static com.damai.core.DistributedLockConstants.REGISTER_USER_LOCK;
 
 @Slf4j
@@ -329,25 +330,35 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     /**
      * 创建用户令牌
+     * 令牌包括内容：令牌ID、用户ID
      *
      * @param userId      用户ID，用于标识令牌的拥有者
      * @param tokenSecret 令牌的密钥，用于保证令牌的安全性
      * @return 返回生成的用户令牌字符串
      */
     public String createToken(Long userId, String tokenSecret) {
-        // 创建一个HashMap用于存储令牌的负载信息
+        // 创建需要在令牌中携带的信息Map
         Map<String, Object> map = new HashMap<>(4);
-        // 将用户ID放入负载中，以便在令牌中携带用户信息
-        map.put("userId", userId);
-        // 使用TokenUtil工具类生成令牌，传递用户ID、负载信息、令牌过期时间和密钥
-        String id = String.valueOf(uidGenerator.getUid());
+
+        // 放入用户ID
+        map.put(USER_ID, userId);
+
+        // 将map转换为json字符串
         String info = JSON.toJSONString(map);
+
+        // 生成令牌ID
+        String id = String.valueOf(uidGenerator.getUid());
+
+        // 设置过期时间
         long expiration = tokenExpireTime * 60 * 1000;
+
+        // 生成令牌并返回
         return TokenUtil.createToken(id, info, expiration, tokenSecret);
     }
 
     /**
      * 用户退出登录
+     *
      * @param userLogoutDto 用户退出登录的请求参数，包括 code 和 token
      * @return
      */

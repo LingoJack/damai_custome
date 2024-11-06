@@ -41,35 +41,58 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
 
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 返回过滤器 参考 {@link org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBodyGatewayFilterFactory}
- * @author: 阿星不是程序员
+ * 返回过滤器 参考 {@link org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBodyGatewayFilterFactory}
  **/
 @Component
 @Slf4j
 public class ResponseValidationFilter implements GlobalFilter, Ordered {
 
+    // AES向量值，用于加密解密
     @Value("${aes.vector:default}")
     private String aesVector;
 
+    // 通道数据服务，用于获取通道数据
     @Autowired
     private ChannelDataService channelDataService;
 
+    /**
+     * 返回过滤器的顺序
+     *
+     * @return 过滤器的顺序值
+     */
     @Override
     public int getOrder() {
         return -2;
     }
 
+    /**
+     * 过滤方法，用于处理服务器网页交换
+     *
+     * @param exchange 服务器网页交换对象
+     * @param chain    网关过滤链
+     * @return Mono<Void> 表示异步处理
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         return chain.filter(exchange.mutate().response(decorate(exchange)).build());
     }
 
-   
+    /**
+     * 装饰响应对象，以实现对响应体的修改
+     *
+     * @param exchange 服务器网页交换对象
+     * @return 装饰后的服务器HTTP响应对象
+     */
     private ServerHttpResponse decorate(ServerWebExchange exchange) {
-        return new ServerHttpResponseDecorator(exchange.getResponse()) {
-            
-            
+        ServerHttpResponseDecorator serverHttpResponseDecorator = new ServerHttpResponseDecorator(
+                exchange.getResponse()) {
+
+            /**
+             * 使用修改后的响应体写入响应
+             *
+             * @param body 响应体发布者
+             * @return Mono<Void> 表示异步处理
+             */
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
 
@@ -83,10 +106,10 @@ public class ResponseValidationFilter implements GlobalFilter, Ordered {
                         .create(Objects.requireNonNull(exchange.getResponse().getStatusCode()))
                         .headers(headers -> headers.putAll(httpHeaders))
                         .body(Flux.from(body)).build();
-                
+
                 Mono<String> modifiedBody = clientResponse
                         .bodyToMono(String.class)
-                        .flatMap(originalBody -> modifyResponseBody().apply(exchange,originalBody));
+                        .flatMap(originalBody -> modifyResponseBody().apply(exchange, originalBody));
 
                 BodyInserter<Mono<String>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters.fromPublisher(modifiedBody,
                         String.class);
@@ -103,22 +126,41 @@ public class ResponseValidationFilter implements GlobalFilter, Ordered {
                             return getDelegate().writeWith(messageBody);
                         }));
             }
-            
+
+            /**
+             * 修改响应体的方法生成器
+             *
+             * @return BiFunction<ServerWebExchange, String, Mono < String>> 用于修改响应体的函数
+             */
             private BiFunction<ServerWebExchange, String, Mono<String>> modifyResponseBody() {
-                return (serverWebExchange,responseBody) -> {
+                return (serverWebExchange, responseBody) -> {
                     String modifyResponseBody = checkResponseBody(serverWebExchange, responseBody);
                     return Mono.just(modifyResponseBody);
                 };
             }
 
+            /**
+             * 写入并刷新响应体
+             *
+             * @param body 响应体发布者的发布者
+             * @return Mono<Void> 表示异步处理
+             */
             @Override
             public Mono<Void> writeAndFlushWith(
                     Publisher<? extends Publisher<? extends DataBuffer>> body) {
                 return writeWith(Flux.from(body).flatMapSequential(p -> p));
             }
         };
+        return serverHttpResponseDecorator;
     }
 
+    /**
+     * 检查并修改响应体
+     *
+     * @param serverWebExchange 服务器网页交换对象
+     * @param responseBody      原始响应体
+     * @return 修改后的响应体
+     */
     private String checkResponseBody(final ServerWebExchange serverWebExchange, final String responseBody) {
         String modifyResponseBody = responseBody;
         ServerHttpRequest request = serverWebExchange.getRequest();
@@ -130,7 +172,7 @@ public class ResponseValidationFilter implements GlobalFilter, Ordered {
             if (data != null) {
                 String code = request.getHeaders().getFirst(CODE);
                 GetChannelDataVo channelDataVo = channelDataService.getChannelDataByCode(code);
-                String rsaEncrypt = RsaTool.encrypt(JSON.toJSONString(data),channelDataVo.getDataPublicKey());
+                String rsaEncrypt = RsaTool.encrypt(JSON.toJSONString(data), channelDataVo.getDataPublicKey());
                 apiResponse.setData(rsaEncrypt);
                 modifyResponseBody = JSON.toJSONString(apiResponse);
             }
@@ -138,3 +180,4 @@ public class ResponseValidationFilter implements GlobalFilter, Ordered {
         return modifyResponseBody;
     }
 }
+
