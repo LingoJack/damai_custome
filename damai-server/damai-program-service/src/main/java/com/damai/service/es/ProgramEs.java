@@ -205,8 +205,12 @@ public class ProgramEs {
 
             PageInfo<ProgramListVo> programListVoPageInfo = businessEsHandle.queryPage(
                     SpringUtil.getPrefixDistinctionName() + "-" + ProgramDocumentParamName.INDEX_NAME,
-                    ProgramDocumentParamName.INDEX_TYPE, esDataQueryDtoList, programPageOrder.sortParam,
-                    programPageOrder.sortOrder, programPageListDto.getPageNumber(), programPageListDto.getPageSize(),
+                    ProgramDocumentParamName.INDEX_TYPE,
+                    esDataQueryDtoList,
+                    programPageOrder.sortParam,
+                    programPageOrder.sortOrder,
+                    programPageListDto.getPageNumber(),
+                    programPageListDto.getPageSize(),
                     ProgramListVo.class);
             pageVo = PageUtil.convertPage(programListVoPageInfo, programListVo -> programListVo);
         }
@@ -242,24 +246,36 @@ public class ProgramEs {
         return programPageOrder;
     }
 
+    /**
+     * 根据搜索条件查询节目列表
+     *
+     * @param programSearchDto 节目搜索DTO，包含各种搜索条件
+     * @return 包含节目列表的分页对象
+     */
     public PageVo<ProgramListVo> search(ProgramSearchDto programSearchDto) {
+        // 待返回的查询结果
         PageVo<ProgramListVo> pageVo = new PageVo<>();
         try {
+            // 构建布尔查询
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+            // 如果地区ID不为空，则添加地区ID的条件到布尔查询中
             if (Objects.nonNull(programSearchDto.getAreaId())) {
                 QueryBuilder builds = QueryBuilders.termQuery(ProgramDocumentParamName.AREA_ID, programSearchDto.getAreaId());
                 boolQuery.must(builds);
             }
+            // 如果父节目类别ID不为空，则添加到布尔查询中
             if (Objects.nonNull(programSearchDto.getParentProgramCategoryId())) {
                 QueryBuilder builds = QueryBuilders.termQuery(ProgramDocumentParamName.PARENT_PROGRAM_CATEGORY_ID, programSearchDto.getParentProgramCategoryId());
                 boolQuery.must(builds);
             }
+            // 如果开始时间和结束时间都不为空，则添加时间范围查询到布尔查询中
             if (Objects.nonNull(programSearchDto.getStartDateTime()) &&
                     Objects.nonNull(programSearchDto.getEndDateTime())) {
                 QueryBuilder builds = QueryBuilders.rangeQuery(ProgramDocumentParamName.SHOW_DAY_TIME)
                         .from(programSearchDto.getStartDateTime()).to(programSearchDto.getEndDateTime()).includeLower(true);
                 boolQuery.must(builds);
             }
+            // 如果搜索内容不为空，则构建内部布尔查询以匹配标题或演员
             if (StringUtil.isNotEmpty(programSearchDto.getContent())) {
                 BoolQueryBuilder innerBoolQuery = QueryBuilders.boolQuery();
                 innerBoolQuery.should(QueryBuilders.matchQuery(ProgramDocumentParamName.TITLE, programSearchDto.getContent()));
@@ -268,19 +284,25 @@ public class ProgramEs {
                 boolQuery.must(innerBoolQuery);
             }
 
+            // 创建搜索源构建器
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            // 获取节目分页排序条件
             ProgramPageOrder programPageOrder = getProgramPageOrder(programSearchDto);
+            // 如果排序参数和排序顺序都不为空，则添加排序条件到搜索源构建器中
             if (Objects.nonNull(programPageOrder.sortParam) && Objects.nonNull(programPageOrder.sortOrder)) {
                 FieldSortBuilder sort = SortBuilders.fieldSort(programPageOrder.sortParam);
                 sort.order(programPageOrder.sortOrder);
                 searchSourceBuilder.sort(sort);
             }
+            // 设置查询条件、高亮等
             searchSourceBuilder.query(boolQuery);
             searchSourceBuilder.trackTotalHits(true);
             searchSourceBuilder.from((programSearchDto.getPageNumber() - 1) * programSearchDto.getPageSize());
             searchSourceBuilder.size(programSearchDto.getPageSize());
             searchSourceBuilder.highlighter(getHighlightBuilder(Arrays.asList(ProgramDocumentParamName.TITLE,
                     ProgramDocumentParamName.ACTOR)));
+
+            // 执行查询并处理结果
             List<ProgramListVo> list = new ArrayList<>();
             PageInfo<ProgramListVo> pageInfo = new PageInfo<>(list);
             pageInfo.setPageNum(programSearchDto.getPageNumber());
@@ -288,24 +310,39 @@ public class ProgramEs {
             businessEsHandle.executeQuery(SpringUtil.getPrefixDistinctionName() + "-" + ProgramDocumentParamName.INDEX_NAME,
                     ProgramDocumentParamName.INDEX_TYPE, list, pageInfo, ProgramListVo.class,
                     searchSourceBuilder, Arrays.asList(ProgramDocumentParamName.TITLE, ProgramDocumentParamName.ACTOR));
+
+            // 将查询结果转换为待返回的分页对象
             pageVo = PageUtil.convertPage(pageInfo, programListVo -> programListVo);
         }
         catch (Exception e) {
+            // 记录查询错误日志
             log.error("search error", e);
         }
         return pageVo;
     }
 
+    /**
+     * 创建并返回一个配置了高亮设置的HighlightBuilder对象
+     * 该方法根据提供的字段名称列表，为每个字段配置高亮显示的参数
+     *
+     * @param fieldNameList 字段名称的列表，用于指定需要高亮显示的字段
+     * @return HighlightBuilder对象，配置了指定字段的高亮设置
+     */
     public HighlightBuilder getHighlightBuilder(List<String> fieldNameList) {
         // 创建一个HighlightBuilder
         HighlightBuilder highlightBuilder = new HighlightBuilder();
+        // 遍历字段名称列表，为每个字段配置高亮设置
         for (String fieldName : fieldNameList) {
             // 为特定字段添加高亮设置
             HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field(fieldName);
+            // 设置高亮显示前缀
             highlightTitle.preTags("<em>");
+            // 设置高亮显示后缀
             highlightTitle.postTags("</em>");
+            // 将配置好的高亮字段添加到HighlightBuilder中
             highlightBuilder.field(highlightTitle);
         }
+        // 返回配置了高亮设置的HighlightBuilder对象
         return highlightBuilder;
     }
 

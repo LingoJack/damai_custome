@@ -16,32 +16,51 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 座位 控制层
- * @author: 阿星不是程序员
- **/
+ * SeatController类负责处理与座位相关的HTTP请求，
+ * 提供座位添加、批量添加和查询座位相关信息的功能。
+ */
 @RestController
 @RequestMapping("/seat")
 @Tag(name = "seat", description = "座位")
 public class SeatController {
-    
+
+    /**
+     * 注入SeatService服务，用于处理与座位相关的业务逻辑。
+     */
     @Autowired
     private SeatService seatService;
-    
-    
-    @Operation(summary  = "单个座位添加")
+
+    /**
+     * 处理单个座位添加的请求。
+     *
+     * @param seatAddDto 用于添加座位的DTO，包含了需要的座位信息。
+     * @return 返回一个包含新添加座位ID的ApiResponse对象。
+     */
+    @Operation(summary = "单个座位添加")
     @PostMapping(value = "/add")
     public ApiResponse<Long> add(@Valid @RequestBody SeatAddDto seatAddDto) {
         return ApiResponse.ok(seatService.add(seatAddDto));
     }
-    
-    @Operation(summary  = "批量座位添加")
+
+    /**
+     * 处理批量座位添加的请求。
+     *
+     * @param seatBatchAddDto 用于批量添加座位的DTO，包含了多个座位的信息。
+     * @return 返回一个表示操作是否成功的ApiResponse对象。
+     */
+    @Operation(summary = "批量座位添加")
     @PostMapping(value = "/batch/add")
     public ApiResponse<Boolean> batchAdd(@Valid @RequestBody SeatBatchAddDto seatBatchAddDto) {
         return ApiResponse.ok(seatService.batchAdd(seatBatchAddDto));
     }
-    
-    @Operation(summary  = "查询座位相关信息")
+
+    /**
+     * 查询座位相关信息。
+     *
+     * @param seatListDto 包含了用于查询座位信息的条件。
+     * @return 返回一个包含座位相关信息的ApiResponse对象。
+     */
+    @Operation(summary = "查询座位相关信息")
     @PostMapping(value = "/relate/info")
     public ApiResponse<SeatRelateInfoVo> relateInfo(@Valid @RequestBody SeatListDto seatListDto) {
         return ApiResponse.ok(seatService.relateInfo(seatListDto));

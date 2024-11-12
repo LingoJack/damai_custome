@@ -8,12 +8,11 @@
         <artifactId>damai</artifactId>
         <version>${revision}</version>
     </parent>
-    
+
     <artifactId>damai-thread-pool-framework</artifactId>
 
     <name>thread-pool-framework</name>
     <description>线程池封装(支持最终链路traceId)</description>
-    
 
     <dependencies>
         <dependency>

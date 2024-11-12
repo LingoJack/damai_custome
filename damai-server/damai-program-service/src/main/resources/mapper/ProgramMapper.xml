@@ -18,7 +18,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.damai.mapper.ProgramMapper">
-    
+
     <select id="selectHomeList" parameterType="com.damai.dto.ProgramListDto" resultType="com.damai.entity.Program">
         <if test = 'programListDto.parentProgramCategoryIds != null and programListDto.parentProgramCategoryIds.size>0'>
             <foreach collection='programListDto.parentProgramCategoryIds' item='parentProgramCategoryId' index='index' separator=' union all '>
@@ -42,21 +42,22 @@
             </foreach>
         </if>
     </select>
-    
+
+    <!--    分页查询节目列表    -->
     <select id="selectPage" parameterType="com.damai.dto.ProgramPageListDto" resultType="com.damai.entity.ProgramJoinShowTime">
         select
             dp.id,dp.area_id,dp.program_category_id,dp.parent_program_category_id,dp.title,dp.actor,
             dp.place,dp.item_picture,ds.show_time,ds.show_week_time,ds.show_day_time
-        from 
+        from
             d_program dp left join d_program_show_time ds
         on dp.id = ds.program_id
-        where 
+        where
             dp.status = 1 and ds.status = 1 and dp.program_status = 1
             <if test ='programPageListDto.areaId == null'>
                 and dp.prime = 1
             </if>
             <if test ='programPageListDto.areaId != null'>
-             and dp.area_id = #{programPageListDto.areaId,jdbcType=BIGINT} 
+             and dp.area_id = #{programPageListDto.areaId,jdbcType=BIGINT}
             </if>
             <if test = 'programPageListDto.programCategoryId != null'>
                 and dp.program_category_id = #{programPageListDto.programCategoryId,jdbcType=BIGINT}

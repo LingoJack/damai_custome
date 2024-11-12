@@ -17,34 +17,64 @@ import static com.damai.servicelock.LockType.Reentrant;
 import static com.damai.servicelock.LockType.Write;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
- * @description: 分布式锁 锁缓存
- * @author: 阿星不是程序员
- **/
+ * 分布式锁 锁缓存
+ * 本类负责根据不同的锁类型缓存对应的分布式锁实现
+ */
 public class ManageLocker {
 
+    /**
+     * 锁类型与服务锁实现的映射缓存
+     * 你从这里都是getter方法也可以看出来，这一切只会在初始化时写入一次，后续都是只读操作，因为该字段被声明为final
+     * 在只读环境下，HashMap是线程安全的，因此这里可以不使用ConcurrentHashMap
+     */
     private final Map<LockType, ServiceLocker> cacheLocker = new HashMap<>();
-    
-    public ManageLocker(RedissonClient redissonClient){
-        cacheLocker.put(Reentrant,new RedissonReentrantLocker(redissonClient));
-        cacheLocker.put(Fair,new RedissonFairLocker(redissonClient));
-        cacheLocker.put(Write,new RedissonWriteLocker(redissonClient));
-        cacheLocker.put(Read,new RedissonReadLocker(redissonClient));
+
+    /**
+     * 构造方法
+     * 初始化不同锁类型的锁实例并存入缓存
+     *
+     * @param redissonClient Redisson客户端，用于操作Redis
+     */
+    public ManageLocker(RedissonClient redissonClient) {
+        cacheLocker.put(Reentrant, new RedissonReentrantLocker(redissonClient));
+        cacheLocker.put(Fair, new RedissonFairLocker(redissonClient));
+        cacheLocker.put(Write, new RedissonWriteLocker(redissonClient));
+        cacheLocker.put(Read, new RedissonReadLocker(redissonClient));
     }
-    
-    public ServiceLocker getReentrantLocker(){
+
+    /**
+     * 获取可重入锁的实现
+     *
+     * @return 可重入锁的实现
+     */
+    public ServiceLocker getReentrantLocker() {
         return cacheLocker.get(Reentrant);
     }
-    
-    public ServiceLocker getFairLocker(){
+
+    /**
+     * 获取公平锁的实现
+     *
+     * @return 公平锁的实现
+     */
+    public ServiceLocker getFairLocker() {
         return cacheLocker.get(Fair);
     }
-    
-    public ServiceLocker getWriteLocker(){
+
+    /**
+     * 获取写锁的实现
+     *
+     * @return 写锁的实现
+     */
+    public ServiceLocker getWriteLocker() {
         return cacheLocker.get(Write);
     }
-    
-    public ServiceLocker getReadLocker(){
+
+    /**
+     * 获取读锁的实现
+     *
+     * @return 读锁的实现
+     */
+    public ServiceLocker getReadLocker() {
         return cacheLocker.get(Read);
     }
 }

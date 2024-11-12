@@ -47,16 +47,26 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * elasticsearch处理
- **/
+ * BusinessEsHandle类是用于处理与业务相关的Elasticsearch操作的封装
+ * 提供了与Elasticsearch数据库交互的方法，以便对数据进行查询、更新等操作
+ */
 @Slf4j
 @AllArgsConstructor
 public class BusinessEsHandle {
 
+    /**
+     * 用于与Elasticsearch进行网络通信
+     */
     private final RestClient restClient;
 
+    /**
+     * 用于控制Elasticsearch操作的开关
+     */
     private final Boolean esSwitch;
 
+    /**
+     * 用于控制Elasticsearch中索引类型的开关
+     */
     private final Boolean esTypeSwitch;
 
     /**
@@ -519,10 +529,29 @@ public class BusinessEsHandle {
         return sourceBuilder;
     }
 
+    /**
+     * 执行ES查询方法
+     * 该方法用于构建ES查询请求，发送请求，并处理响应结果
+     * 它会根据提供的索引名称、类型、查询构建器等参数来执行查询，并将结果解析到指定的列表中
+     *
+     * @param indexName              索引名称，用于指定查询的ES索引
+     * @param indexType              索引类型，用于兼容不同版本的ES（某些版本需要指定类型）
+     * @param list                   用于存储查询结果的列表，类型为泛型T
+     * @param pageInfo               分页信息对象，用于接收查询结果的总记录数
+     * @param clazz                  结果对象的类类型，用于将解析的JSON转换为指定的对象类型
+     * @param sourceBuilder          查询构建器，包含查询的具体条件和参数
+     * @param highLightFieldNameList 需要高亮的字段名称列表，用于在结果中标识高亮部分
+     * @throws IOException 当执行查询过程中发生I/O错误时抛出
+     */
     public <T> void executeQuery(String indexName, String indexType, List<T> list, PageInfo<T> pageInfo, Class<T> clazz,
                                  SearchSourceBuilder sourceBuilder, List<String> highLightFieldNameList) throws IOException {
+        // 将查询构建器转换为字符串形式
         String string = sourceBuilder.toString();
+
+        // 创建HTTP实体，包含查询字符串，设置内容类型为JSON
         HttpEntity entity = new NStringEntity(string, ContentType.APPLICATION_JSON);
+
+        // 构建请求的终点URL，根据esTypeSwitch决定是否包含类型
         StringBuilder endpointStringBuilder = new StringBuilder("/" + indexName);
         if (esTypeSwitch) {
             endpointStringBuilder.append("/").append(indexType).append("/_search");
@@ -531,23 +560,41 @@ public class BusinessEsHandle {
             endpointStringBuilder.append("/_search");
         }
         String endpoint = endpointStringBuilder.toString();
+
+        // 日志记录查询DSL字符串
         log.info("query execute query dsl : {}", string);
+
+        // 创建请求对象，设置请求方法为POST，终点为构建的URL
         Request request = new Request("POST", endpoint);
         request.setEntity(entity);
         request.addParameters(Collections.emptyMap());
+
+        // 执行请求，获取响应
         Response response = restClient.performRequest(request);
+
+        // 从响应中提取结果字符串
         String result = EntityUtils.toString(response.getEntity());
+
+        // 如果结果为空，则直接返回
         if (StringUtil.isEmpty(result)) {
             return;
         }
+
+        // 解析结果为JSON对象
         JSONObject resultJsonObject = JSONObject.parseObject(result);
+
+        // 如果解析结果为空，则直接返回
         if (Objects.isNull(resultJsonObject)) {
             return;
         }
+
+        // 获取查询结果中的hits部分
         JSONObject hits = resultJsonObject.getJSONObject("hits");
         if (Objects.isNull(hits)) {
             return;
         }
+
+        // 根据esTypeSwitch获取总记录数
         Long value = null;
         if (esTypeSwitch) {
             value = hits.getLong("total");
@@ -558,53 +605,95 @@ public class BusinessEsHandle {
                 value = totalJsonObject.getLong("value");
             }
         }
+
+        // 如果提供了分页信息对象且总记录数不为空，则设置总记录数
         if (Objects.nonNull(pageInfo) && Objects.nonNull(value)) {
             pageInfo.setTotal(value);
         }
+
+        // 获取查询结果中的数据数组
         JSONArray arrayData = hits.getJSONArray("hits");
         if (Objects.isNull(arrayData) || arrayData.isEmpty()) {
             return;
         }
+
+        // 遍历数据数组，解析每个结果项
         for (int i = 0, size = arrayData.size(); i < size; i++) {
             JSONObject data = arrayData.getJSONObject(i);
+
+            // 如果解析结果为空，则跳过当前循环
             if (Objects.isNull(data)) {
                 continue;
             }
+
+            // 获取结果项的ID和源数据
             String esId = data.getString("_id");
             JSONObject jsonObject = data.getJSONObject("_source");
+
+            // 处理排序字段
             JSONArray jsonArray = data.getJSONArray("sort");
+
+            // 如果排序字段不为null且不为空
             if (Objects.nonNull(jsonArray) && !jsonArray.isEmpty()) {
+                // 获取数组中的第一个元素作为排序参数
                 Long sort = jsonArray.getLong(0);
+                // 将排序参数放入jsonObject中
                 jsonObject.put("sort", sort);
             }
+
+            // 处理高亮字段
             JSONObject highlight = data.getJSONObject("highlight");
+
+            // 如果高亮字段不为null且需要高亮的字段列表不为null
             if (Objects.nonNull(highlight) && Objects.nonNull(highLightFieldNameList)) {
+                // 对于每个需要高亮的字段名称
                 for (String highLightFieldName : highLightFieldNameList) {
+                    // 获取高亮字段的值数组
                     JSONArray highLightFieldValue = highlight.getJSONArray(highLightFieldName);
+                    // 如果高亮字段的值数组为空或无元素，则跳过当前字段
                     if (Objects.isNull(highLightFieldValue) || highLightFieldValue.isEmpty()) {
                         continue;
                     }
+                    // 将高亮字段的第一个值放入JSON对象中
                     jsonObject.put(highLightFieldName, highLightFieldValue.get(0));
                 }
             }
+
+            // 如果ID不为空，则添加到结果对象中
             if (StringUtil.isNotEmpty(esId)) {
                 jsonObject.put("esId", esId);
             }
+
+            // 将解析的JSON对象转换为指定的类类型，并添加到结果列表中
             list.add(JSONObject.parseObject(jsonObject.toJSONString(), clazz));
         }
     }
 
+    /**
+     * 根据文档ID删除指定索引中的文档
+     * 此方法在执行前会检查esSwitch标志，如果不为true，则直接返回，不执行删除操作
+     * 它通过发送DELETE请求到Elasticsearch的相应索引和文档ID来实现文档的删除
+     *
+     * @param index      索引名称，表示要在哪个索引中删除文档
+     * @param documentId 文档ID，指定要删除的文档
+     */
     public void deleteByDocumentId(String index, String documentId) {
+        // 检查ES开关状态，如果未开启，则不执行任何操作
         if (!esSwitch) {
             return;
         }
         try {
+            // 创建一个DELETE请求，指向特定索引和文档ID
             Request request = new Request("DELETE", "/" + index + "/_doc/" + documentId);
+            // 添加空参数，表示不向请求中添加任何额外参数
             request.addParameters(Collections.<String, String>emptyMap());
+            // 执行请求并获取响应
             Response response = restClient.performRequest(request);
+            // 记录删除操作的结果信息
             log.info("deleteByDocumentId result : {}", response.getStatusLine().getReasonPhrase());
         }
         catch (Exception e) {
+            // 如果在执行请求过程中发生异常，记录错误信息
             log.error("deleteData error", e);
         }
     }

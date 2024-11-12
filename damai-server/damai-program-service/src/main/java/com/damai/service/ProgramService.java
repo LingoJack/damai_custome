@@ -214,8 +214,10 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
      * @return 执行后的结果
      */
     public PageVo<ProgramListVo> search(ProgramSearchDto programSearchDto) {
-        //将入参的参数进行具体的组装
+        // 根据预设状态自动填充对应的时间参数
         setQueryTime(programSearchDto);
+
+        // 通过elasticsearch查询
         return programEs.search(programSearchDto);
     }
 
@@ -336,29 +338,42 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
     }
 
     /**
-     * 组装节目参数
+     * 处理时间范围参数
+     * 比如 一天、一周、一个月等
+     * 转换为开始时间和结束时间
+     * <p>
+     * 但我觉得这个逻辑或许可以直接放到前端
+     * <p>
+     * 根据提供的程序列表DTO中的时间类型，设置相应的开始时间和结束时间
+     * 这有助于在查询时确定节目单的时间范围
      *
-     * @param programPageListDto 节目数据的入参
+     * @param programPageListDto 包含时间类型和其他参数的节目单列表DTO对象
      */
     public void setQueryTime(ProgramPageListDto programPageListDto) {
+        // 根据时间类型设置开始时间和结束时间
         switch (programPageListDto.getTimeType()) {
             case ProgramTimeType.TODAY:
+                // 当时间类型为今天时，开始时间和结束时间都设置为当前日期
                 programPageListDto.setStartDateTime(DateUtils.now(FORMAT_DATE));
                 programPageListDto.setEndDateTime(DateUtils.now(FORMAT_DATE));
                 break;
             case ProgramTimeType.TOMORROW:
+                // 当时间类型为明天时，开始时间设置为当前日期，结束时间设置为后一天
                 programPageListDto.setStartDateTime(DateUtils.now(FORMAT_DATE));
                 programPageListDto.setEndDateTime(DateUtils.addDay(DateUtils.now(FORMAT_DATE), 1));
                 break;
             case ProgramTimeType.WEEK:
+                // 当时间类型为一周时，开始时间设置为当前日期，结束时间设置为后一周
                 programPageListDto.setStartDateTime(DateUtils.now(FORMAT_DATE));
                 programPageListDto.setEndDateTime(DateUtils.addWeek(DateUtils.now(FORMAT_DATE), 1));
                 break;
             case ProgramTimeType.MONTH:
+                // 当时间类型为一个月时，开始时间设置为当前日期，结束时间设置为后一个月
                 programPageListDto.setStartDateTime(DateUtils.now(FORMAT_DATE));
                 programPageListDto.setEndDateTime(DateUtils.addMonth(DateUtils.now(FORMAT_DATE), 1));
                 break;
             case ProgramTimeType.CALENDAR:
+                // 当时间类型为自定义日历时，检查开始时间和结束时间是否存在
                 if (Objects.isNull(programPageListDto.getStartDateTime())) {
                     throw new DaMaiFrameException(BaseCode.START_DATE_TIME_NOT_EXIST);
                 }
@@ -367,6 +382,7 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
                 }
                 break;
             default:
+                // 对于其他未知的时间类型，将开始时间和结束时间设置为null
                 programPageListDto.setStartDateTime(null);
                 programPageListDto.setEndDateTime(null);
                 break;
@@ -400,30 +416,58 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
     }
 
     /**
-     * 查询分类信息（数据库查询）
+     * 根据条件从数据库中查询节目列表
+     * 此方法通过连表查询获得节目及其展示时间的信息，同时获取相关节目类型和区域信息
      *
-     * @param programPageListDto 查询节目数据的入参
-     * @return 执行后的结果
+     * @param programPageListDto 节目列表查询条件DTO，包含查询所需的各种条件
+     * @return 返回一个包含节目列表的分页对象
      */
     public PageVo<ProgramListVo> dbSelectPage(ProgramPageListDto programPageListDto) {
-        IPage<ProgramJoinShowTime> iPage =
-                programMapper.selectPage(PageUtil.getPageParams(programPageListDto), programPageListDto);
+        // 根据program和program_show_time从数据库中连表查询
+        IPage<ProgramJoinShowTime> iPage = programMapper.selectPage(
+                PageUtil.getPageParams(programPageListDto),
+                programPageListDto);
+
+        // 如果查询的节目列表为空，则直接返回pageVo对象
         if (CollectionUtil.isEmpty(iPage.getRecords())) {
             return new PageVo<>(iPage.getCurrent(), iPage.getSize(), iPage.getTotal(), new ArrayList<>());
         }
-        Set<Long> programCategoryIdList =
-                iPage.getRecords().stream().map(Program::getProgramCategoryId).collect(Collectors.toSet());
+
+        // 收集节目类型ID集合
+        Set<Long> programCategoryIdList = iPage.getRecords().stream()
+                .map(Program::getProgramCategoryId)
+                .collect(Collectors.toSet());
+
+        // 收集节目类型id为键，节目类型名为值的映射
         Map<Long, String> programCategoryMap = selectProgramCategoryMap(programCategoryIdList);
 
-        List<Long> programIdList = iPage.getRecords().stream().map(Program::getId).collect(Collectors.toList());
+        // 收集节目id集合
+        List<Long> programIdList = iPage.getRecords().stream()
+                .map(Program::getId)
+                .collect(Collectors.toList());
+
+        // 收集以节目ID为键，票档对象为值的映射
         Map<Long, TicketCategoryAggregate> ticketCategorieMap = selectTicketCategorieMap(programIdList);
 
+        // 查询区域，获得以地区ID为键，地区名为值的映射
         Map<Long, String> tempAreaMap = new HashMap<>(64);
+
+        // 地区查询请求传递参数
         AreaSelectDto areaSelectDto = new AreaSelectDto();
-        areaSelectDto.setIdList(iPage.getRecords().stream().map(Program::getAreaId).distinct().collect(Collectors.toList()));
+
+        // 往地区查询传递参数中设置地区ID列表
+        List<Long> areaIds = iPage.getRecords().stream()
+                .map(Program::getAreaId)
+                .distinct()
+                .collect(Collectors.toList());
+        areaSelectDto.setIdList(areaIds);
+
+        // 发起RPC调用获得地区VO列表信息
         ApiResponse<List<AreaVo>> areaResponse = baseDataClient.selectByIdList(areaSelectDto);
         if (Objects.equals(areaResponse.getCode(), ApiResponse.ok().getCode())) {
+            // 若请求状态码正常
             if (CollectionUtil.isNotEmpty(areaResponse.getData())) {
+                // 转换为以地区ID为键，地区名为值的映射
                 tempAreaMap = areaResponse.getData().stream()
                         .collect(Collectors.toMap(AreaVo::getId, AreaVo::getName, (v1, v2) -> v2));
             }
@@ -431,20 +475,27 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
         else {
             log.error("base-data selectByIdList rpc error areaResponse:{}", JSON.toJSONString(areaResponse));
         }
+
         Map<Long, String> areaMap = tempAreaMap;
-
-        return PageUtil.convertPage(iPage, programJoinShowTime -> {
-            ProgramListVo programListVo = new ProgramListVo();
-            BeanUtil.copyProperties(programJoinShowTime, programListVo);
-
-            programListVo.setAreaName(areaMap.get(programJoinShowTime.getAreaId()));
-            programListVo.setProgramCategoryName(programCategoryMap.get(programJoinShowTime.getProgramCategoryId()));
-            programListVo.setMinPrice(Optional.ofNullable(ticketCategorieMap.get(programJoinShowTime.getId()))
-                    .map(TicketCategoryAggregate::getMinPrice).orElse(null));
-            programListVo.setMaxPrice(Optional.ofNullable(ticketCategorieMap.get(programJoinShowTime.getId()))
-                    .map(TicketCategoryAggregate::getMaxPrice).orElse(null));
-            return programListVo;
-        });
+        return PageUtil.convertPage(
+                iPage,
+                programJoinShowTime -> {
+                    ProgramListVo programListVo = new ProgramListVo();
+                    BeanUtil.copyProperties(programJoinShowTime, programListVo);
+                    //区域名字
+                    programListVo.setAreaName(areaMap.get(programJoinShowTime.getAreaId()));
+                    //节目名字
+                    programListVo.setProgramCategoryName(programCategoryMap.get(programJoinShowTime.getProgramCategoryId()));
+                    //最低价
+                    programListVo.setMinPrice(
+                            Optional.ofNullable(ticketCategorieMap.get(programJoinShowTime.getId()))
+                                    .map(TicketCategoryAggregate::getMinPrice).orElse(null));
+                    //最高价
+                    programListVo.setMaxPrice(
+                            Optional.ofNullable(ticketCategorieMap.get(programJoinShowTime.getId()))
+                                    .map(TicketCategoryAggregate::getMaxPrice).orElse(null));
+                    return programListVo;
+                });
     }
 
     /**
@@ -454,6 +505,7 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
      * @return 执行后的结果
      */
     public ProgramVo detail(ProgramGetDto programGetDto) {
+        // 使用组合模式验证参数
         compositeContainer.execute(CompositeCheckType.PROGRAM_DETAIL_CHECK.getValue(), programGetDto);
         return getDetail(programGetDto);
     }
@@ -487,32 +539,42 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
      * @return 执行后的结果
      */
     public ProgramVo getDetail(ProgramGetDto programGetDto) {
-        ProgramShowTime programShowTime = programShowTimeService.selectProgramShowTimeByProgramId(programGetDto.getId());
-        ProgramVo programVo = programService.getById(programGetDto.getId(), DateUtils.countBetweenSecond(DateUtils.now(),
-                programShowTime.getShowTime()), TimeUnit.SECONDS);
+        // 查询节目演出时间
+        Long programIdFromDto = programGetDto.getId();
+        ProgramShowTime programShowTime = programShowTimeService.selectProgramShowTimeByProgramId(programIdFromDto);
+
+        // 从节目表获取数据，以及区域信息
+        long expireTime = DateUtils.countBetweenSecond(DateUtils.now(), programShowTime.getShowTime());
+        ProgramVo programVo = programService.getById(programIdFromDto, expireTime, TimeUnit.SECONDS);
         programVo.setShowTime(programShowTime.getShowTime());
         programVo.setShowDayTime(programShowTime.getShowDayTime());
         programVo.setShowWeekTime(programShowTime.getShowWeekTime());
 
+        // 从节目分组表获取数据
         ProgramGroupVo programGroupVo = programService.getProgramGroup(programVo.getProgramGroupId());
         programVo.setProgramGroupVo(programGroupVo);
 
+        // 预先加载用户购票人
         preloadTicketUserList(programVo.getHighHeat());
 
-        preloadAccountOrderCount(programVo.getId());
+        // 预先加载用户下节目订单数量
+        Long programId = programVo.getId();
+        preloadAccountOrderCount(programId);
 
+        // 设置节目类型相关信息
         ProgramCategory programCategory = getProgramCategory(programVo.getProgramCategoryId());
         if (Objects.nonNull(programCategory)) {
             programVo.setProgramCategoryName(programCategory.getName());
         }
+
+        // 查询节目父级类型相关信息
         ProgramCategory parentProgramCategory = getProgramCategory(programVo.getParentProgramCategoryId());
         if (Objects.nonNull(parentProgramCategory)) {
             programVo.setParentProgramCategoryName(parentProgramCategory.getName());
         }
 
-        List<TicketCategoryVo> ticketCategoryVoList =
-                ticketCategoryService.selectTicketCategoryListByProgramId(programVo.getId(),
-                        DateUtils.countBetweenSecond(DateUtils.now(), programShowTime.getShowTime()), TimeUnit.SECONDS);
+        // 查询节目票档信息
+        List<TicketCategoryVo> ticketCategoryVoList = ticketCategoryService.selectTicketCategoryListByProgramId(programId, expireTime, TimeUnit.SECONDS);
         programVo.setTicketCategoryVoList(ticketCategoryVoList);
 
         return programVo;
@@ -567,8 +629,7 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
         }
 
         // 查询并设置票务类别列表
-        List<TicketCategoryVo> ticketCategoryVoList = ticketCategoryService
-                .selectTicketCategoryListByProgramIdMultipleCache(programVo.getId(), programShowTime.getShowTime());
+        List<TicketCategoryVo> ticketCategoryVoList = ticketCategoryService.selectTicketCategoryListByProgramIdMultipleCache(programVo.getId(), programShowTime.getShowTime());
         programVo.setTicketCategoryVoList(ticketCategoryVoList);
 
         // 返回填充完毕的节目详情对象
@@ -584,37 +645,63 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
      * @return 执行后的结果
      */
     public ProgramVo getByIdMultipleCache(Long programId, Date showTime) {
-        return localCacheProgram.getCache(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId).getRelKey(),
+        RedisKeyBuild redisKey = RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId);
+        return localCacheProgram.getCache(
+                redisKey.getRelKey(),
                 key -> {
                     log.info("查询节目详情 从本地缓存没有查询到 节目id : {}", programId);
-                    ProgramVo programVo = getById(programId, DateUtils.countBetweenSecond(DateUtils.now(), showTime),
-                            TimeUnit.SECONDS);
+                    long expireTime = DateUtils.countBetweenSecond(DateUtils.now(), showTime);
+                    ProgramVo programVo = getById(programId, expireTime, TimeUnit.SECONDS);
                     programVo.setShowTime(showTime);
                     return programVo;
                 });
     }
 
+    /**
+     * 根据节目ID获取节目信息，使用本地缓存和Redis缓存
+     * 首先尝试从本地缓存中获取节目信息，如果未命中，则从Redis缓存中获取
+     *
+     * @param programId 节目ID
+     * @return 节目信息对象，如果未找到则返回null
+     */
     public ProgramVo simpleGetByIdMultipleCache(Long programId) {
-        ProgramVo programVoCache = localCacheProgram.getCache(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM,
-                programId).getRelKey());
+        // 创建Redis键
+        RedisKeyBuild redisKey = RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId);
+        // 尝试从本地缓存中获取节目信息
+        ProgramVo programVoCache = localCacheProgram.getCache(redisKey.getRelKey());
         if (Objects.nonNull(programVoCache)) {
             return programVoCache;
         }
-        return redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId), ProgramVo.class);
+        // 如果本地缓存未命中，则从Redis缓存中获取节目信息
+        return redisCache.get(redisKey, ProgramVo.class);
     }
 
+    /**
+     * 获取节目的信息和播出时间，使用本地缓存和Redis缓存
+     * 首先获取节目播出时间信息，然后获取节目信息，并将播出时间信息设置到节目信息对象中
+     *
+     * @param programId 节目ID
+     * @return 包含播出时间信息的节目信息对象
+     * @throws DaMaiFrameException 如果未找到节目播出时间或节目信息，则抛出异常
+     */
     public ProgramVo simpleGetProgramAndShowMultipleCache(Long programId) {
-        ProgramShowTime programShowTime =
-                programShowTimeService.simpleSelectProgramShowTimeByProgramIdMultipleCache(programId);
+        // 获取节目播出时间信息
+        ProgramShowTime programShowTime = programShowTimeService.simpleSelectProgramShowTimeByProgramIdMultipleCache(programId);
+
+        // 如果未找到节目播出时间，则抛出异常
         if (Objects.isNull(programShowTime)) {
             throw new DaMaiFrameException(BaseCode.PROGRAM_SHOW_TIME_NOT_EXIST);
         }
 
+        // 获取节目信息
         ProgramVo programVo = simpleGetByIdMultipleCache(programId);
+
+        // 如果未找到节目信息，则抛出异常
         if (Objects.isNull(programVo)) {
             throw new DaMaiFrameException(BaseCode.PROGRAM_NOT_EXIST);
         }
 
+        // 将播出时间信息设置到节目信息对象中
         programVo.setShowTime(programShowTime.getShowTime());
         programVo.setShowDayTime(programShowTime.getShowDayTime());
         programVo.setShowWeekTime(programShowTime.getShowWeekTime());
@@ -622,54 +709,111 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
         return programVo;
     }
 
+    /**
+     * 根据节目ID获取节目详细信息
+     * 本方法使用了两个锁，一个是方法级别的ServiceLock，读锁，另一个是在缓存未命中时才加的RLock
+     * 首先尝试从Redis缓存中获取节目信息.
+     * 如果缓存未命中，则需要加分布式锁来保证数据的一致性：避免在高并发场景下出现多个线程重复创建同一份节目信息、缓存不一致等问题
+     * 线程在获取RLock锁之后，再次尝试从Redis获取数据，如果仍然没有，则调用创建节目信息的方法
+     * 并将结果缓存到Redis中
+     *
+     * @param programId  节目ID
+     * @param expireTime 缓存过期时间
+     * @param timeUnit   缓存过期时间单位
+     * @return 节目详细信息对象
+     */
     @ServiceLock(lockType = LockType.Read, name = PROGRAM_LOCK, keys = {"#programId"})
     public ProgramVo getById(Long programId, Long expireTime, TimeUnit timeUnit) {
-        ProgramVo programVo =
-                redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId), ProgramVo.class);
+        // 尝试从Redis缓存中获取节目信息
+        RedisKeyBuild redisKey = RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId);
+        ProgramVo programVo = redisCache.get(redisKey, ProgramVo.class);
+
+        // 如果缓存中存在节目信息，则直接返回
         if (Objects.nonNull(programVo)) {
             return programVo;
         }
+
+        // 记录日志，表示从Redis缓存中未查询到节目详情
         log.info("查询节目详情 从Redis缓存没有查询到 节目id : {}", programId);
+
+        // 获取服务端锁，确保接下来的操作数据一致性
         RLock lock = serviceLockTool.getLock(LockType.Reentrant, GET_PROGRAM_LOCK, new String[]{String.valueOf(programId)});
+
+        // 加锁，避免并发环境下多个线程重复创建同一份节目信息造成的缓存不一致问题
         lock.lock();
         try {
-            return redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM, programId)
-                    , ProgramVo.class,
-                    () -> createProgramVo(programId)
-                    , expireTime,
+            // 再次尝试从Redis获取节目信息，如果仍然没有，则调用创建节目信息的方法
+            // 并将结果缓存到Redis中
+            return redisCache.get(
+                    redisKey,
+                    ProgramVo.class,
+                    () -> createProgramVo(programId),
+                    expireTime,
                     timeUnit);
         }
         finally {
+            // 释放锁，确保其他线程可以继续执行
             lock.unlock();
         }
     }
 
+    /**
+     * 根据节目组ID获取节目组信息，使用本地缓存和Redis缓存双重缓存策略
+     * 首先尝试从本地缓存中获取数据，如果未命中，则调用getProgramGroup方法从Redis缓存或数据库中获取数据
+     *
+     * @param programGroupId 节目组ID
+     * @return 节目组信息对象
+     */
     public ProgramGroupVo getProgramGroupMultipleCache(Long programGroupId) {
         return localCacheProgramGroup.getCache(
                 RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_GROUP, programGroupId).getRelKey(),
-                key -> getProgramGroup(programGroupId));
+                key -> getProgramGroup(programGroupId)
+        );
     }
 
+    /**
+     * 获取节目组信息，使用服务端锁防止并发情况下出现缓存穿透
+     * 首先尝试从Redis缓存中获取数据，如果未命中，则加锁后再次尝试从Redis中获取数据
+     * 如果数据仍然未命中，则从数据库中查询并放入缓存
+     *
+     * @param programGroupId 节目组ID
+     * @return 节目组信息对象
+     */
     @ServiceLock(lockType = LockType.Read, name = PROGRAM_GROUP_LOCK, keys = {"#programGroupId"})
     public ProgramGroupVo getProgramGroup(Long programGroupId) {
-        ProgramGroupVo programGroupVo =
-                redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_GROUP, programGroupId), ProgramGroupVo.class);
+        // 构建Redis缓存键
+        RedisKeyBuild redisKey = RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_GROUP, programGroupId);
+
+        // 尝试从Redis缓存中获取节目组信息
+        ProgramGroupVo programGroupVo = redisCache.get(redisKey, ProgramGroupVo.class);
+
+        // 如果缓存中存在节目组信息，则直接返回
         if (Objects.nonNull(programGroupVo)) {
             return programGroupVo;
         }
+
+        // 如果缓存中不存在节目组信息，则需要加分布式锁来保证数据的一致性
         RLock lock = serviceLockTool.getLock(LockType.Reentrant, GET_PROGRAM_LOCK, new String[]{String.valueOf(programGroupId)});
+
+        // 加锁，避免并发环境下多个线程重复创建同一份节目组信息造成的缓存不一致问题
         lock.lock();
+
         try {
-            programGroupVo = redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_GROUP, programGroupId),
-                    ProgramGroupVo.class);
+            // 再次尝试从Redis获取节目组信息，如果仍然没有，则调用创建节目组信息的方法
+            programGroupVo = redisCache.get(redisKey, ProgramGroupVo.class);
+
+            // 如果数据仍然未命中（说明是缓存失效后第一个进入此代码块的线程），则从数据库中查询并放入缓存
             if (Objects.isNull(programGroupVo)) {
+                // 从数据库中查询并放入缓存
                 programGroupVo = createProgramGroupVo(programGroupId);
-                redisCache.set(RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_GROUP, programGroupId), programGroupVo,
-                        DateUtils.countBetweenSecond(DateUtils.now(), programGroupVo.getRecentShowTime()), TimeUnit.SECONDS);
+                long ttl = DateUtils.countBetweenSecond(DateUtils.now(), programGroupVo.getRecentShowTime());
+                redisCache.set(redisKey, programGroupVo, ttl, TimeUnit.SECONDS);
             }
+            // 返回结果
             return programGroupVo;
         }
         finally {
+            // 释放锁，确保其他线程可以继续执行
             lock.unlock();
         }
     }
@@ -713,27 +857,46 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
                 .collect(Collectors.toMap(TicketCategoryAggregate::getProgramId, ticketCategory -> ticketCategory, (v1, v2) -> v2));
     }
 
+    /**
+     * 根据节目操作数据DTO操作节目数据
+     * 此方法首先验证指定的座位是否存在并检查其销售状态，然后更新座位的销售状态
+     * 最后，更新票务类别的剩余数量
+     *
+     * @param programOperateDataDto 节目操作数据DTO，包含节目ID、票务类别计数列表和座位ID列表
+     * @throws DaMaiFrameException 如果座位不存在、座位已售出或更新操作失败，则抛出异常
+     */
     @RepeatExecuteLimit(name = CANCEL_PROGRAM_ORDER, keys = {"#programOperateDataDto.programId"})
     @Transactional(rollbackFor = Exception.class)
     public void operateProgramData(ProgramOperateDataDto programOperateDataDto) {
+        // 获取票务类别计数列表和座位ID列表
         List<TicketCategoryCountDto> ticketCategoryCountDtoList = programOperateDataDto.getTicketCategoryCountDtoList();
         List<Long> seatIdList = programOperateDataDto.getSeatIdList();
+
+        // 查询指定节目ID和座位ID列表的座位信息
         LambdaQueryWrapper<Seat> seatLambdaQueryWrapper =
                 Wrappers.lambdaQuery(Seat.class)
                         .eq(Seat::getProgramId, programOperateDataDto.getProgramId())
                         .in(Seat::getId, seatIdList);
         List<Seat> seatList = seatMapper.selectList(seatLambdaQueryWrapper);
+
+        // 验证座位是否存在
         if (CollectionUtil.isEmpty(seatList)) {
             throw new DaMaiFrameException(BaseCode.SEAT_NOT_EXIST);
         }
+
+        // 验证查询到的座位数量是否与提供的座位ID数量一致
         if (seatList.size() != seatIdList.size()) {
             throw new DaMaiFrameException(BaseCode.SEAT_UPDATE_REL_COUNT_NOT_EQUAL_PRESET_COUNT);
         }
+
+        // 检查座位是否已售出
         for (Seat seat : seatList) {
             if (Objects.equals(seat.getSellStatus(), SellStatus.SOLD.getCode())) {
                 throw new DaMaiFrameException(BaseCode.SEAT_SOLD);
             }
         }
+
+        // 更新座位的销售状态为已售出
         LambdaUpdateWrapper<Seat> seatLambdaUpdateWrapper =
                 Wrappers.lambdaUpdate(Seat.class)
                         .eq(Seat::getProgramId, programOperateDataDto.getProgramId())
@@ -742,30 +905,57 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
         updateSeat.setSellStatus(SellStatus.SOLD.getCode());
         seatMapper.update(updateSeat, seatLambdaUpdateWrapper);
 
+        // 批量更新票务类别的剩余数量
         int updateRemainNumberCount =
                 ticketCategoryMapper.batchUpdateRemainNumber(ticketCategoryCountDtoList, programOperateDataDto.getProgramId());
+
+        // 验证更新的票务类别数量是否正确
         if (updateRemainNumberCount != ticketCategoryCountDtoList.size()) {
             throw new DaMaiFrameException(BaseCode.UPDATE_TICKET_CATEGORY_COUNT_NOT_CORRECT);
         }
     }
 
+    /**
+     * 根据节目ID创建ProgramVo对象
+     * 此方法首先通过节目ID从数据库中获取节目信息，然后将信息复制到ProgramVo对象中
+     * 如果节目不存在，则抛出异常如果节目存在，它还会根据节目中的区域ID通过RPC调用获取区域信息，
+     * 并将区域名称设置在ProgramVo对象中
+     *
+     * @param programId 节目ID，用于查询节目信息
+     * @return 返回填充了节目信息和区域名称的ProgramVo对象
+     * @throws DaMaiFrameException 如果节目不存在，则抛出此异常
+     */
     private ProgramVo createProgramVo(Long programId) {
+        // 初始化ProgramVo对象
         ProgramVo programVo = new ProgramVo();
-        Program program =
-                Optional.ofNullable(programMapper.selectById(programId))
-                        .orElseThrow(() -> new DaMaiFrameException(BaseCode.PROGRAM_NOT_EXIST));
+
+        // 通过programId获取Program对象，如果不存在，则抛出异常
+        Program program = Optional
+                .ofNullable(programMapper.selectById(programId))
+                .orElseThrow(() -> new DaMaiFrameException(BaseCode.PROGRAM_NOT_EXIST));
+
+        // 将Program对象的属性复制到ProgramVo对象中
         BeanUtil.copyProperties(program, programVo);
+
+        // 初始化AreaGetDto对象，并设置区域ID
         AreaGetDto areaGetDto = new AreaGetDto();
         areaGetDto.setId(program.getAreaId());
+
+        // 通过RPC调用获取区域信息
         ApiResponse<AreaVo> areaResponse = baseDataClient.getById(areaGetDto);
+
+        // 如果RPC调用成功且返回的数据不为空，则将区域名称设置在ProgramVo对象中
         if (Objects.equals(areaResponse.getCode(), ApiResponse.ok().getCode())) {
             if (Objects.nonNull(areaResponse.getData())) {
                 programVo.setAreaName(areaResponse.getData().getName());
             }
         }
+        // 如果RPC调用失败，记录错误日志
         else {
             log.error("base-data rpc getById error areaResponse:{}", JSON.toJSONString(areaResponse));
         }
+
+        // 返回填充了信息的ProgramVo对象
         return programVo;
     }
 
@@ -874,36 +1064,59 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
     }
 
 
+    /**
+     * 预加载账户订单数量
+     * 此方法旨在预先加载用户账户的订单数量到缓存中，以提高后续查询效率
+     * 它首先检查必要的参数是否可用，然后验证用户登录状态，最后在后台线程中执行实际的订单数量查询和缓存操作
+     *
+     * @param programId 程序ID，用于指定查询的程序
+     */
     private void preloadAccountOrderCount(Long programId) {
+        // 获取用户ID和验证码，用于后续的验证和查询
         String userId = BaseParameterHolder.getParameter(USER_ID);
         String code = BaseParameterHolder.getParameter(CODE);
+
+        // 如果用户ID或验证码为空，则直接返回，不执行后续操作
         if (StringUtil.isEmpty(userId) || StringUtil.isEmpty(code)) {
             return;
         }
+
+        // 检查用户登录状态，如果未登录，则直接返回
         Boolean userLogin =
                 redisCache.hasKey(RedisKeyBuild.createRedisKey(RedisKeyManage.USER_LOGIN, code, userId));
         if (!userLogin) {
             return;
         }
+
+        // 使用业务线程池执行预加载操作，避免阻塞当前线程
         BusinessThreadPool.execute(() -> {
             try {
-                if (!redisCache.hasKey(RedisKeyBuild.createRedisKey(RedisKeyManage.ACCOUNT_ORDER_COUNT, userId, programId))) {
+                // 如果缓存中不存在账户订单数量，则进行查询并缓存结果
+                RedisKeyBuild redisKey = RedisKeyBuild.createRedisKey(RedisKeyManage.ACCOUNT_ORDER_COUNT, userId, programId);
+                if (!redisCache.hasKey(redisKey)) {
                     AccountOrderCountDto accountOrderCountDto = new AccountOrderCountDto();
                     accountOrderCountDto.setUserId(Long.parseLong(userId));
                     accountOrderCountDto.setProgramId(programId);
+
+                    // 调用订单客户端获取账户订单数量
                     ApiResponse<AccountOrderCountVo> apiResponse = orderClient.accountOrderCount(accountOrderCountDto);
+
+                    // 如果调用成功，则将结果缓存
                     if (Objects.equals(apiResponse.getCode(), BaseCode.SUCCESS.getCode())) {
                         Optional.ofNullable(apiResponse.getData())
-                                .ifPresent(accountOrderCountVo -> redisCache.set(
-                                        RedisKeyBuild.createRedisKey(RedisKeyManage.ACCOUNT_ORDER_COUNT, userId, programId),
-                                        accountOrderCountVo.getCount(), tokenExpireManager.getTokenExpireTime() + 1,
-                                        TimeUnit.MINUTES));
+                                .ifPresent(accountOrderCountVo -> {
+                                    Integer count = accountOrderCountVo.getCount();
+                                    long ttl = tokenExpireManager.getTokenExpireTime() + 1;
+                                    redisCache.set(redisKey, count, ttl, TimeUnit.MINUTES);
+                                });
                     }
+                    // 如果调用失败，则记录日志
                     else {
                         log.warn("orderClient.accountOrderCount 调用失败 apiResponse : {}", JSON.toJSONString(apiResponse));
                     }
                 }
             }
+            // 捕获并记录任何在执行过程中发生的异常
             catch (Exception e) {
                 log.error("预热加载账户订单数量失败", e);
             }

@@ -1,9 +1,20 @@
-
+-- 创建数据库
+create database if not exists damai_base_data character set utf8mb4;
+create database if not exists damai_customize character set utf8mb4;
+create database if not exists damai_order_0 character set utf8mb4;
+create database if not exists damai_order_1 character set utf8mb4;
+create database if not exists damai_pay_0 character set utf8mb4;
+create database if not exists damai_pay_1 character set utf8mb4;
+create database if not exists damai_program_0 character set utf8mb4;
+create database if not exists damai_program_1 character set utf8mb4;
+create database if not exists damai_user_0 character set utf8mb4;
+create database if not exists damai_user_1 character set utf8mb4;
 USE damai_base_data;
 
 DROP TABLE IF EXISTS `d_area`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `d_area` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '区域id',
   `parent_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '父区域id',
