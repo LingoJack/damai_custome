@@ -10,9 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
- * @description: 本地锁缓存
- * @author: 阿星不是程序员
+ * 本地锁缓存
  **/
 public class LocalLockCache {
 
@@ -20,6 +18,7 @@ public class LocalLockCache {
 	 * 本地锁缓存
 	 */
 	private Cache<String, ReentrantLock> localLockCache;
+
 	/**
 	 * 本地锁的过期时间(小时单位)
 	 */

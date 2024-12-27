@@ -29,6 +29,7 @@ public @interface RepeatExecuteLimit {
 
 	/**
 	 * 在多长时间内一直保持幂等，如果不配置则以执行方法为准
+	 * 如果此值为0，则幂等标识相当于不起任何作用
 	 */
 	long durationTime() default 0L;
 
