@@ -48,7 +48,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       # 主题
-      topic: save_api_data   
+      topic: save_api_data
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   global-config:

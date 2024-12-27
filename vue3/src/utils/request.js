@@ -1,11 +1,11 @@
 import axios from 'axios'
-import {jsrsasign,KJUR, hextob64} from "jsrsasign";
-import { getToken } from '@/utils/auth'
+import {hextob64, KJUR} from "jsrsasign";
+import {getToken} from '@/utils/auth'
 import useUserStore from '@/store/modules/user'
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 是否显示重新登录
-export let isRelogin = { show: false };
+export let isRelogin = {show: false};
 // 创建一个 axios 实例
 const request = axios.create({
     baseURL: import.meta.env.VITE_APP_BASE_API, // 这里设置为代理的路径
@@ -24,13 +24,14 @@ request.interceptors.request.use(
         //向请求头放置token
         if (getToken) {
             let token = getToken();
-            config.headers = Object.assign(config.headers,{token:token});
+            config.headers = Object.assign(config.headers, {token: token});
         }
         return config;
     },
     error => {
         console.log(error); // 打印错误日志
-        Promise.reject(error).then(r => {});
+        Promise.reject(error).then(r => {
+        });
     }
 );
 
@@ -43,22 +44,26 @@ request.interceptors.response.use(
             return response.data;
         }
         const code = response.data.code
-        if(code == "10055"||code == "516"){
+        if (code == "10055" || code == "516") {
             if (!isRelogin.show) {
                 isRelogin.show = true;
-                ElMessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' })
+                ElMessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+                    confirmButtonText: '重新登录',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                })
                     .then(() => {
-                    isRelogin.show = false;
+                        isRelogin.show = false;
                         console.log(useUserStore().logOut());
                         useUserStore().logOut().then(() => {
-                          location.href='/login'
-                    })
-                }).catch(() => {
+                            location.href = '/login'
+                        })
+                    }).catch(() => {
                     isRelogin.show = false;
                 });
             }
             return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
-        }else{
+        } else {
             return response.data;
         }
 
@@ -69,13 +74,13 @@ request.interceptors.response.use(
     }
 );
 
-export function sign(params){
+export function sign(params) {
     const code = import.meta.env.VITE_CODE
     const paramsStr = JSON.stringify(params)
     const signParam = {businessBody: paramsStr, code: code}
 
     const sig = new KJUR.crypto.Signature({alg: "SHA256withRSA"});
-    sig.init("-----BEGIN PRIVATE KEY-----"+import.meta.env.VITE_SIGN_SECRET_KEY+"-----END PRIVATE KEY-----");
+    sig.init("-----BEGIN PRIVATE KEY-----" + import.meta.env.VITE_SIGN_SECRET_KEY + "-----END PRIVATE KEY-----");
     sig.updateString(buildParam(signParam));
     let sign = hextob64(sig.sign());
 

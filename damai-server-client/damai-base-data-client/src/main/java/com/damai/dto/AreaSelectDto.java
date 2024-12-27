@@ -14,10 +14,10 @@ import java.util.List;
 @Schema(title = "AreaSelectDto", description = "AreaSelectDto")
 public class AreaSelectDto {
 
-    /**
-     * 地区ID列表
-     */
-    @Schema(name = "idList", type = "List<Long>", description = "id集合", requiredMode = RequiredMode.REQUIRED)
-    @NotNull
-    private List<Long> idList;
+	/**
+	 * 地区ID列表
+	 */
+	@Schema(name = "idList", type = "List<Long>", description = "id集合", requiredMode = RequiredMode.REQUIRED)
+	@NotNull
+	private List<Long> idList;
 }

@@ -8,32 +8,40 @@
           <el-menu
               :default-openeds="defaultOpened1"
               class="el-menu-vertical-demo"
-              @open="handleOpen"
               @close="handleClose"
+              @open="handleOpen"
 
           >
-            <el-sub-menu index="1" class="titleMenu">
+            <el-sub-menu class="titleMenu" index="1">
               <template #title>
                 <span>交易中心</span>
               </template>
-              <el-menu-item index="5" :class="{ 'is-active': activeIndex === '5'}"><router-link to="/orderManagement/index">订单管理</router-link></el-menu-item>
+              <el-menu-item :class="{ 'is-active': activeIndex === '5'}" index="5">
+                <router-link to="/orderManagement/index">订单管理</router-link>
+              </el-menu-item>
             </el-sub-menu>
 
           </el-menu>
           <el-menu
               :default-openeds="defaultOpened2"
               class="el-menu-vertical-demo"
-              @open="handleOpen"
               @close="handleClose"
+              @open="handleOpen"
           >
             <el-sub-menu index="1">
               <template #title>
                 <span>账户中心</span>
               </template>
-<!--              <el-menu-item index="1" :class="{ 'is-active': props.activeIndex === '1' }">收货地址</el-menu-item>-->
-              <el-menu-item index="2" :class="{ 'is-active': props.activeIndex === '2' }"><router-link to="/accountSettings/index">账号设置</router-link></el-menu-item>
-              <el-menu-item index="3" :class="{ 'is-active': props.activeIndex === '3' }"><router-link to="/personInfo/index">个人信息</router-link></el-menu-item>
-              <el-menu-item index="4" :class="{ 'is-active': props.activeIndex === '4' }"><router-link to="/personInfo/ticketUser">常用购票人</router-link></el-menu-item>
+              <!--              <el-menu-item index="1" :class="{ 'is-active': props.activeIndex === '1' }">收货地址</el-menu-item>-->
+              <el-menu-item :class="{ 'is-active': props.activeIndex === '2' }" index="2">
+                <router-link to="/accountSettings/index">账号设置</router-link>
+              </el-menu-item>
+              <el-menu-item :class="{ 'is-active': props.activeIndex === '3' }" index="3">
+                <router-link to="/personInfo/index">个人信息</router-link>
+              </el-menu-item>
+              <el-menu-item :class="{ 'is-active': props.activeIndex === '4' }" index="4">
+                <router-link to="/personInfo/ticketUser">常用购票人</router-link>
+              </el-menu-item>
             </el-sub-menu>
 
           </el-menu>
@@ -44,8 +52,7 @@
 </template>
 
 <script setup>
-import {Document, Menu as IconMenu, Location, Setting} from '@element-plus/icons-vue'
-import {ref, defineProps} from 'vue'
+import {defineProps, ref} from 'vue'
 // index: 需要打开的 sub-menu 的 index
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
@@ -62,7 +69,7 @@ const props = defineProps({
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   //width: 100%;
   //height: 100%;
@@ -146,7 +153,7 @@ const props = defineProps({
   margin-top: 0px;
 }
 
-:deep(.el-sub-menu .el-menu-item a){
+:deep(.el-sub-menu .el-menu-item a) {
   width: 100%;
   height: 100%;
   display: block;

@@ -3,7 +3,7 @@
   <Header></Header>
   <div class="red-line"></div>
   <div class="section">
-    <MenuSideBar class="sidebarMenu" activeIndex="2"></MenuSideBar>
+    <MenuSideBar activeIndex="2" class="sidebarMenu"></MenuSideBar>
     <div class="right-section">
       <div class="breadcrumb"><span>账号设置</span></div>
       <div class="right-tab">
@@ -11,18 +11,18 @@
           <li class="left">账号设置</li>
         </ul>
         <div class="box">
-          <div class="account-info" v-for="item in accountLists">
+          <div v-for="item in accountLists" class="account-info">
             <ul>
               <li :class="item.nameInfoStyle">{{ item.nameInfo }}</li>
               <li class="detail">{{ item.detailInfo }}</li>
               <li class="explain">
-                <router-link v-if="experienceAccountFlag != 1" :to="item.path"
-                             :class="(item.explainInfo =='立即验证'||item.explainInfo =='立即绑定')? 'pathBtn':'btnColor'">
+                <router-link v-if="experienceAccountFlag != 1" :class="(item.explainInfo =='立即验证'||item.explainInfo =='立即绑定')? 'pathBtn':'btnColor'"
+                             :to="item.path">
                   {{ item.explainInfo }}
                 </router-link>
-                <div class="btnColor" v-if="experienceAccountFlag == 1">
-                    体验不支持
-                </div>  
+                <div v-if="experienceAccountFlag == 1" class="btnColor">
+                  体验不支持
+                </div>
               </li>
             </ul>
           </div>
@@ -37,10 +37,9 @@
 import MenuSideBar from '../../components/menuSidebar/index'
 import Header from '../../components/header/index'
 import Footer from '../../components/footer/index'
-import useUserStore from "../../store/modules/user";
-import {getName, getUserIdKey} from "../../utils/auth";
+import {getUserIdKey} from "../../utils/auth";
 import {getPersonInfoId} from '@/api/personInfo'
-import {ref, reactive} from 'vue'
+import {reactive, ref} from 'vue'
 
 //体验账号标识
 const experienceAccountFlag = ref(import.meta.env.VITE_EXPERIENCE_ACCOUNT_FLAG);
@@ -86,7 +85,7 @@ getIsVaild()
 function getIsVaild() {
   const id = getUserIdKey()
   getPersonInfoId({id: id}).then(response => {
-    let {relAuthenticationStatus, emailStatus,mobile} = response.data
+    let {relAuthenticationStatus, emailStatus, mobile} = response.data
     telNum.value = mobile
     //此处判断是否验证，来控制显示那种图标
     accountLists.value = accountList.map(item => {
@@ -104,7 +103,7 @@ function getIsVaild() {
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .red-line {
   border-bottom: 5px solid rgba(255, 55, 29, 0.85);
 }
@@ -247,6 +246,7 @@ function getIsVaild() {
               display: inline-block;
               font-size: 14px;
             }
+
             .btnColor {
               color: #2f97b4;
               font-size: 14px;

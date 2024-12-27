@@ -12,6 +12,7 @@ export function getcategoryType(data) {
         data: data
     })
 }
+
 export function getMainCategory(data) {
     return request({
         url: '/damai/program/program/home/list',

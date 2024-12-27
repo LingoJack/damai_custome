@@ -20,7 +20,7 @@
                   </div>
                 </div>
                 <!--                预售-->
-                <div class="notice" v-show="detailList.preSell=='1'">
+                <div v-show="detailList.preSell=='1'" class="notice">
                   <div class="ticket-type"><span v-if="detailList.preSell=='1'">预售</span></div>
                   <div class="content">
                     <div>{{ detailList.preSellInstruction }}</div>
@@ -32,7 +32,7 @@
                 <div class="citys">
                   <span>城市</span>
                   <div class="city-list">
-                    <div class="city-item activeCity" :id="detailList.areaId">{{ detailList.areaName }}</div>
+                    <div :id="detailList.areaId" class="city-item activeCity">{{ detailList.areaName }}</div>
                   </div>
                   <div class="city-more">查看更多</div>
                 </div>
@@ -53,9 +53,9 @@
                   <div class="order-time">
                     <div class="order-name">票档</div>
                     <div class="select">
-                      <div class="select-list" v-for="(item,index) in  ticketCategoryVoList">
-                        <div class="select-list-item " @click="ticketClick(item,index)"
-                             :class="{ticket: actvieIndex == index}">
+                      <div v-for="(item,index) in  ticketCategoryVoList" class="select-list">
+                        <div :class="{ticket: actvieIndex == index}" class="select-list-item "
+                             @click="ticketClick(item,index)">
                           <span>{{ item.introduce }}</span>
                         </div>
                       </div>
@@ -66,7 +66,7 @@
                   <div class="num">数量</div>
                   <div class="count">
                     <div class="count-info">
-                      <el-input-number v-model="num" :min="1" :max="6" @change="handleChange"/>
+                      <el-input-number v-model="num" :max="6" :min="1" @change="handleChange"/>
                     </div>
                     <div class="num-limit">每笔订单限购6张</div>
                   </div>
@@ -74,20 +74,20 @@
                 <div class="order-box">
                   <div class="order-time">
                     <div class="order-name">合计</div>
-                    <div class="order-count" v-if="allPrice==''">￥{{countPrice }}</div>
-                    <div class="order-count" v-else>￥{{allPrice }}</div>
+                    <div v-if="allPrice==''" class="order-count">￥{{ countPrice }}</div>
+                    <div v-else class="order-count">￥{{ allPrice }}</div>
                   </div>
                 </div>
                 <div class="buy">
                   <div class="buy-link-now" @click="nowBuy">立即购买</div>
                   <!--                    <router-link class="buy-link" to="/order/index">不，选座购买</router-link>-->
-<!--                  <div class="subtitle">请您移步手机端购买</div>
-                  <div class="qrcode">
-                    <div class="tip">手机扫码购买更便捷</div>
-                    <div class="J_qrcodeImg"></div>
-                    <div class="buy-link" @click="nowBuy">不，立即购买</div>
+                  <!--                  <div class="subtitle">请您移步手机端购买</div>
+                                    <div class="qrcode">
+                                      <div class="tip">手机扫码购买更便捷</div>
+                                      <div class="J_qrcodeImg"></div>
+                                      <div class="buy-link" @click="nowBuy">不，立即购买</div>
 
-                  </div>-->
+                                    </div>-->
                 </div>
 
               </div>
@@ -95,14 +95,14 @@
           </div>
           <div class="box-item">
             <div class="box-menu">
-              <router-link class="menu-children" to="#projectDetial" @click="detialClick('#projectDetial',1)"
-                           :class="{menuActive: menuActive == 1}">项目详情
+              <router-link :class="{menuActive: menuActive == 1}" class="menu-children" to="#projectDetial"
+                           @click="detialClick('#projectDetial',1)">项目详情
               </router-link>
-              <router-link class="menu-children" to="#ticketNeed" @click="detialClick('#ticketNeed',2)"
-                           :class="{menuActive: menuActive == 2}">购票须知
+              <router-link :class="{menuActive: menuActive == 2}" class="menu-children" to="#ticketNeed"
+                           @click="detialClick('#ticketNeed',2)">购票须知
               </router-link>
-              <router-link class="menu-children" to="#watchNeed" @click="detialClick('#watchNeed',3)"
-                           :class="{menuActive: menuActive == 3}">观演须知
+              <router-link :class="{menuActive: menuActive == 3}" class="menu-children" to="#watchNeed"
+                           @click="detialClick('#watchNeed',3)">观演须知
               </router-link>
             </div>
             <div id="projectDetial">
@@ -134,48 +134,54 @@
         <div class="box-right">
           <div class="service">
 
-            <div class="sit" v-show="detailList.permitChooseSeat=='1'">查看座位图</div>
+            <div v-show="detailList.permitChooseSeat=='1'" class="sit">查看座位图</div>
             <div class="service-note">
-              <div class="service-name" v-if="detailList.permitRefund!=''">
-                <i class="icon-no" v-if="detailList.permitRefund=='0'"></i><span v-if="detailList.permitRefund=='0'">不支持退</span>
-                <i class="icon-yes" v-if="detailList.permitRefund=='1'"></i><span v-if="detailList.permitRefund=='1'">条件退</span>
-                <i class="icon-yes" v-if="detailList.permitRefund=='2'"></i><span v-if="detailList.permitRefund=='2'">全部退</span>
+              <div v-if="detailList.permitRefund!=''" class="service-name">
+                <i v-if="detailList.permitRefund=='0'" class="icon-no"></i><span v-if="detailList.permitRefund=='0'">不支持退</span>
+                <i v-if="detailList.permitRefund=='1'" class="icon-yes"></i><span v-if="detailList.permitRefund=='1'">条件退</span>
+                <i v-if="detailList.permitRefund=='2'" class="icon-yes"></i><span v-if="detailList.permitRefund=='2'">全部退</span>
               </div>
-              <div class="service-desc" v-if="detailList.refundExplain!=''">{{ detailList.refundExplain }}</div>
-              <div class="service-name" v-if="detailList.relNameTicketEntrance!=''">
-                <i class="icon-no" v-if="detailList.relNameTicketEntrance=='0'"></i><span
+              <div v-if="detailList.refundExplain!=''" class="service-desc">{{ detailList.refundExplain }}</div>
+              <div v-if="detailList.relNameTicketEntrance!=''" class="service-name">
+                <i v-if="detailList.relNameTicketEntrance=='0'" class="icon-no"></i><span
                   v-if="detailList.relNameTicketEntrance=='0'">不实名购票和入场</span>
-                <i class="icon-yes" v-if="detailList.relNameTicketEntrance=='1'"></i><span
+                <i v-if="detailList.relNameTicketEntrance=='1'" class="icon-yes"></i><span
                   v-if="detailList.relNameTicketEntrance=='1'">实名购票和入场</span>
 
               </div>
-              <div class="service-desc"  v-if="detailList.relNameTicketEntranceExplain!=''">{{ detailList.relNameTicketEntranceExplain }}</div>
-              <div class="service-name"   v-if="detailList.permitChooseSeat!=''">
-                <i class="icon-no" v-if="detailList.permitChooseSeat=='0'"></i><span
+              <div v-if="detailList.relNameTicketEntranceExplain!=''" class="service-desc">
+                {{ detailList.relNameTicketEntranceExplain }}
+              </div>
+              <div v-if="detailList.permitChooseSeat!=''" class="service-name">
+                <i v-if="detailList.permitChooseSeat=='0'" class="icon-no"></i><span
                   v-if="detailList.permitChooseSeat=='0'">不支持选座</span>
-                <i class="icon-yes" v-if="detailList.permitChooseSeat=='1'"></i><span
+                <i v-if="detailList.permitChooseSeat=='1'" class="icon-yes"></i><span
                   v-if="detailList.permitChooseSeat=='1'">支持选座</span>
 
               </div>
-              <div class="service-desc"  v-if="detailList.chooseSeatExplain!=''">{{ detailList.chooseSeatExplain }}</div>
-              <div class="service-name" v-if="detailList.electronicDeliveryTicket!=''">
-                <i class="icon-no" v-if="detailList.electronicDeliveryTicket=='0'"></i><span
+              <div v-if="detailList.chooseSeatExplain!=''" class="service-desc">{{ detailList.chooseSeatExplain }}</div>
+              <div v-if="detailList.electronicDeliveryTicket!=''" class="service-name">
+                <i v-if="detailList.electronicDeliveryTicket=='0'" class="icon-no"></i><span
                   v-if="detailList.electronicDeliveryTicket=='0'">无票</span>
-                <i class="icon-yes" v-if="detailList.electronicDeliveryTicket=='1'"></i><span
+                <i v-if="detailList.electronicDeliveryTicket=='1'" class="icon-yes"></i><span
                   v-if="detailList.electronicDeliveryTicket=='1'">电子票</span>
-                <i class="icon-yes" v-if="detailList.electronicDeliveryTicket=='2'"></i><span
+                <i v-if="detailList.electronicDeliveryTicket=='2'" class="icon-yes"></i><span
                   v-if="detailList.electronicDeliveryTicket=='2'">快递票</span>
 
               </div>
-              <div class="service-desc"  v-if="detailList.electronicDeliveryTicketExplain!=''">{{ detailList.electronicDeliveryTicketExplain }}</div>
-              <div class="service-name"  v-if="detailList.electronicInvoice!=''">
-                <i class="icon-no" v-if="detailList.electronicInvoice=='0'"></i><span
+              <div v-if="detailList.electronicDeliveryTicketExplain!=''" class="service-desc">
+                {{ detailList.electronicDeliveryTicketExplain }}
+              </div>
+              <div v-if="detailList.electronicInvoice!=''" class="service-name">
+                <i v-if="detailList.electronicInvoice=='0'" class="icon-no"></i><span
                   v-if="detailList.electronicInvoice=='0'">纸质发票</span>
-                <i class="icon-yes" v-if="detailList.electronicInvoice=='1'"></i><span
+                <i v-if="detailList.electronicInvoice=='1'" class="icon-yes"></i><span
                   v-if="detailList.electronicInvoice=='1'">电子发票</span>
 
               </div>
-              <div class="service-desc"  v-if="detailList.electronicInvoiceExplain!=''">{{ detailList.electronicInvoiceExplain }}</div>
+              <div v-if="detailList.electronicInvoiceExplain!=''" class="service-desc">
+                {{ detailList.electronicInvoiceExplain }}
+              </div>
             </div>
 
           </div>
@@ -183,21 +189,24 @@
             为你推荐
           </div>
           <ul class="search__box">
-            <li class="search__item" v-for="item in recommendList">
-                <router-link :to="{name:'detial',params:{id:item.id}}" class="link" >
-                  <img :src="item.itemPicture" alt="">
-                  <router-view :key="route.fullpath" />
+            <li v-for="item in recommendList" class="search__item">
+              <router-link :to="{name:'detial',params:{id:item.id}}" class="link">
+                <img :src="item.itemPicture" alt="">
+                <router-view :key="route.fullpath"/>
 
-                </router-link>
+              </router-link>
 
               <div class="search_item_info">
-                  <router-link :to="{name:'detial',params:{id:item.id}}"  class="link__title" >
-                    <router-view :key="route.fullpath"/>
-                    {{ item.title }}
+                <router-link :to="{name:'detial',params:{id:item.id}}" class="link__title">
+                  <router-view :key="route.fullpath"/>
+                  {{ item.title }}
 
-                  </router-link>
+                </router-link>
                 <div class="search__item__info__venue">{{ item.place }}</div>
-                <div class="search__item__info__venue">{{ formatDateWithWeekday(item.showTime, item.showWeekTime) }}</div>
+                <div class="search__item__info__venue">{{
+                    formatDateWithWeekday(item.showTime, item.showWeekTime)
+                  }}
+                </div>
                 <div class="search__item__info__price">￥<strong>{{ item.minPrice }}</strong> 起</div>
               </div>
 
@@ -207,24 +216,24 @@
       </div>
     </div>
 
-   <Footer></Footer>
+    <Footer></Footer>
 
   </div>
 
 </template>
 
-<script setup name="detial">
+<script name="detial" setup>
 import Header from '@/components/header/index'
 import Footer from '@/components/footer/index'
-import {formatDateWithWeekday } from '@/utils/index'
+import {formatDateWithWeekday, useMitt} from '@/utils/index'
 import {useRoute, useRouter} from 'vue-router'
 import {getProgramDetials} from '@/api/contentDetail'
-import {ref} from 'vue'
-import {   useMitt } from "@/utils/index";
-import {getProgramRecommendList} from "@/api/recommendlist.js"
-const emitter = useMitt();
 //引入reactive
-import {reactive} from 'vue'
+import {reactive, ref} from 'vue'
+import {getProgramRecommendList} from "@/api/recommendlist.js"
+
+const emitter = useMitt();
+
 const route = useRoute();
 const router = useRouter();
 // 获取路由参数
@@ -255,7 +264,7 @@ function getProgramDetialsList() {
   getProgramDetials({id: paramValue}).then(response => {
     detailList.value = response.data
     ticketCategoryVoList.value = detailList.value.ticketCategoryVoList
-    countPrice.value=ticketCategoryVoList.value[0].price
+    countPrice.value = ticketCategoryVoList.value[0].price
     ticketCategoryId.value = ticketCategoryVoList.value[0].id
     allPrice.value = ''
     ticketNeedInfo.value = [{
@@ -316,35 +325,34 @@ const detialClick = (url, index) => {
 
 }
 const handleChange = (value) => {
- const priceEach= countPrice.value
-  allPrice.value = priceEach*value
+  const priceEach = countPrice.value
+  allPrice.value = priceEach * value
 
 }
-const nowBuy=()=>{
-  router.replace({path:'/order/index',state:
-        {'detailList':JSON.stringify(detailList.value),'allPrice':allPrice.value,
-          'countPrice':countPrice.value,'num':num.value,'ticketCategoryId':ticketCategoryId.value}})
+const nowBuy = () => {
+  router.replace({
+    path: '/order/index', state:
+        {
+          'detailList': JSON.stringify(detailList.value), 'allPrice': allPrice.value,
+          'countPrice': countPrice.value, 'num': num.value, 'ticketCategoryId': ticketCategoryId.value
+        }
+  })
 
 }
 
 getRecommendList()
 
 //节目推荐列表
-function getRecommendList(){
+function getRecommendList() {
   getProgramRecommendList(recommendParams).then(response => {
-    recommendList.value = response.data.slice(0,6);
+    recommendList.value = response.data.slice(0, 6);
   })
 }
 
 
-
-
-
-
-
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 1200px;
   margin: 0 auto;
@@ -621,7 +629,8 @@ function getRecommendList(){
                   margin-left: 9px;
                   font-weight: bold;
                 }
-                .count-detial{
+
+                .count-detial {
                   position: relative;
                   font-size: 12px;
                   color: #000;
@@ -671,7 +680,8 @@ function getRecommendList(){
             .buy {
               display: inline-block;
               margin-top: 20px;
-              .buy-link-now{
+
+              .buy-link-now {
                 width: 100px;
                 display: block;
                 margin-bottom: 24px;
@@ -779,7 +789,7 @@ function getRecommendList(){
 
           img {
             width: 100%;
-            height:100%;
+            height: 100%;
             display: block;
             padding-bottom: 50px;
           }
@@ -920,36 +930,43 @@ function getRecommendList(){
           }
         }
       }
-      .box-like{
+
+      .box-like {
         margin-top: 24px;
         margin-bottom: 24px;
         font-size: 20px;
         color: #000;
         line-height: 28px;
       }
-      .search__box{
+
+      .search__box {
         list-style: none;
         margin: 0;
         padding: 0;
-        .search__item{
+
+        .search__item {
           width: 100%;
           height: 160px;
           margin-bottom: 30px;
-          .link{
+
+          .link {
             width: 120px;
             height: 100%;
             display: inline-block;
-            img{
+
+            img {
               float: left;
               width: 120px;
               height: 100%;
             }
           }
-          .search_item_info{
+
+          .search_item_info {
             width: 157px;
             float: right;
             height: 160px;
-            .link__title{
+
+            .link__title {
               display: -webkit-box;
               -webkit-box-orient: vertical;
               -webkit-line-clamp: 2;
@@ -959,14 +976,16 @@ function getRecommendList(){
               color: #4a4a4a;
               padding-left: 17px;
             }
-            .search__item__info__venue{
+
+            .search__item__info__venue {
               margin-top: 12px;
               color: #9b9b9b;
               padding-left: 20px;
               font-size: 12px;
 
             }
-            .search__item__info__price{
+
+            .search__item__info__price {
               font-size: 16px;
               color: rgba(255, 55, 29, 0.85);
               margin-top: 39px;

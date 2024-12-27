@@ -10,9 +10,9 @@ import lombok.Data;
 @Data
 public class BasePageDto {
 
-    @NotNull
-    private Integer pageNumber;
+	@NotNull
+	private Integer pageNumber;
 
-    @NotNull
-    private Integer pageSize;
+	@NotNull
+	private Integer pageSize;
 }

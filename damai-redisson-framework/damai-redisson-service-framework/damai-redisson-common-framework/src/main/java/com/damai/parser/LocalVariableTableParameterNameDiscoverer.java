@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 此类在 6.1其实被废弃，但是只能这个类才能实现对 #对象.属性 的spel解析，所以还得加上
  * @author: 阿星不是程序员
  **/
@@ -32,10 +32,10 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 
 	private static final Log logger = LogFactory.getLog(LocalVariableTableParameterNameDiscoverer.class);
 
-	
+
 	private static final Map<Executable, String[]> NO_DEBUG_INFO_MAP = Collections.emptyMap();
 
-	
+
 	private final Map<Class<?>, Map<Executable, String[]>> parameterNamesCache = new ConcurrentHashMap<>(32);
 
 
@@ -130,6 +130,14 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 			this.executableMap = executableMap;
 		}
 
+		private static boolean isSyntheticOrBridged(int access) {
+			return (((access & Opcodes.ACC_SYNTHETIC) | (access & Opcodes.ACC_BRIDGE)) > 0);
+		}
+
+		private static boolean isStatic(int access) {
+			return ((access & Opcodes.ACC_STATIC) > 0);
+		}
+
 		@Override
 		@Nullable
 		public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
@@ -138,14 +146,6 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 				return new LocalVariableTableVisitor(this.clazz, this.executableMap, name, desc, isStatic(access));
 			}
 			return null;
-		}
-
-		private static boolean isSyntheticOrBridged(int access) {
-			return (((access & Opcodes.ACC_SYNTHETIC) | (access & Opcodes.ACC_BRIDGE)) > 0);
-		}
-
-		private static boolean isStatic(int access) {
-			return ((access & Opcodes.ACC_STATIC) > 0);
 		}
 	}
 
@@ -165,14 +165,12 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 		private final String[] parameterNames;
 
 		private final boolean isStatic;
-
-		private boolean hasLvtInfo = false;
-
 		/*
 		 * The nth entry contains the slot index of the LVT table entry holding the
 		 * argument name for the nth parameter.
 		 */
 		private final int[] lvtSlotIndex;
+		private boolean hasLvtInfo = false;
 
 		public LocalVariableTableVisitor(Class<?> clazz, Map<Executable, String[]> map, String name, String desc, boolean isStatic) {
 			super(SpringAsmInfo.ASM_VERSION);
@@ -183,6 +181,26 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 			this.parameterNames = new String[this.args.length];
 			this.isStatic = isStatic;
 			this.lvtSlotIndex = computeLvtSlotIndices(isStatic, this.args);
+		}
+
+		private static int[] computeLvtSlotIndices(boolean isStatic, Type[] paramTypes) {
+			int[] lvtIndex = new int[paramTypes.length];
+			int nextIndex = (isStatic ? 0 : 1);
+			for (int i = 0; i < paramTypes.length; i++) {
+				lvtIndex[i] = nextIndex;
+				if (isWideType(paramTypes[i])) {
+					nextIndex += 2;
+				}
+				else {
+					nextIndex++;
+				}
+			}
+			return lvtIndex;
+		}
+
+		private static boolean isWideType(Type aType) {
+			// float is not a wide type
+			return (aType == Type.LONG_TYPE || aType == Type.DOUBLE_TYPE);
 		}
 
 		@Override
@@ -205,8 +223,8 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 				this.executableMap.put(resolveExecutable(), this.parameterNames);
 			}
 		}
-		
-		public boolean result(){
+
+		public boolean result() {
 			return this.isStatic && this.parameterNames.length == 0;
 		}
 
@@ -226,26 +244,6 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 				throw new IllegalStateException("Method [" + this.name +
 						"] was discovered in the .class file but cannot be resolved in the class object", ex);
 			}
-		}
-
-		private static int[] computeLvtSlotIndices(boolean isStatic, Type[] paramTypes) {
-			int[] lvtIndex = new int[paramTypes.length];
-			int nextIndex = (isStatic ? 0 : 1);
-			for (int i = 0; i < paramTypes.length; i++) {
-				lvtIndex[i] = nextIndex;
-				if (isWideType(paramTypes[i])) {
-					nextIndex += 2;
-				}
-				else {
-					nextIndex++;
-				}
-			}
-			return lvtIndex;
-		}
-
-		private static boolean isWideType(Type aType) {
-			// float is not a wide type
-			return (aType == Type.LONG_TYPE || aType == Type.DOUBLE_TYPE);
 		}
 	}
 

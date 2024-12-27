@@ -1,70 +1,70 @@
 package com.damai.enums;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 支付渠道
  * @author: 阿星不是程序员
  **/
 public enum PayChannel {
-    /**
-     * 支付渠道
-     * */
-    ALIPAY(1,"alipay","支付宝"),
-    
-    WX(2,"wx","微信"),
-    ;
+	/**
+	 * 支付渠道
+	 */
+	ALIPAY(1, "alipay", "支付宝"),
 
-    private Integer code;
-    
-    private String value;
+	WX(2, "wx", "微信"),
+	;
 
-    private String msg;
+	private Integer code;
 
-    PayChannel(Integer code, String value, String msg) {
-        this.code = code;
-        this.value = value;
-        this.msg = msg;
-    }
+	private String value;
 
-    public Integer getCode() {
-        return code;
-    }
+	private String msg;
 
-    public void setCode(Integer code) {
-        this.code = code;
-    }
+	PayChannel(Integer code, String value, String msg) {
+		this.code = code;
+		this.value = value;
+		this.msg = msg;
+	}
 
-    public String getMsg() {
-        return this.msg == null ? "" : this.msg;
-    }
+	public static String getMsg(Integer code) {
+		for (PayChannel re : PayChannel.values()) {
+			if (re.code.intValue() == code.intValue()) {
+				return re.msg;
+			}
+		}
+		return "";
+	}
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-    
-    public String getValue() {
-        return value;
-    }
-    
-    public void setValue(final String value) {
-        this.value = value;
-    }
-    
-    public static String getMsg(Integer code) {
-        for (PayChannel re : PayChannel.values()) {
-            if (re.code.intValue() == code.intValue()) {
-                return re.msg;
-            }
-        }
-        return "";
-    }
+	public static PayChannel getRc(Integer code) {
+		for (PayChannel re : PayChannel.values()) {
+			if (re.code.intValue() == code.intValue()) {
+				return re;
+			}
+		}
+		return null;
+	}
 
-    public static PayChannel getRc(Integer code) {
-        for (PayChannel re : PayChannel.values()) {
-            if (re.code.intValue() == code.intValue()) {
-                return re;
-            }
-        }
-        return null;
-    }
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
+	public String getMsg() {
+		return this.msg == null ? "" : this.msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(final String value) {
+		this.value = value;
+	}
 }

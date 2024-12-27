@@ -54,7 +54,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.util.retry.RetrySpec;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 对 {@link LoadBalancerClientConfiguration} 的定制增强
  * @author: 阿星不是程序员
  **/
@@ -65,7 +65,7 @@ public class EnhanceLoadBalancerClientConfiguration {
 
 	@Bean
 	public ReactorLoadBalancer<ServiceInstance> reactorServiceInstanceLoadBalancer(Environment environment,
-			LoadBalancerClientFactory loadBalancerClientFactory) {
+																				   LoadBalancerClientFactory loadBalancerClientFactory) {
 		String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
 		return new RoundRobinLoadBalancer(
 				loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class), name);
@@ -102,7 +102,7 @@ public class EnhanceLoadBalancerClientConfiguration {
 		}
 
 		@Bean
-		@ConditionalOnBean({ ReactiveDiscoveryClient.class, WebClient.Builder.class })
+		@ConditionalOnBean({ReactiveDiscoveryClient.class, WebClient.Builder.class})
 		@Conditional(HealthCheckConfigurationCondition.class)
 		public ServiceInstanceListSupplier healthCheckDiscoveryClientServiceInstanceListSupplier(
 				ConfigurableApplicationContext context,
@@ -177,7 +177,7 @@ public class EnhanceLoadBalancerClientConfiguration {
 		}
 
 		@Bean
-		@ConditionalOnBean({ DiscoveryClient.class, RestTemplate.class })
+		@ConditionalOnBean({DiscoveryClient.class, RestTemplate.class})
 		@Conditional(HealthCheckConfigurationCondition.class)
 		public ServiceInstanceListSupplier healthCheckDiscoveryClientServiceInstanceListSupplier(
 				ConfigurableApplicationContext context,
@@ -187,7 +187,7 @@ public class EnhanceLoadBalancerClientConfiguration {
 		}
 
 		@Bean
-		@ConditionalOnBean({ DiscoveryClient.class, RestClient.class })
+		@ConditionalOnBean({DiscoveryClient.class, RestClient.class})
 		@Conditional(HealthCheckConfigurationCondition.class)
 		public ServiceInstanceListSupplier healthCheckRestClientDiscoveryClientServiceInstanceListSupplier(
 				ConfigurableApplicationContext context,

@@ -14,15 +14,15 @@ import java.util.Map;
 @Data
 public class RequestTemporaryWrapper {
 
-    /**
-     * 存储请求参数或其他临时数据
-     * 使用Map结构以便于快速的插入和查询数据
-     */
-    private Map<String, String> map;
+	/**
+	 * 存储请求参数或其他临时数据
+	 * 使用Map结构以便于快速的插入和查询数据
+	 */
+	private Map<String, String> map;
 
-    /**
-     * 存储对请求的响应数据
-     * 使用ApiResponse对象以便于统一响应格式和处理逻辑
-     */
-    private ApiResponse<?> apiResponse;
+	/**
+	 * 存储对请求的响应数据
+	 * 使用ApiResponse对象以便于统一响应格式和处理逻辑
+	 */
+	private ApiResponse<?> apiResponse;
 }

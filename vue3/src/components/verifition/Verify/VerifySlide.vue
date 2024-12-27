@@ -1,38 +1,38 @@
 <template>
   <div style="position: relative;">
-    <div v-if="type === '2'" class="verify-img-out"
-         :style="{height: (parseInt(setSize.imgHeight) + vSpace) + 'px'}"
+    <div v-if="type === '2'" :style="{height: (parseInt(setSize.imgHeight) + vSpace) + 'px'}"
+         class="verify-img-out"
     >
-      <div class="verify-img-panel" :style="{width: setSize.imgWidth,
-                                                   height: setSize.imgHeight,}">
+      <div :style="{width: setSize.imgWidth,
+                                                   height: setSize.imgHeight,}" class="verify-img-panel">
         <img :src="'data:image/png;base64,'+backImgBase" alt="" style="width:100%;height:100%;display:block">
-        <div class="verify-refresh" @click="refresh" v-show="showRefresh"><i class="iconfont icon-refresh"></i>
+        <div v-show="showRefresh" class="verify-refresh" @click="refresh"><i class="iconfont icon-refresh"></i>
         </div>
         <transition name="tips">
-          <span class="verify-tips" v-if="tipWords" :class="passFlag ?'suc-bg':'err-bg'">{{ tipWords }}</span>
+          <span v-if="tipWords" :class="passFlag ?'suc-bg':'err-bg'" class="verify-tips">{{ tipWords }}</span>
         </transition>
       </div>
     </div>
     <!-- 公共部分 -->
-    <div class="verify-bar-area" :style="{width: setSize.imgWidth,
+    <div :style="{width: setSize.imgWidth,
                                               height: barSize.height,
-                                              'line-height':barSize.height}">
+                                              'line-height':barSize.height}" class="verify-bar-area">
       <span class="verify-msg" v-text="text"></span>
-      <div class="verify-left-bar"
-           :style="{width: (leftBarWidth!==undefined)?leftBarWidth: barSize.height, height: barSize.height, 'border-color': leftBarBorderColor, transaction: transitionWidth}">
+      <div :style="{width: (leftBarWidth!==undefined)?leftBarWidth: barSize.height, height: barSize.height, 'border-color': leftBarBorderColor, transaction: transitionWidth}"
+           class="verify-left-bar">
         <span class="verify-msg" v-text="finishText"></span>
-        <div class="verify-move-block"
-             @touchstart="start"
+        <div :style="{width: barSize.height, height: barSize.height, 'background-color': moveBlockBackgroundColor, left: moveBlockLeft, transition: transitionLeft}"
+             class="verify-move-block"
              @mousedown="start"
-             :style="{width: barSize.height, height: barSize.height, 'background-color': moveBlockBackgroundColor, left: moveBlockLeft, transition: transitionLeft}">
+             @touchstart="start">
           <i :class="['verify-icon iconfont', iconClass]"
              :style="{color: iconColor}"></i>
-          <div v-if="type === '2'" class="verify-sub-block"
-               :style="{'width':Math.floor(parseInt(setSize.imgWidth)*47/310)+ 'px',
+          <div v-if="type === '2'" :style="{'width':Math.floor(parseInt(setSize.imgWidth)*47/310)+ 'px',
                                   'height': setSize.imgHeight,
                                   'top':'-' + (parseInt(setSize.imgHeight) + vSpace) + 'px',
                                   'background-size': setSize.imgWidth + ' ' + setSize.imgHeight,
-                                  }">
+                                  }"
+               class="verify-sub-block">
             <img :src="'data:image/png;base64,'+blockBackImgBase" alt=""
                  style="width:100%;height:100%;display:block;-webkit-user-drag:none;">
           </div>
@@ -48,9 +48,8 @@
  * */
 import {aesEncrypt} from "./../utils/ase"
 import {resetSize} from './../utils/util'
-import {reqGet, reqCheck} from "./../api/index"
-import {computed, onMounted, reactive, ref, watch, nextTick, toRefs, watchEffect, getCurrentInstance} from 'vue';
-import {ElMessage} from "element-plus";
+import {reqCheck, reqGet} from "./../api/index"
+import {computed, getCurrentInstance, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue';
 import $bus from '../../../utils/bus.js'
 //  "captchaType":"blockPuzzle",
 export default {
@@ -260,7 +259,7 @@ export default {
         //验证
         reqCheck(data).then(res => {
           if (res.repCode == "0000") {
-            $bus.emit('res',res)
+            $bus.emit('res', res)
             moveBlockBackgroundColor.value = '#5cb85c'
             leftBarBorderColor.value = '#5cb85c'
             iconColor.value = '#fff'
@@ -330,6 +329,7 @@ export default {
         text.value = explain.value
       }, 300)
     }
+
     // 请求背景图片和验证图片
     function getPictrue() {
       let data = {
@@ -338,7 +338,7 @@ export default {
       reqGet(data).then(res => {
 
         if (res.repCode == "0000") {
-          $bus.emit('getKeyValue',res)
+          $bus.emit('getKeyValue', res)
           backImgBase.value = res.repData.originalImageBase64
           blockBackImgBase.value = res.repData.jigsawImageBase64
           backToken.value = res.repData.token

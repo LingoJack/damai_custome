@@ -1,4 +1,4 @@
-export function getIdTypeName(idType){
+export function getIdTypeName(idType) {
     if (idType == 1) {
         return '身份证';
     }

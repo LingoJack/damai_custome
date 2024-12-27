@@ -1,17 +1,17 @@
 <template>
   <div class="app-header">
     <div class="header">
-      <router-link to="/index" class="link">
+      <router-link class="link" to="/index">
         <img :src="logo" alt="">
       </router-link>
-      <div class="localHeader" v-if="isShowHeader">
+      <div v-if="isShowHeader" class="localHeader">
         <el-icon :size="16">
           <Location/>
         </el-icon>
 
-        <el-popover placement="bottom" @click="visible = !visible" style="height: 10px">
+        <el-popover placement="bottom" style="height: 10px" @click="visible = !visible">
           <template #reference>
-            <span style="margin-right: 16px" class="city-location">{{ localName }}<el-icon :size="12"> <CaretBottom/></el-icon></span>
+            <span class="city-location" style="margin-right: 16px">{{ localName }}<el-icon :size="12"> <CaretBottom/></el-icon></span>
           </template>
           <div class="city">
             <div class="now-city">
@@ -20,7 +20,7 @@
             <div class="hot-city">
               <span class="title-city">热门城市：</span>
               <ul class="list-city">
-                <li class="city-name" v-for="item in hotCity" :key="item.id" @click="getCityInfoList(item)">
+                <li v-for="item in hotCity" :key="item.id" class="city-name" @click="getCityInfoList(item)">
                   {{ item.name }}
                 </li>
               </ul>
@@ -28,7 +28,7 @@
             <div class="others-city">
               <span class="title-city">其他城市：</span>
               <ul class="list-city">
-                <li class="city-name" v-for="item in otherCity" :key="item.id" @click="getCityInfoList(item)">
+                <li v-for="item in otherCity" :key="item.id" class="city-name" @click="getCityInfoList(item)">
                   {{ item.name }}
                 </li>
               </ul>
@@ -38,15 +38,15 @@
 
 
       </div>
-      <div class="recommendHeader" v-if="isShowHeader">
-        <router-link to="/index" class="routeHome" tag="div">首页</router-link>
-        <router-link to="/allType/index" class="routeType" tag="div">分类</router-link>
+      <div v-if="isShowHeader" class="recommendHeader">
+        <router-link class="routeHome" tag="div" to="/index">首页</router-link>
+        <router-link class="routeType" tag="div" to="/allType/index">分类</router-link>
       </div>
-      <div class="searchHeader" v-if="isShowHeader">
+      <div v-if="isShowHeader" class="searchHeader">
         <el-input
             v-model="iptSearch"
-            placeholder="搜索明星、演出、体育赛事"
             class="input-with-search"
+            placeholder="搜索明星、演出、体育赛事"
         >
           <template #prepend>
             <el-icon :size="20">
@@ -58,13 +58,13 @@
           </template>
         </el-input>
       </div>
-      <div class="rightHeader" v-if="isShowHeader">
+      <div v-if="isShowHeader" class="rightHeader">
         <div class="box-left">
 
           <el-popover :width="100">
             <template #reference>
               <span><img :src="photo" alt="" class="">
-                <router-link to="/login" class="log">{{ isLoginToken }}</router-link></span>
+                <router-link class="log" to="/login">{{ isLoginToken }}</router-link></span>
             </template>
             <template #default>
               <ul class="loginInfo">
@@ -77,7 +77,7 @@
                 <li>
                   <router-link to="/orderManagement/index">订单管理</router-link>
                 </li>
-                <li @click="loginOut" class="logOut" v-if="isHasToken">
+                <li v-if="isHasToken" class="logOut" @click="loginOut">
                   <span class="loginOut">退出登录</span>
                 </li>
               </ul>
@@ -99,13 +99,12 @@
 import logo from '@/assets/login/logo.png'
 import photo from '@/assets/login/photo.png'
 import document from '@/assets/login/document.jpeg'
-import {ref, reactive, onMounted, nextTick} from 'vue'
-import {getToken, getUserIdKey, removeToken, removeUserIdKey, removeName} from "../../utils/auth";
+import {defineEmits, onMounted, ref} from 'vue'
+import {getUserIdKey, removeName, removeToken, removeUserIdKey} from "../../utils/auth";
 import useUserStore from '@/store/modules/user'
 import {getPersonInfoId} from '@/api/personInfo'
 import {useRoute, useRouter} from 'vue-router'
-import {getCurrentCity, getHotCity, getOtherCity, getCityInfo} from '@/api/area'
-import {defineEmits} from 'vue'
+import {getCityInfo, getCurrentCity, getHotCity, getOtherCity} from '@/api/area'
 import {getProgramSearch} from "@/api/allType";
 import {useMitt} from "@/utils/index";
 
@@ -170,7 +169,7 @@ function getNickName() {
       let {name} = response.data
       isLoginToken.value = name
       if (isLoginToken.value && isLoginToken.value.length > 2) {
-        isLoginToken.value = isLoginToken.value.slice(0,2)+"..."
+        isLoginToken.value = isLoginToken.value.slice(0, 2) + "..."
       }
       isHasToken.value = true
     }
@@ -225,17 +224,18 @@ function getCityInfoList(params) {
     getOther()
   })
 }
+
 function getProgramSearchList() {
   queryParams.value.content = iptSearch.value
   getProgramSearch(queryParams.value).then(response => {
-    emitter.emit('searchList',response.data)
+    emitter.emit('searchList', response.data)
     router.push({path: "/allType/index"});
   })
 }
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-header {
   width: 100%;
   height: 72px;

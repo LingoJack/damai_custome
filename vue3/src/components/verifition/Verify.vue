@@ -1,27 +1,27 @@
 <template>
-  <div :class="mode=='pop'?'mask':''" v-show="showBox">
+  <div v-show="showBox" :class="mode=='pop'?'mask':''">
     <div :class="mode=='pop'?'verifybox':''" :style="{'max-width':parseInt(imgSize.width)+30+'px'}">
-      <div class="verifybox-top" v-if="mode=='pop'">
+      <div v-if="mode=='pop'" class="verifybox-top">
         请完成安全验证
         <span class="verifybox-close" @click="closeBox">
                 <i class="iconfont icon-close"></i>
             </span>
       </div>
-      <div class="verifybox-bottom" :style="{padding:mode=='pop'?'15px':'0'}">
+      <div :style="{padding:mode=='pop'?'15px':'0'}" class="verifybox-bottom">
         <!-- 验证码容器 -->
-        <component v-if="componentType"
-                   :is="componentType"
-                   :captchaType="captchaType"
-                   :type="verifyType"
-                   :figure="figure"
+        <component :is="componentType"
+                   v-if="componentType"
+                   ref="instance"
                    :arith="arith"
-                   :mode="mode"
-                   :vSpace="vSpace"
-                   :explain="explain"
-                   :imgSize="imgSize"
-                   :blockSize="blockSize"
                    :barSize="barSize"
-                   ref="instance"></component>
+                   :blockSize="blockSize"
+                   :captchaType="captchaType"
+                   :explain="explain"
+                   :figure="figure"
+                   :imgSize="imgSize"
+                   :mode="mode"
+                   :type="verifyType"
+                   :vSpace="vSpace"></component>
       </div>
     </div>
   </div>
@@ -33,7 +33,7 @@
  * */
 import VerifySlide from './Verify/VerifySlide'
 import VerifyPoints from './Verify/VerifyPoints'
-import {computed, ref, watch, toRefs, watchEffect} from 'vue';
+import {computed, ref, toRefs, watchEffect} from 'vue';
 
 
 export default {

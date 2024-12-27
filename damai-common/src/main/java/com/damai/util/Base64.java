@@ -3,7 +3,7 @@ package com.damai.util;
 import java.util.Arrays;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: base64
  * @author: 阿星不是程序员
  **/
@@ -19,29 +19,29 @@ public final class Base64 {
 	private static final char PAD = '=';
 	private static final byte[] BASE64_ALPHABET = new byte[BASE_LENGTH];
 	private static final char[] LOOKUP_BASE64_ALPHABET = new char[LOOKUP_LENGTH];
-	
+
 	private static final char A_UPPER_CASE = 'A';
 	private static final char A_LOWER_CASE = 'a';
 	private static final char Z_UPPER_CASE = 'Z';
-	
+
 	private static final char Z_LOWER_CASE = 'z';
-	
+
 	private static final char ZERO = '0';
-	
+
 	private static final char NINE = '9';
-	
+
 	private static final int TWENTY_FIVE = 25;
-	
+
 	private static final int TWENTY_SIX = 26;
-	
+
 	private static final int FIFTY_ONE = 51;
-	
+
 	private static final int FIFTY_TWO = 52;
-	
+
 	private static final int SIXTY_ONE = 61;
-	
+
 	private static final byte LOW_FOUR_BITS_MASK = 0xf;
-	
+
 	private static final byte LOW_TWO_BITS_MASK = 0x3;
 
 	static {
@@ -90,9 +90,8 @@ public final class Base64 {
 
 	/**
 	 * Encodes hex octects into Base64
-	 * 
-	 * @param binaryData
-	 *            Array containing binaryData
+	 *
+	 * @param binaryData Array containing binaryData
 	 * @return Encoded Base64 array
 	 */
 	public static String encode(byte[] binaryData) {
@@ -142,14 +141,15 @@ public final class Base64 {
 		if (fewerThan24bits == EIGHT_BIT) {
 			b1 = binaryData[dataIndex];
 			k = (byte) (b1 & 0x03);
-			
+
 			byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
 					: (byte) ((b1) >> 2 ^ 0xc0);
 			encodedData[encodedIndex++] = LOOKUP_BASE64_ALPHABET[val1];
 			encodedData[encodedIndex++] = LOOKUP_BASE64_ALPHABET[k << 4];
 			encodedData[encodedIndex++] = PAD;
 			encodedData[encodedIndex++] = PAD;
-		} else if (fewerThan24bits == SIXTEEN_BIT) {
+		}
+		else if (fewerThan24bits == SIXTEEN_BIT) {
 			b1 = binaryData[dataIndex];
 			b2 = binaryData[dataIndex + 1];
 			l = (byte) (b2 & 0x0f);
@@ -171,9 +171,8 @@ public final class Base64 {
 
 	/**
 	 * remove WhiteSpace from MIME containing encoded Base64 data.
-	 * 
-	 * @param data
-	 *            the byte array of base64 data (with WS)
+	 *
+	 * @param data the byte array of base64 data (with WS)
 	 * @return the new length
 	 */
 	private static int removeWhiteSpace(char[] data) {

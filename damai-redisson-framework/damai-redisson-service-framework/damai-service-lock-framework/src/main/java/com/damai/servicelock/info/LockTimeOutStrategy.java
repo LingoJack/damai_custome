@@ -10,16 +10,16 @@ package com.damai.servicelock.info;
  * 用于在锁超时时执行相应的处理逻辑。
  **/
 public enum LockTimeOutStrategy implements LockTimeOutHandler {
-    /**
-     * 锁获取失败策略
-     * 处理逻辑：当锁获取失败时，抛出 RuntimeException 异常，
-     * 提示请求频繁。
-     */
-    FAIL() {
-        @Override
-        public void handler(String lockName) {
-            String msg = String.format("%s请求频繁", lockName);
-            throw new RuntimeException(msg);
-        }
-    }
+	/**
+	 * 锁获取失败策略
+	 * 处理逻辑：当锁获取失败时，抛出 RuntimeException 异常，
+	 * 提示请求频繁。
+	 */
+	FAIL() {
+		@Override
+		public void handler(String lockName) {
+			String msg = String.format("%s请求频繁", lockName);
+			throw new RuntimeException(msg);
+		}
+	}
 }

@@ -12,27 +12,27 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class LockInfoHandleFactory implements ApplicationContextAware {
 
-    // Spring应用上下文
-    private ApplicationContext applicationContext;
+	// Spring应用上下文
+	private ApplicationContext applicationContext;
 
-    /**
-     * 根据锁信息类型获取对应的锁信息处理对象
-     *
-     * @param lockInfoType 锁信息类型，用于确定获取哪种类型的LockInfoHandle实现类
-     * @return LockInfoHandle 实例，根据给定的锁信息类型获取
-     */
-    public LockInfoHandle getLockInfoHandle(String lockInfoType) {
-        return applicationContext.getBean(lockInfoType, LockInfoHandle.class);
-    }
+	/**
+	 * 根据锁信息类型获取对应的锁信息处理对象
+	 *
+	 * @param lockInfoType 锁信息类型，用于确定获取哪种类型的LockInfoHandle实现类
+	 * @return LockInfoHandle 实例，根据给定的锁信息类型获取
+	 */
+	public LockInfoHandle getLockInfoHandle(String lockInfoType) {
+		return applicationContext.getBean(lockInfoType, LockInfoHandle.class);
+	}
 
-    /**
-     * 设置Spring应用上下文
-     *
-     * @param applicationContext Spring应用上下文
-     * @throws BeansException 如果设置过程中出现错误
-     */
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
+	/**
+	 * 设置Spring应用上下文
+	 *
+	 * @param applicationContext Spring应用上下文
+	 * @throws BeansException 如果设置过程中出现错误
+	 */
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
 }

@@ -22,59 +22,59 @@ import java.util.Optional;
 @Component
 public class ProgramDetailCheckHandler extends AbstractProgramCheckHandler {
 
-    @Autowired
-    private ProgramService programService;
+	@Autowired
+	private ProgramService programService;
 
-    /**
-     * 执行节目详情的检查逻辑
-     * 主要验证座位选择权限和订单购票数量限制
-     *
-     * @param programOrderCreateDto 节目订单创建DTO，包含订单相关信息
-     */
-    @Override
-    protected void execute(final ProgramOrderCreateDto programOrderCreateDto) {
-        ProgramGetDto programGetDto = new ProgramGetDto();
-        programGetDto.setId(programOrderCreateDto.getProgramId());
-        ProgramVo programVo = programService.detail(programGetDto);
-        if (programVo.getPermitChooseSeat().equals(BusinessStatus.NO.getCode())) {
-            if (Objects.nonNull(programOrderCreateDto.getSeatDtoList())) {
-                throw new DaMaiFrameException(BaseCode.PROGRAM_NOT_ALLOW_CHOOSE_SEAT);
-            }
-        }
-        Integer seatCount = Optional.ofNullable(programOrderCreateDto.getSeatDtoList()).map(List::size).orElse(0);
-        Integer ticketCount = Optional.ofNullable(programOrderCreateDto.getTicketCount()).orElse(0);
-        if (seatCount > programVo.getPerOrderLimitPurchaseCount() || ticketCount > programVo.getPerOrderLimitPurchaseCount()) {
-            throw new DaMaiFrameException(BaseCode.PER_ORDER_PURCHASE_COUNT_OVER_LIMIT);
-        }
-    }
+	/**
+	 * 执行节目详情的检查逻辑
+	 * 主要验证座位选择权限和订单购票数量限制
+	 *
+	 * @param programOrderCreateDto 节目订单创建DTO，包含订单相关信息
+	 */
+	@Override
+	protected void execute(final ProgramOrderCreateDto programOrderCreateDto) {
+		ProgramGetDto programGetDto = new ProgramGetDto();
+		programGetDto.setId(programOrderCreateDto.getProgramId());
+		ProgramVo programVo = programService.detail(programGetDto);
+		if (programVo.getPermitChooseSeat().equals(BusinessStatus.NO.getCode())) {
+			if (Objects.nonNull(programOrderCreateDto.getSeatDtoList())) {
+				throw new DaMaiFrameException(BaseCode.PROGRAM_NOT_ALLOW_CHOOSE_SEAT);
+			}
+		}
+		Integer seatCount = Optional.ofNullable(programOrderCreateDto.getSeatDtoList()).map(List::size).orElse(0);
+		Integer ticketCount = Optional.ofNullable(programOrderCreateDto.getTicketCount()).orElse(0);
+		if (seatCount > programVo.getPerOrderLimitPurchaseCount() || ticketCount > programVo.getPerOrderLimitPurchaseCount()) {
+			throw new DaMaiFrameException(BaseCode.PER_ORDER_PURCHASE_COUNT_OVER_LIMIT);
+		}
+	}
 
-    /**
-     * 执行父订单的逻辑
-     *
-     * @return 返回执行的顺序号
-     */
-    @Override
-    public Integer executeParentOrder() {
-        return 1;
-    }
+	/**
+	 * 执行父订单的逻辑
+	 *
+	 * @return 返回执行的顺序号
+	 */
+	@Override
+	public Integer executeParentOrder() {
+		return 1;
+	}
 
-    /**
-     * 执行层级的逻辑
-     *
-     * @return 返回执行的顺序号
-     */
-    @Override
-    public Integer executeTier() {
-        return 2;
-    }
+	/**
+	 * 执行层级的逻辑
+	 *
+	 * @return 返回执行的顺序号
+	 */
+	@Override
+	public Integer executeTier() {
+		return 2;
+	}
 
-    /**
-     * 执行订单的逻辑
-     *
-     * @return 返回执行的顺序号
-     */
-    @Override
-    public Integer executeOrder() {
-        return 1;
-    }
+	/**
+	 * 执行订单的逻辑
+	 *
+	 * @return 返回执行的顺序号
+	 */
+	@Override
+	public Integer executeOrder() {
+		return 1;
+	}
 }

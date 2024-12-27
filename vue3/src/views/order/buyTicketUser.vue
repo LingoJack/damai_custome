@@ -1,51 +1,56 @@
 <template>
-<div class="app-container">
-  <el-form ref="formTicket" :model="form" :rules="rules" class="login-form">
-    <el-form-item label="姓名" prop="relName" label-width="272px" >
-      <el-input
-          v-model="form.relName"
-          type="text"
-          placeholder="请填写观演人姓名"
-      ></el-input>
-    </el-form-item>
-    <div class="line"></div>
-    <el-form-item label="证件类型" prop="idType" label-width="272px"   >
-      <el-select  v-model="form.idType">
-        <el-option v-for="item in idType"
-                   :value="item.value"
-                   :label="item.name" >{{item.name}}</el-option>
-      </el-select>
-    </el-form-item>
-    <div class="line"></div>
-    <el-form-item label="证件号码" prop="idNumber" label-width="272px"  >
-      <el-input
-          v-model="form.idNumber"
-          type="text"
-          placeholder="请填写证件号码"
-      ></el-input>
-    </el-form-item>
-    <div class="line"></div>
-    <div class="tips"><el-icon><Warning /></el-icon>点击确定表示您已阅读并同意 <span>《实名须知》</span></div>
-    <div class="sure">
-      <el-button  class="submit" @click="submit">确定</el-button>
-    </div>
-  </el-form>
+  <div class="app-container">
+    <el-form ref="formTicket" :model="form" :rules="rules" class="login-form">
+      <el-form-item label="姓名" label-width="272px" prop="relName">
+        <el-input
+            v-model="form.relName"
+            placeholder="请填写观演人姓名"
+            type="text"
+        ></el-input>
+      </el-form-item>
+      <div class="line"></div>
+      <el-form-item label="证件类型" label-width="272px" prop="idType">
+        <el-select v-model="form.idType">
+          <el-option v-for="item in idType"
+                     :label="item.name"
+                     :value="item.value">{{ item.name }}
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <div class="line"></div>
+      <el-form-item label="证件号码" label-width="272px" prop="idNumber">
+        <el-input
+            v-model="form.idNumber"
+            placeholder="请填写证件号码"
+            type="text"
+        ></el-input>
+      </el-form-item>
+      <div class="line"></div>
+      <div class="tips">
+        <el-icon>
+          <Warning/>
+        </el-icon>
+        点击确定表示您已阅读并同意 <span>《实名须知》</span></div>
+      <div class="sure">
+        <el-button class="submit" @click="submit">确定</el-button>
+      </div>
+    </el-form>
 
 
-</div>
+  </div>
 </template>
 
-<script setup name="BuyTicket">
-import {getCurrentInstance, ref,onMounted} from 'vue'
+<script name="BuyTicket" setup>
+import {getCurrentInstance, onMounted, ref} from 'vue'
 import {saveTicketUser} from "@/api/buyTicketUser";
-import { getUserIdKey} from "@/utils/auth";
+import {getUserIdKey} from "@/utils/auth";
 import {useRoute, useRouter} from 'vue-router'
 
 const route = useRoute();
 const router = useRouter();
 
 const {proxy} = getCurrentInstance();
-const form=ref({})
+const form = ref({})
 const rules = ref({})
 form.value.idType = ref('1')
 const detailList = ref([])
@@ -54,49 +59,49 @@ const countPrice = ref('')
 const num = ref('')
 
 const idType = ref([{
-  name:'身份证',
-  value:'1'
-},{
-  name:'港澳台居民居住证',
-  value:'2'
-},{
-  name:'港澳台居民来往内地通行证',
-  value:'3'
-},{
-  name:'台湾居民来往内地通行证',
-  value:'4'
-},{
-  name:'护照',
-  value:'5'
-},{
-  name:'歪果仁永久居住证',
-  value:'6'
+  name: '身份证',
+  value: '1'
+}, {
+  name: '港澳台居民居住证',
+  value: '2'
+}, {
+  name: '港澳台居民来往内地通行证',
+  value: '3'
+}, {
+  name: '台湾居民来往内地通行证',
+  value: '4'
+}, {
+  name: '护照',
+  value: '5'
+}, {
+  name: '歪果仁永久居住证',
+  value: '6'
 }])
 
-onMounted(()=>{
-  detailList.value  = JSON.parse(history.state.detailList)
-  allPrice.value  = history.state.allPrice
-  countPrice.value  =history.state.countPrice
-  num.value  =history.state.num
+onMounted(() => {
+  detailList.value = JSON.parse(history.state.detailList)
+  allPrice.value = history.state.allPrice
+  countPrice.value = history.state.countPrice
+  num.value = history.state.num
 })
-const submit =()=>{
+const submit = () => {
   proxy.$refs.formTicket.validate(valid => {
     if (valid) {
-      if(form.value.relName == undefined){
+      if (form.value.relName == undefined) {
         ElMessage({
           message: '请填写观演姓名',
           type: 'error',
         })
-      }else if(form.value.idNumber == undefined){
+      } else if (form.value.idNumber == undefined) {
         ElMessage({
           message: '请填写证件号码',
           type: 'error',
         })
-      }else{
-        form.value.userId=getUserIdKey()
-        saveTicketUser(form.value).then(response=>{
-          if(response.code==0){
-            router.replace({path:'/order/index'})
+      } else {
+        form.value.userId = getUserIdKey()
+        saveTicketUser(form.value).then(response => {
+          if (response.code == 0) {
+            router.replace({path: '/order/index'})
           }
 
         })
@@ -107,24 +112,12 @@ const submit =()=>{
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 
-<style scoped lang="scss">
-.app-container{
-  .el-form{
-    .el-form-item{
+<style lang="scss" scoped>
+.app-container {
+  .el-form {
+    .el-form-item {
       width: auto;
       height: 18.1vmin;
       padding-left: 5.6vmin;
@@ -137,18 +130,20 @@ const submit =()=>{
       -webkit-box-align: center;
       align-items: center;
 
-      .el-input{
+      .el-input {
 
       }
     }
-    .line{
+
+    .line {
       width: auto;
       height: 0.27vmin;
       margin-left: 5.6vmin;
       margin-right: 5.6vmin;
       background: rgb(238, 238, 238);
     }
-    .tips{
+
+    .tips {
       width: auto;
       height: 10.67vmin;
       color: rgb(204, 204, 204);
@@ -159,11 +154,13 @@ const submit =()=>{
       display: flex;
       -webkit-box-align: center;
       align-items: center;
-      span{
+
+      span {
         color: rgb(59, 153, 252);
       }
     }
-    .sure{
+
+    .sure {
       width: 100%;
       position: absolute;
       display: flex;
@@ -172,10 +169,11 @@ const submit =()=>{
       -webkit-box-align: end;
       align-items: flex-end;
       bottom: 0px;
-      height:21.5vmin;
+      height: 21.5vmin;
       padding-bottom: 5.9vmin;
       box-shadow: rgba(0, 0, 0, 0.04) 0px -2px 6px 0px;
-      .submit{
+
+      .submit {
         display: flex;
         -webkit-box-pack: center;
         justify-content: center;
@@ -202,6 +200,7 @@ const submit =()=>{
   font-weight: normal;
 
 }
+
 :deep(.el-input .el-input__wrapper .el-input__inner) {
   border: none !important; /* 移除边框 */
   box-shadow: none !important; /* 移除阴影 */

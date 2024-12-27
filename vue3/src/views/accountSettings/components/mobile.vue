@@ -12,9 +12,9 @@
         </el-form-item>
       </el-col>
       <el-button
+          class="btn"
           size="large"
           type="primary"
-          class="btn"
           @click.prevent="savePsd"
       ><span>保存</span></el-button>
     </el-form>
@@ -26,10 +26,9 @@
 
 import Header from '../../../components/header/index'
 import Footer from '../../../components/footer/index'
-import {getEditPsd} from '@/api/accountSettings'
 import {ElMessage} from "element-plus"
 import {getUserIdKey} from "../../../utils/auth"
-import {ref, reactive} from 'vue'
+import {reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import useUserStore from '@/store/modules/user'
 import {getEditMobile} from "../../../api/accountSettings";
@@ -80,7 +79,7 @@ function savePsd() {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .el-row {
   width: 400px;
   height: 400px;

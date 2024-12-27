@@ -3,37 +3,37 @@
   <Header></Header>
   <div class="red-line"></div>
   <div class="section">
-    <MenuSideBar class="sidebarMenu" activeIndex="3"></MenuSideBar>
+    <MenuSideBar activeIndex="3" class="sidebarMenu"></MenuSideBar>
     <div class="right-section">
       <div class="breadcrumb"><span>个人信息</span></div>
       <div class="right-tab">
         <ul class="title">
           <li class="left">基础资料</li>
-<!--          <li class="right">资料完整度：<span>30%</span></li>-->
+          <!--          <li class="right">资料完整度：<span>30%</span></li>-->
         </ul>
         <div class="box">
           <div class="info-list">
             <div class="tips-info">完善更多个人信息，有助于我们为您提供更加个性化的服务，本程序将尊重并保护您的隐私。</div>
             <el-form ref="perInfoRef" :model="perInfoForm" :rules="perInfoRules" class="perInfo-form">
-              <el-form-item label-width="100px" label="昵称:" prop="name">
+              <el-form-item label="昵称:" label-width="100px" prop="name">
                 <el-input v-model="perInfoForm.name"/>
               </el-form-item>
-              <el-form-item label-width="100px" label="真实姓名:" prop="relName">
+              <el-form-item label="真实姓名:" label-width="100px" prop="relName">
                 <el-input v-model="perInfoForm.relName"/>
               </el-form-item>
-              <el-form-item label-width="100px" label="性别:" prop="gender">
+              <el-form-item label="性别:" label-width="100px" prop="gender">
                 <el-radio-group v-model="perInfoForm.gender">
                   <el-radio label="1" size="large">男</el-radio>
                   <el-radio label="2" size="large">女</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label-width="100px" label="身份证号:" prop="idNumber">
+              <el-form-item label="身份证号:" label-width="100px" prop="idNumber">
                 <el-input v-model="perInfoForm.idNumber"/>
               </el-form-item>
               <el-button
+                  class="btn"
                   size="small"
                   type="primary"
-                  class="btn"
                   @click.prevent="gePersonList"
               >保存
               </el-button>
@@ -51,11 +51,11 @@
 import MenuSideBar from '../../components/menuSidebar/index'
 import Header from '../../components/header/index'
 import Footer from '../../components/footer/index'
-import {ref, reactive, getCurrentInstance,nextTick,onMounted } from 'vue'
+import {getCurrentInstance, nextTick, onMounted, reactive, ref} from 'vue'
 import {getPersonInfo, getPersonInfoId} from '@/api/personInfo'
 import useUserStore from "../../store/modules/user";
 import {ElMessage} from 'element-plus'
-import {getName,getUserIdKey} from "@/utils/auth";
+import {getUserIdKey} from "@/utils/auth";
 
 const {proxy} = getCurrentInstance();
 const useUser = useUserStore()
@@ -86,11 +86,11 @@ function gePersonList() {
             message: '保存成功',
             type: 'success',
           })
-        }else{
-            ElMessage({
-              message: response.message,
-              type: 'error',
-            })
+        } else {
+          ElMessage({
+            message: response.message,
+            type: 'error',
+          })
         }
 
       })
@@ -100,8 +100,8 @@ function gePersonList() {
 }
 
 //回显
-onMounted(()=>{
-  nextTick(()=>{
+onMounted(() => {
+  nextTick(() => {
     getPersonInfoIdList()
   })
 })
@@ -120,7 +120,7 @@ async function getPersonInfoIdList() {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .red-line {
   border-bottom: 5px solid rgba(255, 55, 29, 0.85);
 }

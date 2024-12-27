@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory, createWebHistory} from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 import {getToken} from '@/utils/auth'
 
 export const constantRoutes = [
@@ -58,7 +58,7 @@ export const constantRoutes = [
         component: () => import('@/views/order/paySuccess'),
         meta: {requiresAuth: true},
 
-    },{
+    }, {
         path: '/order/buyTicketUser',
         name: 'BuyTicketUser',
         component: () => import('@/views/order/buyTicketUser'),
@@ -69,7 +69,7 @@ export const constantRoutes = [
         name: '个人信息',
         component: () => import('@/views/personInfo/index'),
         meta: {requiresAuth: true}
-    },{
+    }, {
         path: '/personInfo/ticketUser',
         name: '购票人列表',
         component: () => import('@/views/personInfo/ticketUser.vue'),

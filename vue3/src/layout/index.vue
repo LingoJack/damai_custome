@@ -2,12 +2,9 @@
 
 </template>
 
-<script setup>
-import Header from './header'
-
-</script>
-<style scoped lang="scss">
-.container{
+<script setup></script>
+<style lang="scss" scoped>
+.container {
   width: 100%;
   height: 100%;
   position: absolute;

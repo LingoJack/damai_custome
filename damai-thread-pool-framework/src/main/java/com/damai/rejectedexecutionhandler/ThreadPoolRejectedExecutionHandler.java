@@ -12,18 +12,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ThreadPoolRejectedExecutionHandler {
 
 
-    public static class BusinessAbortPolicy implements RejectedExecutionHandler {
+	public static class BusinessAbortPolicy implements RejectedExecutionHandler {
 
-        public BusinessAbortPolicy() {
+		public BusinessAbortPolicy() {
 
-        }
+		}
 
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+		@Override
+		public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 
-            throw new RejectedExecutionException("threadPoolApplicationName business task " + r.toString() +
-                    " rejected from " +
-                    executor.toString());
-        }
-    }
+			throw new RejectedExecutionException("threadPoolApplicationName business task " + r.toString() +
+					" rejected from " +
+					executor.toString());
+		}
+	}
 }

@@ -1,7 +1,7 @@
-import {createApp,ref,provide} from 'vue'
+import {createApp} from 'vue'
 import Cookies from 'js-cookie'
 import App from './App.vue'
-import  router from './router/router'
+import router from './router/router'
 import '@/assets/styles/index.scss' // global css
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -22,8 +22,6 @@ app.component('Pagination', Pagination)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
-
-
 
 
 app.use(router)

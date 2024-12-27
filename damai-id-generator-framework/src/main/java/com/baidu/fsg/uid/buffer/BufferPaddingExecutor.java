@@ -33,149 +33,164 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents an executor for padding {@link RingBuffer}<br>
  * There are two kinds of executors: one for scheduled padding, the other for padding immediately.
- * 
+ *
  * @author yutianbao
  */
 public class BufferPaddingExecutor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RingBuffer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RingBuffer.class);
 
-    /** Constants */
-    private static final String WORKER_NAME = "RingBuffer-Padding-Worker";
-    private static final String SCHEDULE_NAME = "RingBuffer-Padding-Schedule";
-    
-    /**
-     * 5 minutes
-     * */
-    private static final long DEFAULT_SCHEDULE_INTERVAL = 5 * 60L;
-    
-    /** Whether buffer padding is running */
-    private final AtomicBoolean running;
+	/**
+	 * Constants
+	 */
+	private static final String WORKER_NAME = "RingBuffer-Padding-Worker";
+	private static final String SCHEDULE_NAME = "RingBuffer-Padding-Schedule";
 
-    /** We can borrow UIDs from the future, here store the last second we have consumed */
-    private final PaddedAtomicLong lastSecond;
+	/**
+	 * 5 minutes
+	 */
+	private static final long DEFAULT_SCHEDULE_INTERVAL = 5 * 60L;
 
-    /** RingBuffer & BufferUidProvider */
-    private final RingBuffer ringBuffer;
-    private final BufferedUidProvider uidProvider;
+	/**
+	 * Whether buffer padding is running
+	 */
+	private final AtomicBoolean running;
 
-    /** Padding immediately by the thread pool */
-    private final ExecutorService bufferPadExecutors;
-    /** Padding schedule thread */
-    private final ScheduledExecutorService bufferPadSchedule;
-    
-    /** Schedule interval Unit as seconds */
-    private long scheduleInterval = DEFAULT_SCHEDULE_INTERVAL;
+	/**
+	 * We can borrow UIDs from the future, here store the last second we have consumed
+	 */
+	private final PaddedAtomicLong lastSecond;
 
-    /**
-     * Constructor with {@link RingBuffer} and {@link BufferedUidProvider}, default use schedule
-     *
-     * @param ringBuffer {@link RingBuffer}
-     * @param uidProvider {@link BufferedUidProvider}
-     */
-    public BufferPaddingExecutor(RingBuffer ringBuffer, BufferedUidProvider uidProvider) {
-        this(ringBuffer, uidProvider, true);
-    }
+	/**
+	 * RingBuffer & BufferUidProvider
+	 */
+	private final RingBuffer ringBuffer;
+	private final BufferedUidProvider uidProvider;
 
-    /**
-     * Constructor with {@link RingBuffer}, {@link BufferedUidProvider}, and whether use schedule padding
-     *
-     * @param ringBuffer {@link RingBuffer}
-     * @param uidProvider {@link BufferedUidProvider}
-     * @param usingSchedule
-     */
-    public BufferPaddingExecutor(RingBuffer ringBuffer, BufferedUidProvider uidProvider, boolean usingSchedule) {
-        this.running = new AtomicBoolean(false);
-        this.lastSecond = new PaddedAtomicLong(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        this.ringBuffer = ringBuffer;
-        this.uidProvider = uidProvider;
+	/**
+	 * Padding immediately by the thread pool
+	 */
+	private final ExecutorService bufferPadExecutors;
+	/**
+	 * Padding schedule thread
+	 */
+	private final ScheduledExecutorService bufferPadSchedule;
 
-        // initialize thread pool
-        int cores = Runtime.getRuntime().availableProcessors();
-        
-        bufferPadExecutors = new ThreadPoolExecutor(cores * 2,cores * 2,0L, 
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),new NamingThreadFactory(WORKER_NAME));
+	/**
+	 * Schedule interval Unit as seconds
+	 */
+	private long scheduleInterval = DEFAULT_SCHEDULE_INTERVAL;
 
-        // initialize schedule thread
-        if (usingSchedule) {
-            bufferPadSchedule = new ScheduledThreadPoolExecutor(1, new NamingThreadFactory(SCHEDULE_NAME));
-        } else {
-            bufferPadSchedule = null;
-        }
-    }
+	/**
+	 * Constructor with {@link RingBuffer} and {@link BufferedUidProvider}, default use schedule
+	 *
+	 * @param ringBuffer  {@link RingBuffer}
+	 * @param uidProvider {@link BufferedUidProvider}
+	 */
+	public BufferPaddingExecutor(RingBuffer ringBuffer, BufferedUidProvider uidProvider) {
+		this(ringBuffer, uidProvider, true);
+	}
 
-    /**
-     * Start executors such as schedule
-     */
-    public void start() {
-        if (bufferPadSchedule != null) {
-            bufferPadSchedule.scheduleWithFixedDelay(() -> paddingBuffer(), scheduleInterval, scheduleInterval, TimeUnit.SECONDS);
-        }
-    }
+	/**
+	 * Constructor with {@link RingBuffer}, {@link BufferedUidProvider}, and whether use schedule padding
+	 *
+	 * @param ringBuffer    {@link RingBuffer}
+	 * @param uidProvider   {@link BufferedUidProvider}
+	 * @param usingSchedule
+	 */
+	public BufferPaddingExecutor(RingBuffer ringBuffer, BufferedUidProvider uidProvider, boolean usingSchedule) {
+		this.running = new AtomicBoolean(false);
+		this.lastSecond = new PaddedAtomicLong(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+		this.ringBuffer = ringBuffer;
+		this.uidProvider = uidProvider;
 
-    /**
-     * Shutdown executors
-     */
-    public void shutdown() {
-        if (!bufferPadExecutors.isShutdown()) {
-            bufferPadExecutors.shutdownNow();
-        }
+		// initialize thread pool
+		int cores = Runtime.getRuntime().availableProcessors();
 
-        if (bufferPadSchedule != null && !bufferPadSchedule.isShutdown()) {
-            bufferPadSchedule.shutdownNow();
-        }
-    }
+		bufferPadExecutors = new ThreadPoolExecutor(cores * 2, cores * 2, 0L,
+				TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new NamingThreadFactory(WORKER_NAME));
 
-    /**
-     * Whether is padding
-     *
-     * @return
-     */
-    public boolean isRunning() {
-        return running.get();
-    }
+		// initialize schedule thread
+		if (usingSchedule) {
+			bufferPadSchedule = new ScheduledThreadPoolExecutor(1, new NamingThreadFactory(SCHEDULE_NAME));
+		}
+		else {
+			bufferPadSchedule = null;
+		}
+	}
 
-    /**
-     * Padding buffer in the thread pool
-     */
-    public void asyncPadding() {
-        bufferPadExecutors.submit(this::paddingBuffer);
-    }
+	/**
+	 * Start executors such as schedule
+	 */
+	public void start() {
+		if (bufferPadSchedule != null) {
+			bufferPadSchedule.scheduleWithFixedDelay(() -> paddingBuffer(), scheduleInterval, scheduleInterval, TimeUnit.SECONDS);
+		}
+	}
 
-    /**
-     * Padding buffer fill the slots until to catch the cursor
-     */
-    public void paddingBuffer() {
-        LOGGER.info("Ready to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
+	/**
+	 * Shutdown executors
+	 */
+	public void shutdown() {
+		if (!bufferPadExecutors.isShutdown()) {
+			bufferPadExecutors.shutdownNow();
+		}
 
-        // is still running
-        if (!running.compareAndSet(false, true)) {
-            LOGGER.info("Padding buffer is still running. {}", ringBuffer);
-            return;
-        }
+		if (bufferPadSchedule != null && !bufferPadSchedule.isShutdown()) {
+			bufferPadSchedule.shutdownNow();
+		}
+	}
 
-        // fill the rest slots until to catch the cursor
-        boolean isFullRingBuffer = false;
-        while (!isFullRingBuffer) {
-            List<Long> uidList = uidProvider.provide(lastSecond.incrementAndGet());
-            for (Long uid : uidList) {
-                isFullRingBuffer = !ringBuffer.put(uid);
-                if (isFullRingBuffer) {
-                    break;
-                }
-            }
-        }
+	/**
+	 * Whether is padding
+	 *
+	 * @return
+	 */
+	public boolean isRunning() {
+		return running.get();
+	}
 
-        // not running now
-        running.compareAndSet(true, false);
-        LOGGER.info("End to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
-    }
+	/**
+	 * Padding buffer in the thread pool
+	 */
+	public void asyncPadding() {
+		bufferPadExecutors.submit(this::paddingBuffer);
+	}
 
-    /**
-     * Setters
-     */
-    public void setScheduleInterval(long scheduleInterval) {
-        Assert.isTrue(scheduleInterval > 0, "Schedule interval must positive!");
-        this.scheduleInterval = scheduleInterval;
-    }
-    
+	/**
+	 * Padding buffer fill the slots until to catch the cursor
+	 */
+	public void paddingBuffer() {
+		LOGGER.info("Ready to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
+
+		// is still running
+		if (!running.compareAndSet(false, true)) {
+			LOGGER.info("Padding buffer is still running. {}", ringBuffer);
+			return;
+		}
+
+		// fill the rest slots until to catch the cursor
+		boolean isFullRingBuffer = false;
+		while (!isFullRingBuffer) {
+			List<Long> uidList = uidProvider.provide(lastSecond.incrementAndGet());
+			for (Long uid : uidList) {
+				isFullRingBuffer = !ringBuffer.put(uid);
+				if (isFullRingBuffer) {
+					break;
+				}
+			}
+		}
+
+		// not running now
+		running.compareAndSet(true, false);
+		LOGGER.info("End to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
+	}
+
+	/**
+	 * Setters
+	 */
+	public void setScheduleInterval(long scheduleInterval) {
+		Assert.isTrue(scheduleInterval > 0, "Schedule interval must positive!");
+		this.scheduleInterval = scheduleInterval;
+	}
+
 }

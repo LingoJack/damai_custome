@@ -11,7 +11,7 @@
     <div class="category">
       <ul>
         <li v-for="(item,ind) in categoryArr">
-          <router-link   :to="{ path: '/allType/index', query: {type:item.type,name:item.name,id:item.id} }">
+          <router-link :to="{ path: '/allType/index', query: {type:item.type,name:item.name,id:item.id} }">
             <i :class="['sprit','sprit'+(ind+1)]"></i>
             <span>{{ item.name }}</span>
           </router-link>
@@ -19,21 +19,24 @@
       </ul>
     </div>
 
-    <div class="diffrentType" v-for="(item,index) in  programList">
+    <div v-for="(item,index) in  programList" class="diffrentType">
       <div>
         <div class="name">
           <span>{{ item.categoryName }}</span>
-          <router-link :to="{ path: '/allType/index', query: {type:1,name:item.categoryName,id:item.categoryId} }" class="more">查看全部</router-link>
+          <router-link :to="{ path: '/allType/index', query: {type:1,name:item.categoryName,id:item.categoryId} }"
+                       class="more">查看全部
+          </router-link>
         </div>
         <div class="box">
-          <div class="box-left"  >
-            {{item.programListVoList[0].itemPicture}}
-            <router-link :to="{ name: 'detial', params: { id: item.programListVoList[0].id }}"><img :src="item.programListVoList[0].itemPicture" alt=""></router-link>
+          <div class="box-left">
+            {{ item.programListVoList[0].itemPicture }}
+            <router-link :to="{ name: 'detial', params: { id: item.programListVoList[0].id }}"><img
+                :src="item.programListVoList[0].itemPicture" alt=""></router-link>
           </div>
 
-            <div class="box-right">
-              <div class="rtLink" v-for="(dict,ind) in item.programListVoList.slice(1)">
-                <router-link  :to="{ name: 'detial', params: { id: dict.id }}" >
+          <div class="box-right">
+            <div v-for="(dict,ind) in item.programListVoList.slice(1)" class="rtLink">
+              <router-link :to="{ name: 'detial', params: { id: dict.id }}">
                 <img :src="dict.itemPicture" alt="">
                 <div class="info">
                   <div class="img-title">{{ dict.title }}</div>
@@ -41,9 +44,9 @@
                   <div class="showTime">{{ dict.showTime }}{{ dict.showWeekTime }}</div>
                   <div class="price">{{ dict.minPrice }} <span class="rise">起</span></div>
                 </div>
-                </router-link>
-              </div>
+              </router-link>
             </div>
+          </div>
 
         </div>
 
@@ -56,8 +59,6 @@
 <script setup>
 import Header from '@/components/header/index'
 import swiperPic1 from '@/assets/section/javaup.png'
-import concert from '@/assets/section/concert.jpg'
-import small from '@/assets/section/small.jpg'
 import {onMounted, ref} from 'vue'
 import Footer from '@/components/footer/index'
 import {getcategoryType, getMainCategory} from '@/api/index'
@@ -111,16 +112,16 @@ function getMainCategoryList() {
 }
 
 
-
 </script>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 1200px;
   margin: 0 auto;
 
   .carousel-lamp {
     width: 100%;
-    img{
+
+    img {
       width: 1200px;
       height: 300px;
     }

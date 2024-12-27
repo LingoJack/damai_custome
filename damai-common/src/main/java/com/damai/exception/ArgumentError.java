@@ -9,13 +9,13 @@ import lombok.Data;
 @Data
 public class ArgumentError {
 
-    /**
-     * 参数名，用于标识发生错误的参数
-     **/
-    private String argumentName;
+	/**
+	 * 参数名，用于标识发生错误的参数
+	 **/
+	private String argumentName;
 
-    /**
-     * 错误消息，描述参数错误的详细信息
-     **/
-    private String message;
+	/**
+	 * 错误消息，描述参数错误的详细信息
+	 **/
+	private String message;
 }

@@ -13,10 +13,10 @@ import lombok.Data;
 @Schema(title = "ProgramGetDto", description = "节目")
 public class ProgramGetDto {
 
-    /**
-     * 节目ID
-     */
-    @Schema(name = "id", type = "Long", description = "id", requiredMode = RequiredMode.REQUIRED)
-    @NotNull
-    private Long id;
+	/**
+	 * 节目ID
+	 */
+	@Schema(name = "id", type = "Long", description = "id", requiredMode = RequiredMode.REQUIRED)
+	@NotNull
+	private Long id;
 }

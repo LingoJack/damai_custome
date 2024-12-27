@@ -15,16 +15,16 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(BloomFilterProperties.class)
 public class BloomFilterAutoConfiguration {
 
-    /**
-     * 创建并配置布隆过滤器处理器
-     * 此方法创建一个布隆过滤器处理器实例，并注入Redisson客户端和布隆过滤器属性。
-     *
-     * @param redissonClient        Redisson客户端，用于连接Redis
-     * @param bloomFilterProperties 布隆过滤器的配置属性
-     * @return 配置好的布隆过滤器处理器实例
-     */
-    @Bean
-    public BloomFilterHandler rBloomFilterUtil(RedissonClient redissonClient, BloomFilterProperties bloomFilterProperties) {
-        return new BloomFilterHandler(redissonClient, bloomFilterProperties);
-    }
+	/**
+	 * 创建并配置布隆过滤器处理器
+	 * 此方法创建一个布隆过滤器处理器实例，并注入Redisson客户端和布隆过滤器属性。
+	 *
+	 * @param redissonClient        Redisson客户端，用于连接Redis
+	 * @param bloomFilterProperties 布隆过滤器的配置属性
+	 * @return 配置好的布隆过滤器处理器实例
+	 */
+	@Bean
+	public BloomFilterHandler rBloomFilterUtil(RedissonClient redissonClient, BloomFilterProperties bloomFilterProperties) {
+		return new BloomFilterHandler(redissonClient, bloomFilterProperties);
+	}
 }

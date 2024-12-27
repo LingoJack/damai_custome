@@ -33,14 +33,14 @@ import java.util.List;
 @AllArgsConstructor
 public class PageVo<T> implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private long pageNum;
+	private long pageNum;
 
-    private long pageSize;
+	private long pageSize;
 
-    private long totalSize;
+	private long totalSize;
 
-    private List<T> list;
+	private List<T> list;
 }

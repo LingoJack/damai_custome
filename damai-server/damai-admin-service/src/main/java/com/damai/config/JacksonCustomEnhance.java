@@ -32,61 +32,61 @@ import java.util.TimeZone;
 
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 定制对象字段
  * @author: 阿星不是程序员
  **/
 public class JacksonCustomEnhance implements Jackson2ObjectMapperBuilderCustomizer, Ordered {
 
-    /**
-     * 默认日期时间格式 
-     * */
-    private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-    
-    @Override
-    public void customize(Jackson2ObjectMapperBuilder builder) {
-        builder.serializationInclusion(Include.ALWAYS);
-        builder.featuresToEnable(Feature.ALLOW_SINGLE_QUOTES);
-        builder.featuresToEnable(Feature.ALLOW_UNQUOTED_FIELD_NAMES);
-        
-        
-        SimpleModule[] simpleModules = new SimpleModule[9];
-        simpleModules[0] = new SimpleModule().setSerializerModifier(new JsonCustomSerializer());
-        simpleModules[1] = new SimpleModule().addSerializer(Date.class, new JsonSerializer<Date>() {
+	/**
+	 * 默认日期时间格式
+	 */
+	private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            @Override
-            public void serialize(Date value, JsonGenerator gen, SerializerProvider serializers)
-                    throws IOException {
-                SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
-                String newValue = sdf.format(value);
-                gen.writeString(newValue);
-            }
+	@Override
+	public void customize(Jackson2ObjectMapperBuilder builder) {
+		builder.serializationInclusion(Include.ALWAYS);
+		builder.featuresToEnable(Feature.ALLOW_SINGLE_QUOTES);
+		builder.featuresToEnable(Feature.ALLOW_UNQUOTED_FIELD_NAMES);
 
-        });
-        simpleModules[2] = new SimpleModule().addDeserializer(Date.class, new DateJsonDeserializer());
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat);
-        simpleModules[3] = new SimpleModule().addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormatter));
-        simpleModules[4] = new SimpleModule().addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
-        String dateFormat = "yyyy-MM-dd";
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(dateFormat);
-        simpleModules[5] = new SimpleModule().addSerializer(LocalDate.class, new LocalDateSerializer(dateFormatter));
-        simpleModules[6] = new SimpleModule().addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormatter));
-        String timeFormat = "HH:mm:ss";
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timeFormat);
-        simpleModules[7] = new SimpleModule().addSerializer(LocalTime.class, new LocalTimeSerializer(timeFormatter));
-        simpleModules[8] = new SimpleModule().addDeserializer(LocalTime.class, new LocalTimeDeserializer(timeFormatter));
-        
-        builder.modules(simpleModules);
-        builder.modules(new JavaTimeModule());
-        
-        builder.timeZone(TimeZone.getDefault());
-        builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        builder.featuresToEnable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature());
-        builder.featuresToEnable(JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS.mappedFeature());
-    }
 
-    @Override
-    public int getOrder() {
-        return 1;
-    }
+		SimpleModule[] simpleModules = new SimpleModule[9];
+		simpleModules[0] = new SimpleModule().setSerializerModifier(new JsonCustomSerializer());
+		simpleModules[1] = new SimpleModule().addSerializer(Date.class, new JsonSerializer<Date>() {
+
+			@Override
+			public void serialize(Date value, JsonGenerator gen, SerializerProvider serializers)
+					throws IOException {
+				SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
+				String newValue = sdf.format(value);
+				gen.writeString(newValue);
+			}
+
+		});
+		simpleModules[2] = new SimpleModule().addDeserializer(Date.class, new DateJsonDeserializer());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+		simpleModules[3] = new SimpleModule().addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormatter));
+		simpleModules[4] = new SimpleModule().addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
+		String dateFormat = "yyyy-MM-dd";
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(dateFormat);
+		simpleModules[5] = new SimpleModule().addSerializer(LocalDate.class, new LocalDateSerializer(dateFormatter));
+		simpleModules[6] = new SimpleModule().addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormatter));
+		String timeFormat = "HH:mm:ss";
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timeFormat);
+		simpleModules[7] = new SimpleModule().addSerializer(LocalTime.class, new LocalTimeSerializer(timeFormatter));
+		simpleModules[8] = new SimpleModule().addDeserializer(LocalTime.class, new LocalTimeDeserializer(timeFormatter));
+
+		builder.modules(simpleModules);
+		builder.modules(new JavaTimeModule());
+
+		builder.timeZone(TimeZone.getDefault());
+		builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		builder.featuresToEnable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature());
+		builder.featuresToEnable(JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS.mappedFeature());
+	}
+
+	@Override
+	public int getOrder() {
+		return 1;
+	}
 }

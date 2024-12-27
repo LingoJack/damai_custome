@@ -21,30 +21,30 @@ import com.baidu.fsg.uid.utils.ValuedEnum;
  * WorkerNodeType
  * <li>CONTAINER: Such as Docker
  * <li>ACTUAL: Actual machine
- * 
+ *
  * @author yutianbao
  */
 public enum WorkerNodeType implements ValuedEnum<Integer> {
-    /**
-     * 百度uid
-     * */
-    CONTAINER(1), ACTUAL(2);
+	/**
+	 * 百度uid
+	 */
+	CONTAINER(1), ACTUAL(2);
 
-    /**
-     * Lock type
-     */
-    private final Integer type;
+	/**
+	 * Lock type
+	 */
+	private final Integer type;
 
-    /**
-     * Constructor with field of type
-     */
-    private WorkerNodeType(Integer type) {
-        this.type = type;
-    }
+	/**
+	 * Constructor with field of type
+	 */
+	private WorkerNodeType(Integer type) {
+		this.type = type;
+	}
 
-    @Override
-    public Integer value() {
-        return type;
-    }
+	@Override
+	public Integer value() {
+		return type;
+	}
 
 }

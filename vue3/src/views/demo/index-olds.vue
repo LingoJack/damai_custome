@@ -1,17 +1,17 @@
 <template>
   <div class="app-container">
     <ul class="ul">
-      <li class="li" v-for="(dict,ind) in categoryArr">
+      <li v-for="(dict,ind) in categoryArr" class="li">
         <div v-if="dict.name== '城市'">
           <span class="name">{{ dict.name }}：</span>
           <div class="now"><span>当前选中城市：</span><span>{{ dict.selected }}</span></div>
         </div>
         <span v-else class="name1">{{ dict.name }}：</span>
-        <span class="all" @click="allIn(ind,dict)" :class="{ active: activeIndexAll === ind }">全部</span>
+        <span :class="{ active: activeIndexAll === ind }" class="all" @click="allIn(ind,dict)">全部</span>
         <ul>
           <!--          :class="{ active: activeIndex === index }"-->
-          <li v-for="(val,index) in dict.items" @click="activeClick(ind,index)" :key="index"
-              :class="{active: activeIndex ==getInnerItemKey(ind, index)}">{{ val.name }}
+          <li v-for="(val,index) in dict.items" :key="index" :class="{active: activeIndex ==getInnerItemKey(ind, index)}"
+              @click="activeClick(ind,index)">{{ val.name }}
           </li>
         </ul>
       </li>
@@ -162,7 +162,7 @@ const categoryArr = ref(
 const condition = ref([])
 const activeIndexAll = ref(null);
 const activeIndex = ref(null);
-const activeClick = (ind,index, val, dict) => {
+const activeClick = (ind, index, val, dict) => {
   activeIndexAll.value = null;
   activeIndex.value = index;
   activeIndex.value = getInnerItemKey(ind, index)
@@ -178,7 +178,7 @@ const allIn = (index, dict) => {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 928px;
 

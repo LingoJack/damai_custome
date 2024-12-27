@@ -16,13 +16,13 @@ spring:
       discovery:
         server-addr: 127.0.0.1:8848
         username: nacos
-        password: nacos 
+        password: nacos
   security:
     user:
       name: admin
-      password: admin    
-#dingtalk:
-#  token: a
+      password: admin
+  #dingtalk:
+  #  token: a
   main:
     allow-bean-definition-overriding: true
 management:
@@ -34,7 +34,7 @@ management:
       show-details: always
   security:
     enabled: false
-    
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

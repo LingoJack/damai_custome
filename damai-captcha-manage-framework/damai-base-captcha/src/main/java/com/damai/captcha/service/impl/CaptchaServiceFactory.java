@@ -12,43 +12,42 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 工厂
  * @author: 阿星不是程序员
  **/
 public class CaptchaServiceFactory {
 
-    private static Logger logger = LoggerFactory.getLogger(CaptchaServiceFactory.class);
+	public volatile static Map<String, CaptchaService> instances = new HashMap();
+	public volatile static Map<String, CaptchaCacheService> cacheService = new HashMap();
+	private static Logger logger = LoggerFactory.getLogger(CaptchaServiceFactory.class);
 
-    public static CaptchaService getInstance(Properties config) {
-        //先把所有CaptchaService初始化，通过init方法，实例字体等
-        String captchaType = config.getProperty(Const.CAPTCHA_TYPE, "default");
-        CaptchaService ret = instances.get(captchaType);
-        if (ret == null) {
-            throw new RuntimeException("unsupported-[captcha.type]=" + captchaType);
-        }
-        ret.init(config);
-        return ret;
-    }
+	static {
+		ServiceLoader<CaptchaCacheService> cacheServices = ServiceLoader.load(CaptchaCacheService.class);
+		for (CaptchaCacheService item : cacheServices) {
+			cacheService.put(item.type(), item);
+		}
+		logger.info("supported-captchaCache-service:{}", cacheService.keySet().toString());
+		ServiceLoader<CaptchaService> services = ServiceLoader.load(CaptchaService.class);
+		for (CaptchaService item : services) {
+			instances.put(item.captchaType(), item);
+		}
+		;
+		logger.info("supported-captchaTypes-service:{}", instances.keySet().toString());
+	}
 
-    public static CaptchaCacheService getCache(String cacheType) {
-        return cacheService.get(cacheType);
-    }
+	public static CaptchaService getInstance(Properties config) {
+		//先把所有CaptchaService初始化，通过init方法，实例字体等
+		String captchaType = config.getProperty(Const.CAPTCHA_TYPE, "default");
+		CaptchaService ret = instances.get(captchaType);
+		if (ret == null) {
+			throw new RuntimeException("unsupported-[captcha.type]=" + captchaType);
+		}
+		ret.init(config);
+		return ret;
+	}
 
-    public volatile static Map<String, CaptchaService> instances = new HashMap();
-    public volatile static Map<String, CaptchaCacheService> cacheService = new HashMap();
-
-    static {
-        ServiceLoader<CaptchaCacheService> cacheServices = ServiceLoader.load(CaptchaCacheService.class);
-        for (CaptchaCacheService item : cacheServices) {
-            cacheService.put(item.type(), item);
-        }
-        logger.info("supported-captchaCache-service:{}", cacheService.keySet().toString());
-        ServiceLoader<CaptchaService> services = ServiceLoader.load(CaptchaService.class);
-        for (CaptchaService item : services) {
-            instances.put(item.captchaType(), item);
-        }
-        ;
-        logger.info("supported-captchaTypes-service:{}", instances.keySet().toString());
-    }
+	public static CaptchaCacheService getCache(String cacheType) {
+		return cacheService.get(cacheType);
+	}
 }

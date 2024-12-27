@@ -7,21 +7,21 @@
         <span v-for='(item,index) in condition' class='active'>{{ item.name }}&nbsp;|&nbsp;</span>
       </div>
     </template>
-    <div class="filter-container" v-if='category.length'>
+    <div v-if='category.length' class="filter-container">
       <!--       类型-->
-      <div class='filter-category' v-for='(items,index) in category'>
+      <div v-for='(items,index) in category' class='filter-category'>
         <!--        类型名称-->
-        <div class='filter-select' v-if='items.name' :key="items.id">
+        <div v-if='items.name' :key="items.id" class='filter-select'>
           <!--          类型-->
           <span class="type">{{ items.name }}:</span>
-          <span class="city" v-if="items.name == '城市'"> 当前选中城市：<span
+          <span v-if="items.name == '城市'" class="city"> 当前选中城市：<span
               class="selectCity">{{ items.selected }}</span></span>
           <!--         全部-->
-          <span class="all"><span @click='allIn(index)' > 全部</span>
+          <span class="all"><span @click='allIn(index)'> 全部</span>
           </span>
           <ol v-if='items.items.length'>
             <li v-for='(item,key) in items.items'>
-              <span :class="{'active':item.active}" @click='handle(index,key)' :key='item.id'>{{ item.name }}</span>
+              <span :key='item.id' :class="{'active':item.active}" @click='handle(index,key)'>{{ item.name }}</span>
             </li>
           </ol>
         </div>
@@ -225,7 +225,7 @@ function allIn(index) {
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 928px;
 
@@ -378,7 +378,8 @@ function allIn(index) {
 
   }
 }
-.active{
+
+.active {
   background-color: #ed0b75;
   color: #fff;
   display: inline-block;

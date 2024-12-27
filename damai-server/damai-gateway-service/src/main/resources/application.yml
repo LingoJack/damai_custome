@@ -12,7 +12,7 @@ spring:
     # 微服务调用
     active: pro
     # 单体服务调用
-#    active: single
+  #    active: single
   main:
     allow-bean-definition-overriding: true
   data:
@@ -35,21 +35,21 @@ spring:
       transport:
         port: 8768
         dashboard: 127.0.0.1:8082
-#      datasource:
-#        degrade:
-#          nacos:
-#            server-addr: ${spring.cloud.nacos.discovery.server-addr}
-#            dataId: ${spring.application.name}-degrade-rules
-#            groupId: SENTINEL_GROUP
-#            dataType: json
-#            rule-type: degrade
-#        flow:
-#          nacos:
-#            server-addr: ${spring.cloud.nacos.discovery.server-addr}
-#            dataId: ${spring.application.name}-flow-rules
-#            groupId: SENTINEL_GROUP
-#            dataType: json
-#            rule-type: flow
+    #      datasource:
+    #        degrade:
+    #          nacos:
+    #            server-addr: ${spring.cloud.nacos.discovery.server-addr}
+    #            dataId: ${spring.application.name}-degrade-rules
+    #            groupId: SENTINEL_GROUP
+    #            dataType: json
+    #            rule-type: degrade
+    #        flow:
+    #          nacos:
+    #            server-addr: ${spring.cloud.nacos.discovery.server-addr}
+    #            dataId: ${spring.application.name}-flow-rules
+    #            groupId: SENTINEL_GROUP
+    #            dataType: json
+    #            rule-type: flow
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
@@ -62,7 +62,7 @@ spring:
     topic: save_api_data
 api:
   limit:
-    paths: /**/customize/test/test   
+    paths: /**/customize/test/test
 feign:
   sentinel:
     enabled: false

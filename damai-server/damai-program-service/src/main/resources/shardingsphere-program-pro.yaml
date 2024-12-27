@@ -1,4 +1,4 @@
-dataSources: 
+dataSources:
   ds_0:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -16,7 +16,7 @@ dataSources:
     password: qazxsw890
     hikari:
       max-lifetime: 60000
-    
+
 rules:
   - !SHARDING
     tables:
@@ -69,7 +69,7 @@ rules:
         tableStrategy:
           standard:
             shardingColumn: program_id
-            shardingAlgorithmName: tableTicketCategoryModModel      
+            shardingAlgorithmName: tableTicketCategoryModModel
     broadcastTables:
       - d_program_category
     shardingAlgorithms:
@@ -88,7 +88,7 @@ rules:
       tableProgramGroupModModel:
         type: MOD
         props:
-          sharding-count: 2    
+          sharding-count: 2
       databaseProgramShowTimeModModel:
         type: MOD
         props:
@@ -112,6 +112,6 @@ rules:
       tableTicketCategoryModModel:
         type: MOD
         props:
-          sharding-count: 2    
+          sharding-count: 2
 props:
   sql-show: true

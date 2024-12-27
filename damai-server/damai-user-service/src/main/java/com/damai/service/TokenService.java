@@ -15,33 +15,33 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: token service
  * @author: 阿星不是程序员
  **/
 
 @Component
 public class TokenService {
-    
-    private static final String TOKEN_SECRET = "CSYZWECHAT";
-    
-    @Autowired
-    private RedisCache redisCache;
-    
-    public String parseToken(String token){
-        String userStr = TokenUtil.parseToken(token,TOKEN_SECRET);
-        if (StringUtil.isNotEmpty(userStr)) {
-            return JSONObject.parseObject(userStr).getString("userId");
-        }
-        return null;
-    }
-    
-    public UserVo getUser(String token){
-        UserVo userVo = null;
-        String userId = parseToken(token);
-        if (StringUtil.isNotEmpty(userId)) {
-            userVo = redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.USER_LOGIN, userId), UserVo.class);
-        }
-        return Optional.ofNullable(userVo).orElseThrow(() -> new DaMaiFrameException(BaseCode.USER_EMPTY));
-    }
+
+	private static final String TOKEN_SECRET = "CSYZWECHAT";
+
+	@Autowired
+	private RedisCache redisCache;
+
+	public String parseToken(String token) {
+		String userStr = TokenUtil.parseToken(token, TOKEN_SECRET);
+		if (StringUtil.isNotEmpty(userStr)) {
+			return JSONObject.parseObject(userStr).getString("userId");
+		}
+		return null;
+	}
+
+	public UserVo getUser(String token) {
+		UserVo userVo = null;
+		String userId = parseToken(token);
+		if (StringUtil.isNotEmpty(userId)) {
+			userVo = redisCache.get(RedisKeyBuild.createRedisKey(RedisKeyManage.USER_LOGIN, userId), UserVo.class);
+		}
+		return Optional.ofNullable(userVo).orElseThrow(() -> new DaMaiFrameException(BaseCode.USER_EMPTY));
+	}
 }

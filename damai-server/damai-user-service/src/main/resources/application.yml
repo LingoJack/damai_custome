@@ -22,7 +22,7 @@ spring:
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
     url: jdbc:shardingsphere:classpath:shardingsphere-user-${spring.profiles.active}.yaml
-  data:  
+  data:
     redis:
       database: 0
       host: 127.0.0.1
@@ -53,7 +53,7 @@ aj:
     req-get-lock-limit: 5
     req-get-lock-seconds: 360
     req-get-minute-limit: 30
-    req-check-minute-limit: 30  
+    req-check-minute-limit: 30
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   global-config:

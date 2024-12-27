@@ -20,7 +20,7 @@
 <mapper namespace="com.damai.mapper.OrderMapper">
     <select id="accountOrderCount" resultType="java.lang.Integer">
         select
-            count(*)
+        count(*)
         from d_order
         where ( order_status = 1 or order_status = 3)
         and user_id = #{userId,jdbcType=BIGINT}

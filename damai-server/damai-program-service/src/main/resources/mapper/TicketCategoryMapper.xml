@@ -20,7 +20,7 @@
 <mapper namespace="com.damai.mapper.TicketCategoryMapper">
     <select id="selectAggregateList" resultType="com.damai.entity.TicketCategoryAggregate">
         select
-            program_id,min(price) as min_price,max(price) as max_price
+        program_id,min(price) as min_price,max(price) as max_price
         from d_ticket_category
         where program_id in
         <foreach collection='programIdList' item='programId' index='index' open='(' close=')' separator=','>
@@ -28,18 +28,18 @@
         </foreach>
         group by program_id
     </select>
-    
+
     <update id="updateRemainNumber">
         update
-            d_ticket_category
+        d_ticket_category
         set remain_number = remain_number - #{number,jdbcType=BIGINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
-    
+
     <update id="batchUpdateRemainNumber">
         <foreach collection="ticketCategoryCountDtoList" item="ticketCategoryCountDto" index="index">
             update
-                d_ticket_category
+            d_ticket_category
             set remain_number = remain_number - #{ticketCategoryCountDto.count,jdbcType=BIGINT}
             where id = #{ticketCategoryCountDto.ticketCategoryId,jdbcType=BIGINT}
             and program_id = #{programId,jdbcType=BIGINT}

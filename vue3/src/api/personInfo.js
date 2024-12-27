@@ -6,17 +6,18 @@ import request from '@/utils/request'
  * @param data
  * @returns {*}
  */
-export function getPersonInfo(data){
+export function getPersonInfo(data) {
     return request({
         url: '/damai/user/user/update',
         method: 'post',
-        data:data
+        data: data
     })
 }
-export function getPersonInfoId(data){
+
+export function getPersonInfoId(data) {
     return request({
         url: '/damai/user/user/get/id',
         method: 'post',
-        data:data
+        data: data
     })
 }

@@ -10,6 +10,6 @@ import lombok.Data;
 @Schema(title = "ProgramSearchDto", description = "节目搜索")
 public class ProgramSearchDto extends ProgramPageListDto {
 
-    @Schema(name = "content", type = "String", description = "搜索内容")
-    private String content;
+	@Schema(name = "content", type = "String", description = "搜索内容")
+	private String content;
 }

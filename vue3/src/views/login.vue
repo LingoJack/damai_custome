@@ -9,15 +9,16 @@
         <div class="main-right">
           <el-tabs
               v-model="activeName"
-              type="card"
               class="demo-tabs"
+              type="card"
               @tab-click="handleClick"
           >
             <el-tab-pane label="密码登录" name="first">
               <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
-                <div class="error-tips" v-if="isTips">
+                <div v-if="isTips" class="error-tips">
                   <WarningFilled style="width: 1em; height: 1em; margin-left: 8px;color: #ff934c"/>
-                  {{ tipsContent }}</div>
+                  {{ tipsContent }}
+                </div>
                 <el-input v-model="userName" placeholder="请输入手机号或邮箱" prop="userName">
                   <template #prepend>
                     <el-icon :size="30" color="#ffffff">
@@ -25,8 +26,8 @@
                     </el-icon>
                   </template>
                 </el-input>
-                <el-input type="password" show-password v-model="loginForm.password" placeholder="请输入密码"
-                          prop="password">
+                <el-input v-model="loginForm.password" placeholder="请输入密码" prop="password" show-password
+                          type="password">
                   <template #prepend>
                     <el-icon :size="30" color="#ffffff">
                       <Lock/>
@@ -35,19 +36,20 @@
                 </el-input>
                 <el-button
                     :loading="loading"
-                    size="large"
-                    type="primary"
-                    style="width:100%;"
                     class="btn"
+                    size="large"
+                    style="width:100%;"
+                    type="primary"
                     @click.prevent="handleLogin"
                 >
                   <span v-if="!loading">登 录</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
-                <div v-show="experienceAccountFlag != 1" style="float: right;" v-if="register" class="register">
-                  <router-link class="link-type" :to="'/register'">立即注册</router-link>
+                <div v-if="register" v-show="experienceAccountFlag != 1" class="register" style="float: right;">
+                  <router-link :to="'/register'" class="link-type">立即注册</router-link>
                 </div>
-                <div v-show="experienceAccountFlag == 1" style="float: right;" v-if="register" class="experienceAccount">
+                <div v-if="register" v-show="experienceAccountFlag == 1" class="experienceAccount"
+                     style="float: right;">
                   <a class="link-type" @click="getExperienceAccount">点击获取体验账号</a>
                 </div>
               </el-form>
@@ -72,9 +74,9 @@
           }}
         </h2>
         <img
-            class="qrcode-image"
             :src="wechatOfficialAccount"
             alt="微信公众号"
+            class="qrcode-image"
         />
         <div class="dialog-footer">
           <el-button class="experienceAccountConfirm" @click="stateOpen = false">确定</el-button>
@@ -89,8 +91,8 @@ import wechatOfficialAccount from '@/assets/section/wechatOfficialAccount.jpg'
 import bg from '@/assets/section/javaup.jpg'
 import Header from '@/components/header/index'
 import Footer from '@/components/footer/index'
-import {isPhoneNumber, isEmailAddress} from '@/utils/index'
-import {ref, getCurrentInstance, inject} from 'vue'
+import {isEmailAddress, isPhoneNumber} from '@/utils/index'
+import {getCurrentInstance, ref} from 'vue'
 import useUserStore from '@/store/modules/user'
 import {useRouter} from 'vue-router'
 
@@ -131,7 +133,7 @@ const handleLogin = () => {
       } else if (loginForm.value.password == '') {
         tipsContent.value = '请输入密码'
         isTips.value = true
-      }else{
+      } else {
         isTips.value = false
         //正则匹配(手机号还是邮箱涉及到传参)
         identifyType(userName.value)
@@ -158,14 +160,14 @@ function identifyType(value) {
   }
 }
 
-function getExperienceAccount(){
+function getExperienceAccount() {
   console.log('getExperienceAccount')
   stateOpen.value = true
 }
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 100%;
   height: 100%;
@@ -308,7 +310,8 @@ function getExperienceAccount(){
   width: 100%;
   cursor: pointer;
 }
-.error-tips{
+
+.error-tips {
   border: 1px solid #ff934c;
   background: #fefcee;
   margin-bottom: 16px;
@@ -319,6 +322,7 @@ function getExperienceAccount(){
   z-index: 1001;
   text-align: left;
 }
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -339,7 +343,7 @@ function getExperienceAccount(){
   justify-content: center; /* Center the button horizontally */
 }
 
-.experienceAccountConfirm{
+.experienceAccountConfirm {
   background-color: rgba(255, 55, 29, 0.85);
   background-image: -webkit-gradient(linear, left top, right top, from(rgba(255, 55, 29, 0.85)), to(rgba(255, 55, 29, 0.85)));
   background-image: linear-gradient(90deg, rgba(255, 55, 29, 0.85), rgba(255, 55, 29, 0.85));

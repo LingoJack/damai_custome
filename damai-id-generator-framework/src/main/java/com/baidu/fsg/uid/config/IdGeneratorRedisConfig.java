@@ -12,25 +12,25 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * @program: cook-frame
  * @description: 对百度开源id生成器进行redis适配
- * @see <a href="https://github.com/baidu/uid-generator/">百度开源id生成器</a>
  * @author: 阿星不是程序员
  * @create: 2023-05-23
+ * @see <a href="https://github.com/baidu/uid-generator/">百度开源id生成器</a>
  **/
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty("spring.data.redis.host")
 public class IdGeneratorRedisConfig {
-    
-    @Bean("idGeneratorRedisTemplate")
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        return redisTemplate;
-    }
-    
-    @Bean("disposableWorkerIdAssigner")
-    public WorkerIdAssigner redisDisposableWorkerIdAssigner(@Qualifier("idGeneratorRedisTemplate") RedisTemplate redisTemplate){
-        RedisDisposableWorkerIdAssigner redisDisposableWorkerIdAssigner = new RedisDisposableWorkerIdAssigner(redisTemplate);
-        return redisDisposableWorkerIdAssigner;
-    }
+
+	@Bean("idGeneratorRedisTemplate")
+	public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		RedisTemplate redisTemplate = new RedisTemplate();
+		redisTemplate.setDefaultSerializer(new StringRedisSerializer());
+		redisTemplate.setConnectionFactory(redisConnectionFactory);
+		return redisTemplate;
+	}
+
+	@Bean("disposableWorkerIdAssigner")
+	public WorkerIdAssigner redisDisposableWorkerIdAssigner(@Qualifier("idGeneratorRedisTemplate") RedisTemplate redisTemplate) {
+		RedisDisposableWorkerIdAssigner redisDisposableWorkerIdAssigner = new RedisDisposableWorkerIdAssigner(redisTemplate);
+		return redisDisposableWorkerIdAssigner;
+	}
 }

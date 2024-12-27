@@ -3,86 +3,94 @@
   <div class="orderDetail">
     <Header></Header>
     <div class="app-container">
-      <div class="orderNum" v-if="orderData[0]" >订单号: {{orderData[0].orderNumber}}</div>
-      <div class="isPay" v-if="orderData[0]&&orderData[0].orderStatus == 1"><span>未支付</span><span>需付款: <span>￥{{orderData[0].orderPrice}}</span></span></div>
-      <div class="isPay" v-if="orderData[0]&&orderData[0].orderStatus == 2">交易关闭<span>需付款: <span>￥{{orderData[0].orderPrice}}</span></span></div>
-      <div class="isPay" v-if="orderData[0]&&orderData[0].orderStatus == 3"><span>已支付</span> <span>实付款: <span>￥{{orderData[0].orderPrice}}</span></span></div>
-      <div class="isPay" v-if="orderData[0]&&orderData[0].orderStatus == 4">交易关闭<span>需付款: <span>￥{{orderData[0].orderPrice}}</span></span></div>
+      <div v-if="orderData[0]" class="orderNum">订单号: {{ orderData[0].orderNumber }}</div>
+      <div v-if="orderData[0]&&orderData[0].orderStatus == 1" class="isPay">
+        <span>未支付</span><span>需付款: <span>￥{{ orderData[0].orderPrice }}</span></span></div>
+      <div v-if="orderData[0]&&orderData[0].orderStatus == 2" class="isPay">
+        交易关闭<span>需付款: <span>￥{{ orderData[0].orderPrice }}</span></span></div>
+      <div v-if="orderData[0]&&orderData[0].orderStatus == 3" class="isPay"><span>已支付</span>
+        <span>实付款: <span>￥{{ orderData[0].orderPrice }}</span></span></div>
+      <div v-if="orderData[0]&&orderData[0].orderStatus == 4" class="isPay">
+        交易关闭<span>需付款: <span>￥{{ orderData[0].orderPrice }}</span></span></div>
       <div class="program-table">
-        <el-table :data="orderData" border style="width: 100%" class="tableCloumn">
-          <el-table-column   label="项目信息"  width="400px" >
+        <el-table :data="orderData" border class="tableCloumn" style="width: 100%">
+          <el-table-column label="项目信息" width="400px">
             <template #default="scope">
               <img :src="scope.row.programItemPicture" alt="">
               <div class="project">
-                <div class="title">{{scope.row.programTitle}}</div>
-                <div class="content">演出场次: {{scope.row.programShowTime}}</div>
-                <div class="content">演出场馆: {{scope.row.programPlace}}</div>
+                <div class="title">{{ scope.row.programTitle }}</div>
+                <div class="content">演出场次: {{ scope.row.programShowTime }}</div>
+                <div class="content">演出场馆: {{ scope.row.programPlace }}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="座位信息" align="center">
-            <template #default="scope" >
+          <el-table-column align="center" label="座位信息">
+            <template #default="scope">
               <div v-for="item in scope.row.orderTicketInfoVoList">
-                <span>{{item.seatInfo}}</span>
+                <span>{{ item.seatInfo }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column   label="单价"   align="center">
-            <template #default="scope" >
+          <el-table-column align="center" label="单价">
+            <template #default="scope">
               <div v-for="item in scope.row.orderTicketInfoVoList">
-                <span>{{'￥'+item.price}}</span>
+                <span>{{ '￥' + item.price }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column   label="数量"  align="center">
-            <template #default="scope" >
+          <el-table-column align="center" label="数量">
+            <template #default="scope">
               <div v-for="item in scope.row.orderTicketInfoVoList">
-                <span>{{item.quantity}}</span>
+                <span>{{ item.quantity }}</span>
               </div>
-            </template></el-table-column>
-          <el-table-column   label="优惠"  align="center">
-            <template #default="scope" >
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="优惠">
+            <template #default="scope">
               <div v-for="item in scope.row.orderTicketInfoVoList">
-                <span v-if="item.favourablePrice!=''">{{item.favourablePrice}}</span>
+                <span v-if="item.favourablePrice!=''">{{ item.favourablePrice }}</span>
                 <span v-else>-</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column  label="小计"  align="center"><template #default="scope" >
-            <div v-for="item in scope.row.orderTicketInfoVoList">
-              <span>{{item.relPrice}}</span>
-            </div>
-          </template></el-table-column>
+          <el-table-column align="center" label="小计">
+            <template #default="scope">
+              <div v-for="item in scope.row.orderTicketInfoVoList">
+                <span>{{ item.relPrice }}</span>
+              </div>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
       <ul v-for="item in orderData" class="orderDetialInfo">
         <li>
           <p class="title">配送信息</p>
-          <div>配送方式：{{item.distributionMode}}</div>
-          <div>取票方式：{{item.takeTicketMode}}</div>
-          <div>收货人：{{item.userAndTicketUserInfoVo.userInfoVo.name}}</div>
-          <div>手机号：{{item.userAndTicketUserInfoVo.userInfoVo.mobile}}</div>
+          <div>配送方式：{{ item.distributionMode }}</div>
+          <div>取票方式：{{ item.takeTicketMode }}</div>
+          <div>收货人：{{ item.userAndTicketUserInfoVo.userInfoVo.name }}</div>
+          <div>手机号：{{ item.userAndTicketUserInfoVo.userInfoVo.mobile }}</div>
         </li>
         <li>
-          <p  class="title">订单信息</p>
-          <div>订单编号：{{item.orderNumber}}</div>
-          <div>创建时间：{{item.createOrderTime}}</div>
+          <p class="title">订单信息</p>
+          <div>订单编号：{{ item.orderNumber }}</div>
+          <div>创建时间：{{ item.createOrderTime }}</div>
         </li>
         <li>
-         <p  class="title">发票信息</p>
+          <p class="title">发票信息</p>
           <div>发票类型: 请在演出开始前，在程序上开具发票</div>
         </li>
         <li>
-          <p  class="title">金额明细</p>
-          <div> 商品总价: ￥{{item.orderPrice}}</div>
+          <p class="title">金额明细</p>
+          <div> 商品总价: ￥{{ item.orderPrice }}</div>
         </li>
-        </ul>
-      <div class="buyCustom" v-for="dict in orderData">
-        <p  class="title">购票人</p>
-        <div class="info" v-for="(ticketUserInfo,index) in dict.userAndTicketUserInfoVo.ticketUserInfoVoList" :key="index">
-          <div>购票人姓名: {{ticketUserInfo.relName}}</div>
-          <div>证件类型: {{getIdTypeName(ticketUserInfo.idType)}}</div>
-          <div>证件号码: {{ticketUserInfo.idNumber}}</div>
+      </ul>
+      <div v-for="dict in orderData" class="buyCustom">
+        <p class="title">购票人</p>
+        <div v-for="(ticketUserInfo,index) in dict.userAndTicketUserInfoVo.ticketUserInfoVoList" :key="index"
+             class="info">
+          <div>购票人姓名: {{ ticketUserInfo.relName }}</div>
+          <div>证件类型: {{ getIdTypeName(ticketUserInfo.idType) }}</div>
+          <div>证件号码: {{ ticketUserInfo.idNumber }}</div>
         </div>
       </div>
     </div>
@@ -90,18 +98,17 @@
   </div>
 </template>
 
-<script setup name="OrderDetail">
-import {ref, computed, onMounted, getCurrentInstance, nextTick, onBeforeMount} from 'vue'
+<script name="OrderDetail" setup>
+import {onMounted, ref} from 'vue'
 import Header from '@/components/header/index'
 import Footer from '@/components/footer/index'
 import {useRoute} from 'vue-router'
 import {getIdTypeName} from '@/api/common.js'
-import {ElMessage} from "element-plus";
 import {getOrderDetailApi} from '@/api/order.js'
 
 //订单详情入参
 const orderDetailParams = ref({
-  orderNumber:undefined
+  orderNumber: undefined
 })
 //订单详情数据
 const orderData = ref([])
@@ -109,9 +116,10 @@ const route = useRoute();
 // 获取路由参数
 orderDetailParams.value.orderNumber = route.params.orderNumber;
 
-onMounted(()=>{
+onMounted(() => {
   getOrderDetail()
 })
+
 //订单详情方法
 function getOrderDetail() {
   getOrderDetailApi(orderDetailParams.value).then(response => {
@@ -119,7 +127,7 @@ function getOrderDetail() {
   })
 }
 
-function getOrderStatus(orderStatus){
+function getOrderStatus(orderStatus) {
   if (orderStatus == 1) {
     return '未支付';
   }
@@ -135,49 +143,57 @@ function getOrderStatus(orderStatus){
 }
 </script>
 
-<style scoped lang="scss">
-.orderDetail{
+<style lang="scss" scoped>
+.orderDetail {
   width: 100%;
   height: 100%;
   background: #ffffff;
-  .app-container{
+
+  .app-container {
     width: 1200px;
     margin: 0 auto;
     padding: 10px 0;
-    .orderNum{
+
+    .orderNum {
       margin-top: 10px;
       font-size: 16px;
       margin-bottom: 20px;
     }
-    .isPay{
+
+    .isPay {
       font-size: 30px;
       display: flex;
       flex-direction: row;
       margin-bottom: 20px;
-      span:first-child{
-      flex-grow: 0.8;
+
+      span:first-child {
+        flex-grow: 0.8;
       }
-      span:last-child{
+
+      span:last-child {
         font-size: 14px;
         flex-grow: 0.2;
-        span{
+
+        span {
           font-size: 30px;
         }
       }
     }
-    .program-table{
-      .tableCloumn{
-        img{
+
+    .program-table {
+      .tableCloumn {
+        img {
           width: 62px;
           height: 80px;
           float: left;
         }
-        .project{
-          width: 293px;
-          padding-left:68px;
 
-          .title{
-            width:315px;
+        .project {
+          width: 293px;
+          padding-left: 68px;
+
+          .title {
+            width: 315px;
             color: #4a4a4a;
             margin-bottom: 4px;
             display: inline-block;
@@ -186,7 +202,8 @@ function getOrderStatus(orderStatus){
             text-overflow: ellipsis;
 
           }
-          .content{
+
+          .content {
             color: #9b9b9b;
             margin-bottom: 2px;
           }
@@ -195,27 +212,31 @@ function getOrderStatus(orderStatus){
       }
 
     }
-    .orderDetialInfo{
+
+    .orderDetialInfo {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 180px;
       border: 1px solid #f5f7fa;
       margin-top: 30px;
-      li{
+
+      li {
         width: 25%;
         height: 100%;
         border-right: 1px solid #f5f7fa;
         list-style: none;
         float: left;
-        .title{
+
+        .title {
           width: 100%;
           height: 20px;
           display: block;
           font-size: 20px;
           padding-left: 20px;
         }
-        div{
+
+        div {
           padding: 2px 2px 2px 10px;
           font-size: 14px;
 
@@ -223,24 +244,28 @@ function getOrderStatus(orderStatus){
         }
       }
     }
-    .buyCustom{
+
+    .buyCustom {
       width: 100%;
       height: 180px;
       margin-top: 20px;
       margin-bottom: 20px;
       border: 1px solid #f5f7fa;
-      .title{
+
+      .title {
         width: 100%;
         height: 20px;
         display: block;
         font-size: 20px;
         padding-left: 20px;
       }
-      .info{
+
+      .info {
         width: 20%;
         height: 150px;
         margin-top: 10px;
-        div{
+
+        div {
           padding: 2px 2px 2px 10px;
           font-size: 14px;
         }

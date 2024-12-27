@@ -15,19 +15,19 @@
                 </template>
                 <div class="city">
                   <ul style="margin-left: 70px">
-                    <li v-show="isShow" v-for="(item,index) in cityArr.slice(0,22)" :key="item.id"
+                    <li v-for="(item,index) in cityArr.slice(0,22)" v-show="isShow" :key="item.id"
                         @click="cityClick(item,index)"
                     >
                       <span v-if="item.name==currentCity" class="active">{{ item.name }}</span>
                       <span v-else>{{ item.name }}</span>
                     </li>
-                    <li v-show="!isShow" v-for="(item,index) in cityArr" :key="item.id"
-                        @click="cityClick(item,index)" :class="{active: activeCityIndex == index}">{{ item.name }}
+                    <li v-for="(item,index) in cityArr" v-show="!isShow" :key="item.id"
+                        :class="{active: activeCityIndex == index}" @click="cityClick(item,index)">{{ item.name }}
                     </li>
 
                   </ul>
                 </div>
-                <div class="btn" v-show="cityArr.length>22">
+                <div v-show="cityArr.length>22" class="btn">
                   <span v-show="isShow" @click="isShow=false">更多</span>
                   <span v-show="!isShow" @click="isShow=true">收起</span>
                 </div>
@@ -42,22 +42,24 @@
                         @click="categoryClick(item,ind)"
                     >
                       <span v-if="$route.query.name==item.name" class="active">{{ item.name }}</span>
-                      <span v-if="$route.query.name!=item.name&&item.name=='全部'" :class="{active:isActive}">全部</span>
-                      <span v-if="$route.query.name!=item.name&&item.name!='全部'" :class="{active: activeIndex == ind}">{{
+                      <span v-if="$route.query.name!=item.name&&item.name=='全部'"
+                            :class="{active:isActive}">全部</span>
+                      <span v-if="$route.query.name!=item.name&&item.name!='全部'"
+                            :class="{active: activeIndex == ind}">{{
                           item.name
                         }}</span>
                     </li>
                   </ul>
                 </div>
               </el-collapse-item>
-              <el-collapse-item name="3" v-if="isShowChildren">
+              <el-collapse-item v-if="isShowChildren" name="3">
                 <template #title>
                   <span class="title">子类:</span>
                 </template>
                 <div>
                   <ul>
                     <li v-for="(item,index) in childrenArr" :key="item.id"
-                        @click="childrenClick(item,index)" :class="{active: activeChildrenIndex == index}">
+                        :class="{active: activeChildrenIndex == index}" @click="childrenClick(item,index)">
                       {{ item.name }}
                     </li>
 
@@ -72,16 +74,16 @@
                 <div>
                   <ul>
                     <li v-for="(item,index) in timeArr" :key="item.id"
-                        @click="timeClick(item,index)" :class="{active: activeTimeIndex == index}">
+                        :class="{active: activeTimeIndex == index}" @click="timeClick(item,index)">
                       <span>{{ item.name }}</span>
                     </li>
                     <li class="liDate">
                       <el-date-picker
                           v-if="isShowDate"
                           v-model="value1"
-                          type="daterange"
-                          start-placeholder="开始时间"
                           end-placeholder="结束时间"
+                          start-placeholder="开始时间"
+                          type="daterange"
                           @change="handleChangeDate"
                       />
                     </li>
@@ -93,7 +95,7 @@
             </el-collapse>
           </div>
           <div class="box-sort">
-            <el-tabs type="border-card" class="box-tabs" @tab-click="handleClickTab">
+            <el-tabs class="box-tabs" type="border-card" @tab-click="handleClickTab">
               <el-tab-pane label="Config">
                 <template #label>相关度排序</template>
                 <ul>
@@ -104,15 +106,16 @@
                     <div class="item-txt">
                       <div class="item-title">
                         <span>【{{ item.areaName }}】</span>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="titleIsShow">
+                        <router-link v-if="titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial">
                           {{ item.title }}
                         </router-link>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="!titleIsShow"
+                        <router-link v-if="!titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial"
                                      v-html="item.title"></router-link>
 
                       </div>
-                      <div class="item-content" v-if="titleIsShow">艺人：{{ item.actor }}</div>
-                      <div class="item-content" v-if="!titleIsShow"><span>艺人：</span><span  v-html="item.actor"></span> </div>
+                      <div v-if="titleIsShow" class="item-content">艺人：{{ item.actor }}</div>
+                      <div v-if="!titleIsShow" class="item-content"><span>艺人：</span><span v-html="item.actor"></span>
+                      </div>
 
                       <div class="item-content"> {{ item.areaName }} | {{ item.place }}</div>
                       <div class="item-content">{{ formatDateWithWeekday(item.showTime, item.showWeekTime) }}</div>
@@ -126,9 +129,9 @@
                 </ul>
                 <pagination
                     v-show="total > 0"
-                    :total="total"
-                    v-model:page="queryParams.pageNum"
                     v-model:limit="queryParams.pageSize"
+                    v-model:page="queryParams.pageNum"
+                    :total="total"
                     @pagination="getList"
                 />
               </el-tab-pane>
@@ -142,15 +145,16 @@
                     <div class="item-txt">
                       <div class="item-title">
                         <span>【{{ item.areaName }}】</span>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="titleIsShow">
+                        <router-link v-if="titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial">
                           {{ item.title }}
                         </router-link>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="!titleIsShow"
+                        <router-link v-if="!titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial"
                                      v-html="item.title"></router-link>
 
                       </div>
-                      <div class="item-content" v-if="titleIsShow">艺人：{{ item.actor }}</div>
-                      <div class="item-content" v-if="!titleIsShow"><span>艺人：</span><span  v-html="item.actor"></span> </div>
+                      <div v-if="titleIsShow" class="item-content">艺人：{{ item.actor }}</div>
+                      <div v-if="!titleIsShow" class="item-content"><span>艺人：</span><span v-html="item.actor"></span>
+                      </div>
                       <div class="item-content"> {{ item.areaName }} | {{ item.place }}</div>
                       <div class="item-content">{{ formatDateWithWeekday(item.showTime, item.showWeekTime) }}</div>
 
@@ -163,9 +167,9 @@
                 </ul>
                 <pagination
                     v-show="total > 0"
-                    :total="total"
-                    v-model:page="queryParams.pageNum"
                     v-model:limit="queryParams.pageSize"
+                    v-model:page="queryParams.pageNum"
+                    :total="total"
                     @pagination="getList"
                 />
               </el-tab-pane>
@@ -179,15 +183,16 @@
                     <div class="item-txt">
                       <div class="item-title">
                         <span>【{{ item.areaName }}】</span>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="titleIsShow">
+                        <router-link v-if="titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial">
                           {{ item.title }}
                         </router-link>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="!titleIsShow"
+                        <router-link v-if="!titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial"
                                      v-html="item.title"></router-link>
 
                       </div>
-                      <div class="item-content" v-if="titleIsShow">艺人：{{ item.actor }}</div>
-                      <div class="item-content" v-if="!titleIsShow"><span>艺人：</span><span  v-html="item.actor"></span> </div>
+                      <div v-if="titleIsShow" class="item-content">艺人：{{ item.actor }}</div>
+                      <div v-if="!titleIsShow" class="item-content"><span>艺人：</span><span v-html="item.actor"></span>
+                      </div>
                       <div class="item-content"> {{ item.areaName }} | {{ item.place }}</div>
                       <div class="item-content">{{ formatDateWithWeekday(item.showTime, item.showWeekTime) }}</div>
 
@@ -200,9 +205,9 @@
                 </ul>
                 <pagination
                     v-show="total > 0"
-                    :total="total"
-                    v-model:page="queryParams.pageNum"
                     v-model:limit="queryParams.pageSize"
+                    v-model:page="queryParams.pageNum"
+                    :total="total"
                     @pagination="getList"
                 />
               </el-tab-pane>
@@ -216,15 +221,16 @@
                     <div class="item-txt">
                       <div class="item-title">
                         <span>【{{ item.areaName }}】</span>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="titleIsShow">
+                        <router-link v-if="titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial">
                           {{ item.title }}
                         </router-link>
-                        <router-link :to="{name:'detial', params:{id:item.id}}" class="link-detial" v-if="!titleIsShow"
+                        <router-link v-if="!titleIsShow" :to="{name:'detial', params:{id:item.id}}" class="link-detial"
                                      v-html="item.title"></router-link>
 
                       </div>
-                      <div class="item-content" v-if="titleIsShow">艺人：{{ item.actor }}</div>
-                      <div class="item-content" v-if="!titleIsShow"><span>艺人：</span><span  v-html="item.actor"></span> </div>
+                      <div v-if="titleIsShow" class="item-content">艺人：{{ item.actor }}</div>
+                      <div v-if="!titleIsShow" class="item-content"><span>艺人：</span><span v-html="item.actor"></span>
+                      </div>
                       <div class="item-content"> {{ item.areaName }} | {{ item.place }}</div>
                       <div class="item-content">{{ formatDateWithWeekday(item.showTime, item.showWeekTime) }}</div>
 
@@ -237,9 +243,9 @@
                 </ul>
                 <pagination
                     v-show="total > 0"
-                    :total="total"
-                    v-model:page="queryParams.pageNum"
                     v-model:limit="queryParams.pageSize"
+                    v-model:page="queryParams.pageNum"
+                    :total="total"
                     @pagination="getList"
                 />
               </el-tab-pane>
@@ -253,7 +259,7 @@
           您可能还喜欢
         </div>
         <ul class="search__box">
-          <li class="search__item" v-for="item in recommendList">
+          <li v-for="item in recommendList" class="search__item">
             <router-link :to="{name:'detial',params:{id:item.id}}" class="link">
               <img :src="item.itemPicture" alt="">
             </router-link>
@@ -278,7 +284,7 @@
 import {getCurrentInstance, onMounted, reactive, ref} from 'vue'
 import {getCurrentCity, getOtherCity} from '@/api/area'
 import {getcategoryType} from "@/api/index";
-import {getCurrentDate, useMitt,formatDateWithWeekday} from "@/utils/index";
+import {formatDateWithWeekday, getCurrentDate, useMitt} from "@/utils/index";
 import {getChildrenType, getProgramPageType} from "@/api/allType";
 import {getProgramRecommendList} from "@/api/recommendlist.js"
 //引入路由器
@@ -402,7 +408,7 @@ const categoryClick = (item, ind) => {
     //推荐节目列表入参中的父节目类型字段
     recommendParams.parentProgramCategoryId = item.id;
     if (isActive.value == false) {
-        getChildrenTypeList()
+      getChildrenTypeList()
     }
     getList()
     getRecommendList()
@@ -524,7 +530,7 @@ function removeTag(str, tag) {
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 1200px;
   margin: 0 auto;
@@ -836,8 +842,9 @@ function removeTag(str, tag) {
 .search__item__info__price strong {
   color: rgba(255, 55, 29, 0.85); /* 价格字体颜色为红色 */
 }
-:deep(em){
- font-weight: bolder;
+
+:deep(em) {
+  font-weight: bolder;
   color: rgba(255, 55, 29, 0.85);
 
 }

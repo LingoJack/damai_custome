@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 @Data
 public class RateLimiterProperty {
 
-    // 限流开关，默认为false，表示不限流
-    @Value("${rate.switch:false}")
-    private Boolean rateSwitch;
+	// 限流开关，默认为false，表示不限流
+	@Value("${rate.switch:false}")
+	private Boolean rateSwitch;
 
-    // 最大并发许可数，默认为200
-    @Value("${rate.permits:200}")
-    private Integer ratePermits;
+	// 最大并发许可数，默认为200
+	@Value("${rate.permits:200}")
+	private Integer ratePermits;
 }

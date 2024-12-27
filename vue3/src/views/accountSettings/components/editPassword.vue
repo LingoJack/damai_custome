@@ -3,19 +3,19 @@
   <el-row>
     <el-form ref="editPsdRef" :model="editPsdForm" :rules="editPsdRules" class="login-form">
       <el-col :span="24">
-        <el-form-item label="输入密码:" prop="password" >
+        <el-form-item label="输入密码:" prop="password">
           <el-input
               v-model="editPsdForm.password"
               class="input-with-select"
-              type="password"
               show-password
-          > </el-input>
+              type="password"
+          ></el-input>
         </el-form-item>
       </el-col>
       <el-button
+          class="btn"
           size="large"
           type="primary"
-          class="btn"
           @click.prevent="savePsd"
       ><span>保存</span></el-button>
     </el-form>
@@ -30,7 +30,7 @@ import Footer from '../../../components/footer/index'
 import {getEditPsd} from '@/api/accountSettings'
 import {ElMessage} from "element-plus"
 import {getUserIdKey} from "../../../utils/auth"
-import {ref, reactive} from 'vue'
+import {reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import useUserStore from '@/store/modules/user'
 
@@ -52,8 +52,8 @@ const editPsdRules = reactive([
 
 
 function savePsd() {
-  getEditPsd(editPsdForm.value).then(response=>{
-    if(response.code == '0'){
+  getEditPsd(editPsdForm.value).then(response => {
+    if (response.code == '0') {
       ElMessage({
         message: '保存成功',
         type: 'success',
@@ -63,7 +63,7 @@ function savePsd() {
         location.href = '../../login';
       })
 
-    }else{
+    } else {
       ElMessage({
         message: response.message,
         type: 'error',
@@ -73,13 +73,14 @@ function savePsd() {
 }
 </script>
 
-<style scoped lang="scss">
-.el-row{
+<style lang="scss" scoped>
+.el-row {
   width: 400px;
   height: 400px;
   margin: 100px auto 30px;
 }
-.btn{
+
+.btn {
   margin-left: 130px;
   background: rgba(255, 55, 29, 0.85);
   border: none;

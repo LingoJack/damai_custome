@@ -3,124 +3,142 @@
     <div class="confirm-order">
       <div class="basic-info1">
         <div class="top">
-          <span class="title">{{detailList.title}}</span>
+          <span class="title">{{ detailList.title }}</span>
           <span class="local">{{ detailList.areaName }}|{{ detailList.place }}</span>
           <div class="line"></div>
           <div class="time"><span>{{ formatDateWithWeekday(detailList.showTime, detailList.showWeekTime) }}</span></div>
-          <div class="money"><span>￥<span v-if="allPrice == ''">{{countPrice}}</span><span v-else>{{allPrice}}</span>票档</span><span >×<span  v-if="allPrice == ''">1</span><span  v-else>{{num}}</span>张</span></div>
+          <div class="money"><span>￥<span v-if="allPrice == ''">{{ countPrice }}</span><span
+              v-else>{{ allPrice }}</span>票档</span><span>×<span v-if="allPrice == ''">1</span><span
+              v-else>{{ num }}</span>张</span></div>
           <div class="order-info">
             <span>按付款顺序配票，优先连座配票</span>
           </div>
 
-      </div>
+        </div>
         <div class="bottom">
           <div class="service-box">
             <span class="service">服务</span>
-            <div class="service-name" v-if="detailList.permitRefund!=''">
-              <i class="icon-warn" v-if="detailList.permitRefund=='0'"></i><span v-if="detailList.permitRefund=='0'">不支持退</span>
-              <i class="icon-yes-blue" v-if="detailList.permitRefund=='1'"></i><span v-if="detailList.permitRefund=='1'">条件退</span>
-              <i class="icon-yes-blue" v-if="detailList.permitRefund=='2'"></i><span v-if="detailList.permitRefund=='2'">全部退</span>
+            <div v-if="detailList.permitRefund!=''" class="service-name">
+              <i v-if="detailList.permitRefund=='0'" class="icon-warn"></i><span v-if="detailList.permitRefund=='0'">不支持退</span>
+              <i v-if="detailList.permitRefund=='1'" class="icon-yes-blue"></i><span
+                v-if="detailList.permitRefund=='1'">条件退</span>
+              <i v-if="detailList.permitRefund=='2'" class="icon-yes-blue"></i><span
+                v-if="detailList.permitRefund=='2'">全部退</span>
             </div>
-          <div class="service-name" v-if="detailList.relNameTicketEntrance!=''">
-            <i class="icon-warn" v-if="detailList.relNameTicketEntrance=='0'"></i><span
-              v-if="detailList.relNameTicketEntrance=='0'">不实名购票和入场</span>
-            <i class="icon-yes-blue" v-if="detailList.relNameTicketEntrance=='1'"></i><span
-              v-if="detailList.relNameTicketEntrance=='1'">实名购票和入场</span>
-          </div>
-          <div class="service-name"   v-if="detailList.permitChooseSeat!=''">
-            <i class="icon-warn" v-if="detailList.permitChooseSeat=='0'"></i><span
-              v-if="detailList.permitChooseSeat=='0'">不支持选座</span>
-            <i class="icon-yes-blue" v-if="detailList.permitChooseSeat=='1'"></i><span
-              v-if="detailList.permitChooseSeat=='1'">支持选座</span>
-          </div>
-          <div class="service-name" v-if="detailList.electronicDeliveryTicket!=''">
-            <i class="icon-warn" v-if="detailList.electronicDeliveryTicket=='0'"></i><span
-              v-if="detailList.electronicDeliveryTicket=='0'">无票</span>
-            <i class="icon-yes-blue" v-if="detailList.electronicDeliveryTicket=='1'"></i><span
-              v-if="detailList.electronicDeliveryTicket=='1'">电子票</span>
-            <i class="icon-yes-blue" v-if="detailList.electronicDeliveryTicket=='2'"></i><span
-              v-if="detailList.electronicDeliveryTicket=='2'">快递票</span>
-          </div>
-          <div class="service-name"  v-if="detailList.electronicInvoice!=''">
-            <i class="icon-warn" v-if="detailList.electronicInvoice=='0'"></i><span
-              v-if="detailList.electronicInvoice=='0'">纸质发票</span>
-            <i class="icon-yes-blue" v-if="detailList.electronicInvoice=='1'"></i><span
-              v-if="detailList.electronicInvoice=='1'">电子发票</span>
-          </div>
+            <div v-if="detailList.relNameTicketEntrance!=''" class="service-name">
+              <i v-if="detailList.relNameTicketEntrance=='0'" class="icon-warn"></i><span
+                v-if="detailList.relNameTicketEntrance=='0'">不实名购票和入场</span>
+              <i v-if="detailList.relNameTicketEntrance=='1'" class="icon-yes-blue"></i><span
+                v-if="detailList.relNameTicketEntrance=='1'">实名购票和入场</span>
+            </div>
+            <div v-if="detailList.permitChooseSeat!=''" class="service-name">
+              <i v-if="detailList.permitChooseSeat=='0'" class="icon-warn"></i><span
+                v-if="detailList.permitChooseSeat=='0'">不支持选座</span>
+              <i v-if="detailList.permitChooseSeat=='1'" class="icon-yes-blue"></i><span
+                v-if="detailList.permitChooseSeat=='1'">支持选座</span>
+            </div>
+            <div v-if="detailList.electronicDeliveryTicket!=''" class="service-name">
+              <i v-if="detailList.electronicDeliveryTicket=='0'" class="icon-warn"></i><span
+                v-if="detailList.electronicDeliveryTicket=='0'">无票</span>
+              <i v-if="detailList.electronicDeliveryTicket=='1'" class="icon-yes-blue"></i><span
+                v-if="detailList.electronicDeliveryTicket=='1'">电子票</span>
+              <i v-if="detailList.electronicDeliveryTicket=='2'" class="icon-yes-blue"></i><span
+                v-if="detailList.electronicDeliveryTicket=='2'">快递票</span>
+            </div>
+            <div v-if="detailList.electronicInvoice!=''" class="service-name">
+              <i v-if="detailList.electronicInvoice=='0'" class="icon-warn"></i><span
+                v-if="detailList.electronicInvoice=='0'">纸质发票</span>
+              <i v-if="detailList.electronicInvoice=='1'" class="icon-yes-blue"></i><span
+                v-if="detailList.electronicInvoice=='1'">电子发票</span>
+            </div>
           </div>
           <div class="line"></div>
         </div>
         <div class="isRealName">
-          <div class="left"><span class="title">实名观演人</span><span class="notice">仅需选择一位，入场时需携带对应证件</span></div>
-          <div class="right"><el-button class="btn" type="primary" circle @click="buyTicketInfo">新增</el-button></div>
-          <div class="ticketInfo" v-if="ticketInfoArr!=''">
-              <div  class="ticket" v-for="item in ticketInfoArr">
-              <div class="info" v-if="isSHowInfo">
-                <span class="title">{{item.relName}}</span>
-               <div class="card">
-                 <span class="cardType" v-if="item.idType == 1">身份证</span>
-                 <span class="cardType" v-if="item.idType == 2">港澳台居民居住证</span>
-                 <span class="cardType" v-if="item.idType == 3">港澳居民来往内地通行证</span>
-                 <span class="cardType" v-if="item.idType == 4">台湾居民来往内地通行证</span>
-                 <span class="cardType" v-if="item.idType == 5">护照</span>
-                 <span class="cardType" v-if="item.idType == 6">外国人永久居住证</span>
-                 <span class="cardId"> {{item.idNumber}}</span>
-               </div>
+          <div class="left"><span class="title">实名观演人</span><span
+              class="notice">仅需选择一位，入场时需携带对应证件</span></div>
+          <div class="right">
+            <el-button circle class="btn" type="primary" @click="buyTicketInfo">新增</el-button>
+          </div>
+          <div v-if="ticketInfoArr!=''" class="ticketInfo">
+            <div v-for="item in ticketInfoArr" class="ticket">
+              <div v-if="isSHowInfo" class="info">
+                <span class="title">{{ item.relName }}</span>
+                <div class="card">
+                  <span v-if="item.idType == 1" class="cardType">身份证</span>
+                  <span v-if="item.idType == 2" class="cardType">港澳台居民居住证</span>
+                  <span v-if="item.idType == 3" class="cardType">港澳居民来往内地通行证</span>
+                  <span v-if="item.idType == 4" class="cardType">台湾居民来往内地通行证</span>
+                  <span v-if="item.idType == 5" class="cardType">护照</span>
+                  <span v-if="item.idType == 6" class="cardType">外国人永久居住证</span>
+                  <span class="cardId"> {{ item.idNumber }}</span>
+                </div>
               </div>
-                <div class="chx"> <el-checkbox class="checkSelect" :value="item.id" size="large" @change="getSelectTicketUser(item.id, $event)"></el-checkbox></div>
+              <div class="chx">
+                <el-checkbox :value="item.id" class="checkSelect" size="large"
+                             @change="getSelectTicketUser(item.id, $event)"></el-checkbox>
               </div>
+            </div>
           </div>
         </div>
         <div class="line"></div>
         <div class="sendMethod">
-          <div  class="sendMethodTitle">配送方式</div>
-          <div class="ticketType"  v-if="detailList.electronicDeliveryTicket=='1'">电子票 <el-button   class="ticketbtn"  v-if="detailList.electronicDeliveryTicket=='1'">直接入场</el-button></div>
-          <div class="ticketInfo"  v-if="detailList.electronicDeliveryTicket=='1'">支付成功后，无需取票，前往票夹查看入场凭证</div>
-<!--          <div class="ticketType"  v-if="detailList.electronicDeliveryTicket=='2'">快递</div>-->
-<!--          <div class="ticketInfo"  v-if="detailList.electronicDeliveryTicket=='2'"></div>-->
-<!--          <div class="ticketType"  v-if="detailList.electronicDeliveryTicket=='2'">运费</div>-->
-<!--          <div class="ten"  v-if="detailList.electronicDeliveryTicket=='2'">￥10.00</div>-->
+          <div class="sendMethodTitle">配送方式</div>
+          <div v-if="detailList.electronicDeliveryTicket=='1'" class="ticketType">电子票
+            <el-button v-if="detailList.electronicDeliveryTicket=='1'" class="ticketbtn">直接入场</el-button>
+          </div>
+          <div v-if="detailList.electronicDeliveryTicket=='1'" class="ticketInfo">
+            支付成功后，无需取票，前往票夹查看入场凭证
+          </div>
+          <!--          <div class="ticketType"  v-if="detailList.electronicDeliveryTicket=='2'">快递</div>-->
+          <!--          <div class="ticketInfo"  v-if="detailList.electronicDeliveryTicket=='2'"></div>-->
+          <!--          <div class="ticketType"  v-if="detailList.electronicDeliveryTicket=='2'">运费</div>-->
+          <!--          <div class="ten"  v-if="detailList.electronicDeliveryTicket=='2'">￥10.00</div>-->
         </div>
         <div class="sendline"></div>
         <div class="tel">
           <div class="title">联系方式</div>
-          <div class="telNum">{{telNum}}</div>
+          <div class="telNum">{{ telNum }}</div>
         </div>
         <div class="sendline"></div>
         <div class="payMethod">
           <div class="title">支付方式</div>
-          <div class="payMoney"><img :src="pay" alt=""><span>支付宝</span> <el-radio class="radioPay" value="1" size="large"></el-radio></div>
+          <div class="payMoney"><img :src="pay" alt=""><span>支付宝</span>
+            <el-radio class="radioPay" size="large" value="1"></el-radio>
+          </div>
         </div>
         <div class="info">
-          <div class="descript">由于票品为价票券，非普通商品，其背后承载的文化服务具有时效性、稀缺性等特征，一旦订购成功，不支持退换。</div>
-        <div class="price">
-          <span class="num" v-if="allPrice == ''">￥{{ countPrice }}</span>
-          <span class="num" v-else>￥{{ allPrice }}</span>
-          <span class="detail">明细</span>
-<!--          <el-button type="primary" class="dialogShow"-->
-<!--                     @click="dialogShow">点击显示弹框</el-button>-->
-<!--          <el-button type="primary" class="dialogShow"-->
-<!--                     v-loading.fullscreen.lock="loading"-->
-<!--                     element-loading-text="请稍后..."-->
-<!--                     :element-loading-spinner="svg"-->
-<!--                     element-loading-svg-view-box="-10, -10, 50, 50"-->
-<!--                     element-loading-background="rgba(122, 122, 122, 0.8)"-->
-<!--                     @click="dialogLoading">点击loading</el-button>-->
-          <el-button type="primary" class="submit" @click="submitOrder">提交订单</el-button>
-        </div>
+          <div class="descript">
+            由于票品为价票券，非普通商品，其背后承载的文化服务具有时效性、稀缺性等特征，一旦订购成功，不支持退换。
+          </div>
+          <div class="price">
+            <span v-if="allPrice == ''" class="num">￥{{ countPrice }}</span>
+            <span v-else class="num">￥{{ allPrice }}</span>
+            <span class="detail">明细</span>
+            <!--          <el-button type="primary" class="dialogShow"-->
+            <!--                     @click="dialogShow">点击显示弹框</el-button>-->
+            <!--          <el-button type="primary" class="dialogShow"-->
+            <!--                     v-loading.fullscreen.lock="loading"-->
+            <!--                     element-loading-text="请稍后..."-->
+            <!--                     :element-loading-spinner="svg"-->
+            <!--                     element-loading-svg-view-box="-10, -10, 50, 50"-->
+            <!--                     element-loading-background="rgba(122, 122, 122, 0.8)"-->
+            <!--                     @click="dialogLoading">点击loading</el-button>-->
+            <el-button class="submit" type="primary" @click="submitOrder">提交订单</el-button>
+          </div>
         </div>
       </div>
     </div>
     <el-dialog
         v-model="dialogVisible"
-       style="width: 450px;height:500px;background: #FFE7BA;"
+        style="width: 450px;height:500px;background: #FFE7BA;"
 
     >
       <div class="content">当前排队人数太多，请稍候再试~</div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="dialogVisible = false" class="btn1">返回</el-button>
-          <el-button   class="submit btn2"    @click="dialogVisible = false">
+          <el-button class="btn1" @click="dialogVisible = false">返回</el-button>
+          <el-button class="submit btn2" @click="dialogVisible = false">
             继续尝试
           </el-button>
         </div>
@@ -129,13 +147,13 @@
   </div>
 </template>
 
-<script setup name="orderIndex">
-import {ref, nextTick, onActivated, onMounted,onBeforeUnmount } from 'vue'
+<script name="orderIndex" setup>
+import {onBeforeUnmount, onMounted, ref} from 'vue'
 import pay from "@/assets/section/pay.png"
-import {getCurrentDateTime,formatDateWithWeekday,useMitt} from '@/utils/index'
-import {useRoute, useRouter} from 'vue-router'
-import { getUserIdKey} from "@/utils/auth";
-import { getPersonInfoId} from '@/api/personInfo'
+import {formatDateWithWeekday} from '@/utils/index'
+import {useRouter} from 'vue-router'
+import {getUserIdKey} from "@/utils/auth";
+import {getPersonInfoId} from '@/api/personInfo'
 import {getTicketUser} from "@/api/buyTicketUser";
 import {getOrderCacheApi, orderCreateV1Api, orderCreateV2Api, orderCreateV3Api, orderCreateV4Api} from '@/api/order.js'
 import {ElMessage} from "element-plus";
@@ -172,11 +190,11 @@ const timeoutTimer = ref(null);
 const fiveSecond = 5000;
 
 //跳转后的接收值
-onMounted(()=>{
-  detailList.value  = JSON.parse(history.state.detailList)
-  allPrice.value  = history.state.allPrice
-  countPrice.value  =history.state.countPrice
-  num.value  =history.state.num
+onMounted(() => {
+  detailList.value = JSON.parse(history.state.detailList)
+  allPrice.value = history.state.allPrice
+  countPrice.value = history.state.countPrice
+  num.value = history.state.num
   ticketCategoryId.value = history.state.ticketCategoryId
 })
 
@@ -186,24 +204,25 @@ getTicketUserList()
 async function getPersonInfoIdList() {
   const id = getUserIdKey()
   getPersonInfoId({id: id}).then(response => {
-    let {mobile } = response.data
+    let {mobile} = response.data
     telNum.value = mobile
   })
 }
+
 async function getTicketUserList() {
   const id = getUserIdKey()
-  getTicketUser({userId:id}).then(response=>{
-    ticketInfoArr.value =response.data
+  getTicketUser({userId: id}).then(response => {
+    ticketInfoArr.value = response.data
   })
 }
 
 
-function buyTicketInfo(){
-  router.replace({path:'/order/buyTicketUser'})
+function buyTicketInfo() {
+  router.replace({path: '/order/buyTicketUser'})
 
 }
 
-function getSelectTicketUser(ticketUserId,isChecked){
+function getSelectTicketUser(ticketUserId, isChecked) {
   if (isChecked) {
     ticketUserIdArr.value.push(ticketUserId);
   } else {
@@ -212,17 +231,17 @@ function getSelectTicketUser(ticketUserId,isChecked){
 }
 
 
-function getOrderCache(orderNumber){
+function getOrderCache(orderNumber) {
   const orderNumberParams = {orderNumber}
   getOrderCacheApi(orderNumberParams).then(response => {
-    if (response.code == '0' && response.data != null){
+    if (response.code == '0' && response.data != null) {
       orderNumberCache.value = response.data;
     }
   })
 }
 
 //订单查询轮训
-const startPolling = (orderNumber,startTime) => {
+const startPolling = (orderNumber, startTime) => {
   pollingTimer.value = setInterval(() => {
     const currentTime = Date.now();
     if (currentTime - startTime >= fiveSecond) {
@@ -240,7 +259,7 @@ const startPolling = (orderNumber,startTime) => {
       //执行到这里说明订单创建成功
       //loading弹框关闭
       loadingClose();
-      router.replace({path:'/order/payMethod',state:{'orderNumber':orderNumberCache.value}})
+      router.replace({path: '/order/payMethod', state: {'orderNumber': orderNumberCache.value}})
     }
   }, 200); // 每200毫秒调用一次
 };
@@ -255,22 +274,22 @@ const stopPolling = () => {
 /**
  * 提交订单
  * */
-function submitOrder(){
+function submitOrder() {
 
   if (ticketUserIdArr.value.length != num.value) {
     ElMessage({
-      message:'选择的购票人和票张数量不一致',
+      message: '选择的购票人和票张数量不一致',
       type: 'error',
     })
     return;
   }
 
   const orderCreateParams = {
-    'programId':detailList.value.id,
-    'userId':useUser.userId,
-    'ticketUserIdList':ticketUserIdArr.value,
-    'ticketCategoryId':ticketCategoryId.value,
-    'ticketCount':num.value
+    'programId': detailList.value.id,
+    'userId': useUser.userId,
+    'ticketUserIdList': ticketUserIdArr.value,
+    'ticketCategoryId': ticketCategoryId.value,
+    'ticketCount': num.value
   }
 
   const createOrderVersion = import.meta.env.VITE_CREATE_ORDER_VERSION
@@ -279,14 +298,14 @@ function submitOrder(){
 
     //loading弹出框显示
     loadingShow();
-    
+
     orderCreateV1Api(orderCreateParams).then(response => {
       //loading弹出框关闭
       loadingClose();
       if (response.code == '0') {
         const orderNumber = response.data;
-        router.replace({path:'/order/payMethod',state:{'orderNumber':orderNumber}})
-      }else{
+        router.replace({path: '/order/payMethod', state: {'orderNumber': orderNumber}})
+      } else {
         // ElMessage({
         //   message:response.message,
         //   type: 'error',
@@ -295,19 +314,19 @@ function submitOrder(){
         dialogShow();
       }
     })
-  }else if (createOrderVersion == 2) {
+  } else if (createOrderVersion == 2) {
     //v2版本的创建订单
 
     //loading弹出框显示
     loadingShow();
-    
+
     orderCreateV2Api(orderCreateParams).then(response => {
       //loading弹出框关闭
       loadingClose();
       if (response.code == '0') {
         const orderNumber = response.data;
-        router.replace({path:'/order/payMethod',state:{'orderNumber':orderNumber}})
-      }else{
+        router.replace({path: '/order/payMethod', state: {'orderNumber': orderNumber}})
+      } else {
         // ElMessage({
         //   message:response.message,
         //   type: 'error',
@@ -316,19 +335,19 @@ function submitOrder(){
         dialogShow();
       }
     })
-  }else if (createOrderVersion == 3) {
+  } else if (createOrderVersion == 3) {
     //v3版本的创建订单
 
     //loading弹出框显示
     loadingShow();
-    
+
     orderCreateV3Api(orderCreateParams).then(response => {
       //loading弹出框关闭
       loadingClose();
       if (response.code == '0') {
         const orderNumber = response.data;
-        router.replace({path:'/order/payMethod',state:{'orderNumber':orderNumber}})
-      }else{
+        router.replace({path: '/order/payMethod', state: {'orderNumber': orderNumber}})
+      } else {
         // ElMessage({
         //   message:response.message,
         //   type: 'error',
@@ -337,52 +356,53 @@ function submitOrder(){
         dialogShow();
       }
     })
-  }else if (createOrderVersion == 4) {
+  } else if (createOrderVersion == 4) {
     //v4版本的创建订单
 
     //loading弹出框显示
     loadingShow();
-    
+
     orderCreateV4Api(orderCreateParams).then(response => {
       if (response.code == '0' && response.data != null) {
-        console.log('异步订单创建成功 订单编号',response.data)
+        console.log('异步订单创建成功 订单编号', response.data)
         //开始定时轮训查询
-        startPolling(response.data,Date.now());
+        startPolling(response.data, Date.now());
         // 设置一个5s后停止轮询的定时器
         timeoutTimer.value = setTimeout(() => {
           if (pollingTimer.value) {
             stopPolling();
           }
         }, fiveSecond);
-      }else{
+      } else {
         dialogShow();
       }
     })
   }
 }
+
 //弹出排队框
-function dialogShow(){
+function dialogShow() {
   dialogVisible.value = true
-  isSHowInfo.value=false
+  isSHowInfo.value = false
 }
 
-function dialogLoading(){
+function dialogLoading() {
   loading.value = true
-  isSHowInfo.value=false
+  isSHowInfo.value = false
   setTimeout(() => {
     loading.value = false
-    isSHowInfo.value=true
+    isSHowInfo.value = true
   }, 2000)
 }
 
-function loadingShow(){
+function loadingShow() {
   loading.value = true
-  isSHowInfo.value=false
+  isSHowInfo.value = false
 }
 
-function loadingClose(){
+function loadingClose() {
   loading.value = false;
-  isSHowInfo.value=true;
+  isSHowInfo.value = true;
 }
 
 onBeforeUnmount(() => {
@@ -390,7 +410,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 100%;
   height: 100%;
@@ -499,6 +519,7 @@ onBeforeUnmount(() => {
           flex-shrink: 0;
           flex-grow: 0;
           height: fit-content;
+
           span {
             white-space: pre-wrap;
             line-height: 40px;
@@ -522,7 +543,7 @@ onBeforeUnmount(() => {
           flex-grow: 0;
           height: fit-content;
 
-          span{
+          span {
             position: relative;
             display: flex;
             flex-shrink: 0;
@@ -564,12 +585,13 @@ onBeforeUnmount(() => {
         }
 
       }
-      .bottom{
+
+      .bottom {
         width: 100%;
         height: auto;
         margin-top: 330px;
 
-        .service-box{
+        .service-box {
           width: 100%;
           height: 33px;
           line-height: 33px;
@@ -578,19 +600,22 @@ onBeforeUnmount(() => {
           margin-top: 30px;
           color: #000 !important;
           font-size: 24px;
-          .service{
+
+          .service {
             width: 50px;
             height: 33px;
             line-height: 33px;
             margin-left: 50px;
           }
-          .service-name{
+
+          .service-name {
             margin-left: 18px;
             width: fit-content;
             height: 33px;
             line-height: 33px;
             display: inline-block;
-            .icon-warn{
+
+            .icon-warn {
               display: inline-block;
               width: 12px;
               height: 12px;
@@ -599,7 +624,8 @@ onBeforeUnmount(() => {
               background: url('/src/assets/section/warn.png');
               margin-right: 10px;
             }
-            .icon-yes-blue{
+
+            .icon-yes-blue {
               display: inline-block;
               width: 12px;
               height: 12px;
@@ -608,7 +634,8 @@ onBeforeUnmount(() => {
               background: url('/src/assets/section/yes-blue.png');
               margin-right: 10px;
             }
-            span{
+
+            span {
               width: fit-content;
               height: 33px;
               line-height: 33px;
@@ -616,7 +643,8 @@ onBeforeUnmount(() => {
           }
 
         }
-        .line{
+
+        .line {
           margin: 20px 0px 20px 50px;
           width: 97%;
           height: 2px;
@@ -624,9 +652,11 @@ onBeforeUnmount(() => {
           opacity: 0.7;
         }
       }
-      .isRealName{
+
+      .isRealName {
         margin-bottom: 20px;
-        .left{
+
+        .left {
           position: relative;
           display: flex;
           flex: 1 1 0%;
@@ -639,7 +669,8 @@ onBeforeUnmount(() => {
           -webkit-box-flex: 1;
           height: auto;
           float: left;
-          .title{
+
+          .title {
             position: relative;
             display: flex;
             flex-shrink: 0;
@@ -655,7 +686,8 @@ onBeforeUnmount(() => {
             overflow: hidden;
             max-width: none;
           }
-          .notice{
+
+          .notice {
             position: relative;
             display: flex;
             flex: 1 1 0%;
@@ -674,10 +706,12 @@ onBeforeUnmount(() => {
             max-width: none;
           }
         }
-        .right{
+
+        .right {
           float: left;
           margin-left: 43px;
-          .btn{
+
+          .btn {
             position: relative;
             display: flex;
             flex-shrink: 1;
@@ -694,7 +728,8 @@ onBeforeUnmount(() => {
             font-size: 24px;
           }
         }
-        .ticketInfo{
+
+        .ticketInfo {
           width: 100%;
           padding-left: 143.36px;
           padding-right: 143.36px;
@@ -707,13 +742,15 @@ onBeforeUnmount(() => {
           justify-content: space-between;
           -webkit-box-align: center;
           align-items: center;
-          .ticket{
+
+          .ticket {
             width: 100%;
             height: 136px;
             display: flex;
             flex-direction: row;
             align-items: center;
-            .info{
+
+            .info {
               position: relative;
               display: flex;
               flex: 1 1 0%;
@@ -726,7 +763,8 @@ onBeforeUnmount(() => {
               -webkit-box-flex: 1;
               height: auto;
               float: left;
-              .title{
+
+              .title {
                 position: relative;
                 display: flex;
                 flex-shrink: 0;
@@ -746,7 +784,8 @@ onBeforeUnmount(() => {
                 text-overflow: ellipsis;
                 white-space: nowrap;
               }
-              .card{
+
+              .card {
                 font-size: 3.2vmin;
                 color: rgb(156, 156, 165);
                 width: auto;
@@ -770,25 +809,28 @@ onBeforeUnmount(() => {
                 //max-width: none;
                 //font-size: 3.2vmin;
                 //color: rgb(156, 156, 165);
-                .cardType{
+                .cardType {
                   width: 100px;
                   font-size: 24px;
-                  color:rgb(156, 156, 165);
+                  color: rgb(156, 156, 165);
                   display: inline-block;
                 }
-                .cardId{
+
+                .cardId {
 
                 }
               }
 
             }
 
-            .chx{}
+            .chx {
+            }
           }
 
         }
 
       }
+
       .line {
         margin: 114px 0px 20px 50px;
         width: 97%;
@@ -796,9 +838,11 @@ onBeforeUnmount(() => {
         background-color: #cccccc;
         opacity: 0.7;
       }
-      .sendMethod{
+
+      .sendMethod {
         margin-left: 43px;
-        .sendMethodTitle{
+
+        .sendMethodTitle {
           position: relative;
           display: flex;
           flex: 1 1 0%;
@@ -816,7 +860,8 @@ onBeforeUnmount(() => {
           overflow: hidden;
           max-width: none;
         }
-        .ticketType{
+
+        .ticketType {
           position: relative;
           display: flex;
           flex-shrink: 0;
@@ -834,6 +879,7 @@ onBeforeUnmount(() => {
           max-width: none;
           margin-top: 20px;
           margin-bottom: 10px;
+
           .ticketbtn {
             position: relative;
             display: flex;
@@ -854,7 +900,8 @@ onBeforeUnmount(() => {
             border-radius: 20px;
           }
         }
-        .ticketInfo{
+
+        .ticketInfo {
           position: relative;
           display: flex;
           flex-shrink: 0;
@@ -871,49 +918,19 @@ onBeforeUnmount(() => {
           max-width: none;
         }
       }
-      .sendline{
+
+      .sendline {
         margin: 20px 0px 20px 50px;
         width: 97%;
         height: 1px;
         background-color: #cccccc;
         opacity: 0.7;
       }
-      .tel{
+
+      .tel {
         margin-left: 43px;
-        .title{
-          position: relative;
-          display: flex;
-          flex: 1 1 0%;
-          font-size: 24px;
-          place-self: center flex-start;
-          width: fit-content;
-          -webkit-box-flex: 1;
-          color: rgb(0, 0, 0);
-          height: auto;
-          -webkit-box-pack: start;
-          justify-content: flex-start;
-          -webkit-box-align: center;
-          align-items: center;
-          overflow: hidden;
-          max-width: none;
-         margin: 20px 0;
-        }
-        .telNum{
-          width: 100%;
-          height: 100%;
-          outline: none;
-          border: none;
-          padding: 0px;
-          margin: 0px;
-          user-select: auto;
-          font-size: 33px;
-          color: rgb(0, 0, 0);
-          text-align: left;
-        }
-      }
-      .payMethod{
-        margin-left: 43px;
-        .title{
+
+        .title {
           position: relative;
           display: flex;
           flex: 1 1 0%;
@@ -931,14 +948,53 @@ onBeforeUnmount(() => {
           max-width: none;
           margin: 20px 0;
         }
-        .payMoney{
+
+        .telNum {
+          width: 100%;
+          height: 100%;
+          outline: none;
+          border: none;
+          padding: 0px;
+          margin: 0px;
+          user-select: auto;
+          font-size: 33px;
+          color: rgb(0, 0, 0);
+          text-align: left;
+        }
+      }
+
+      .payMethod {
+        margin-left: 43px;
+
+        .title {
+          position: relative;
+          display: flex;
+          flex: 1 1 0%;
+          font-size: 24px;
+          place-self: center flex-start;
+          width: fit-content;
+          -webkit-box-flex: 1;
+          color: rgb(0, 0, 0);
+          height: auto;
+          -webkit-box-pack: start;
+          justify-content: flex-start;
+          -webkit-box-align: center;
+          align-items: center;
+          overflow: hidden;
+          max-width: none;
+          margin: 20px 0;
+        }
+
+        .payMoney {
           display: flex;
           height: 300px;
-          img{
+
+          img {
             width: 80px;
             height: 80px;
           }
-          span{
+
+          span {
             padding: 30px 15px;
             font-size: 3.4vmin;
             color: #000000;
@@ -946,19 +1002,22 @@ onBeforeUnmount(() => {
             line-height: 15px;
             margin-right: 1500px;
           }
-          .radioPay{
+
+          .radioPay {
 
           }
         }
       }
-      .info{
+
+      .info {
         width: 100%;
         height: 150px;
         position: fixed;
         bottom: 0px;
         background: #ffffff;
         z-index: 100000;
-        .descript{
+
+        .descript {
           position: relative;
           display: flex;
           font-size: 22px;
@@ -975,11 +1034,13 @@ onBeforeUnmount(() => {
           max-width: none;
           margin-left: 43px;
         }
-        .price{
+
+        .price {
           display: flex;
           flex-direction: row;
           margin: 20px 0px 20px 43px;
-          .num{
+
+          .num {
             position: relative;
             display: flex;
             flex-shrink: 0;
@@ -997,7 +1058,8 @@ onBeforeUnmount(() => {
             overflow: hidden;
             max-width: none;
           }
-          .detail{
+
+          .detail {
             position: relative;
             display: flex;
             flex-shrink: 0;
@@ -1014,7 +1076,8 @@ onBeforeUnmount(() => {
             align-items: center;
             max-width: none;
           }
-          .submit{
+
+          .submit {
             position: absolute;
             right: 30px;
             display: flex;
@@ -1037,15 +1100,17 @@ onBeforeUnmount(() => {
       }
     }
   }
-  .content{
+
+  .content {
     width: 100%;
-    height:30px;
+    height: 30px;
     line-height: 30px;
     text-align: center;
     font-size: 24px;
     margin-top: 100px;
   }
-  .btn1{
+
+  .btn1 {
     width: 300px;
     height: 50px;
     background: rgb(255, 55, 29);
@@ -1055,37 +1120,44 @@ onBeforeUnmount(() => {
     border-radius: 50px;
     font-size: 20px;
   }
-  .btn2{
+
+  .btn2 {
     width: 300px;
-   border: none;
+    border: none;
     display: block;
     margin: 20px auto;
     background: transparent;
     font-size: 20px;
   }
 }
-:deep(.el-dialog){
+
+:deep(.el-dialog) {
 
   border-radius: 20px;
 }
-:deep(.el-dialog__footer){
-  padding-top: 100px ;
+
+:deep(.el-dialog__footer) {
+  padding-top: 100px;
 }
+
 :deep(.el-radio__input.is-checked .el-radio__inner) {
   border-color: rgba(255, 55, 29, 0.85);
   background: rgba(255, 55, 29, 0.85);
 }
+
 :deep(.el-checkbox.el-checkbox--large .el-checkbox__inner) {
   width: 4.3vmin;
   height: 4.3vmin;
   color: #dddddd;
 }
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner ){
+
+:deep(.el-checkbox__input.is-checked .el-checkbox__inner ) {
   background-color: rgba(255, 55, 29, 0.85);
   border-color: rgba(255, 55, 29, 0.85);
-  font-size:4.3vmin ;
+  font-size: 4.3vmin;
 }
-:deep(.el-checkbox__inner::after){
+
+:deep(.el-checkbox__inner::after) {
   box-sizing: content-box;
   content: "";
   border: 1px solid var(--el-checkbox-checked-icon-color);

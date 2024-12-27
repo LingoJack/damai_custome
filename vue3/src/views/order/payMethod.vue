@@ -1,27 +1,31 @@
 <template>
   <div class="app-container">
     <div class="pay-header">
-      <div class="back"><el-icon><ArrowLeftBold /></el-icon></div>
+      <div class="back">
+        <el-icon>
+          <ArrowLeftBold/>
+        </el-icon>
+      </div>
       <div class="content"><img :src="pay" alt=""><span>支付宝付款</span></div>
     </div>
     <div class="pay-section">
-      <el-button type="primary" class="payContinue" @click="continuePay">继续浏览器付款</el-button>
+      <el-button class="payContinue" type="primary" @click="continuePay">继续浏览器付款</el-button>
     </div>
   </div>
 </template>
 
-<script setup name="PayMethod">
+<script name="PayMethod" setup>
 import pay from "@/assets/section/pay.png"
-import {ref,onMounted} from 'vue'
+import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {getOrderDetailApi,orderPayApi} from "@/api/order.js";
+import {getOrderDetailApi, orderPayApi} from "@/api/order.js";
+import {useMitt} from "@/utils/index";
 //订单编号
 const orderNumber = ref('')
 //订单详情数据
 const orderDetailData = ref('');
 const route = useRoute();
 const router = useRouter();
-import {useMitt} from "@/utils/index";
 
 const emitter = useMitt();
 
@@ -33,12 +37,12 @@ function continuePay() {
   }
 
   const orderPayParams = {
-    'platform':3,
-    'orderNumber':orderNumber.value,
-    'subject':orderDetailData.value.programTitle,
-    'price':orderDetailData.value.orderPrice,
-    'channel':'alipay',
-    'payBillType':1
+    'platform': 3,
+    'orderNumber': orderNumber.value,
+    'subject': orderDetailData.value.programTitle,
+    'price': orderDetailData.value.orderPrice,
+    'channel': 'alipay',
+    'payBillType': 1
   }
   orderPayApi(orderPayParams).then(response => {
     //将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
@@ -51,12 +55,13 @@ function continuePay() {
 onMounted(() => {
   getOrderDetail()
 })
+
 //订单详情方法
 function getOrderDetail() {
   orderNumber.value = history.state.orderNumber;
   const orderDetailParams = {'orderNumber': orderNumber.value}
   //传值-订单号
-  localStorage.setItem('orderNumber',orderNumber.value)
+  localStorage.setItem('orderNumber', orderNumber.value)
   getOrderDetailApi(orderDetailParams).then(response => {
     orderDetailData.value = response.data;
   })
@@ -64,7 +69,7 @@ function getOrderDetail() {
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   .pay-header {
     display: flex;
@@ -81,7 +86,8 @@ function getOrderDetail() {
 
     .back {
       width: 40px;
-      .el-icon{
+
+      .el-icon {
         font-size: 40px;
       }
     }
@@ -90,6 +96,7 @@ function getOrderDetail() {
       width: calc(100% - 40px);
       text-align: center;
       position: relative;
+
       img {
         width: 60px;
         height: 60px;
@@ -110,8 +117,9 @@ function getOrderDetail() {
       }
     }
   }
-  .pay-section{
-    .payContinue{
+
+  .pay-section {
+    .payContinue {
       width: 95%;
       height: 123px;
       margin-top: 300px;

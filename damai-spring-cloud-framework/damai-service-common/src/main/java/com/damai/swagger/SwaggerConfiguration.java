@@ -12,17 +12,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfiguration {
 
-    @Bean
-    public OpenAPI customOpenApi() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("前端使用")
-                        .version("1.0")
-                        .description("项目学习")
-                        .contact(new Contact()
-                                .name("阿星不是程序员")
-                        ));
+	@Bean
+	public OpenAPI customOpenApi() {
+		return new OpenAPI()
+				.info(new Info()
+						.title("前端使用")
+						.version("1.0")
+						.description("项目学习")
+						.contact(new Contact()
+								.name("阿星不是程序员")
+						));
 
-    }
+	}
 }
 

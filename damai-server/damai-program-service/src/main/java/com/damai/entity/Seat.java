@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 座位 实体
  * @author: 阿星不是程序员
  **/
@@ -19,47 +19,47 @@ import java.math.BigDecimal;
 @TableName("d_seat")
 public class Seat extends BaseTableData implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+	/**
+	 * 主键id
+	 */
+	@TableId(value = "id", type = IdType.AUTO)
+	private Long id;
 
-    /**
-     * 节目表id
-     */
-    private Long programId;
-    
-    /**
-     * 节目票档id
-     * */
-    private Long ticketCategoryId;
-    
-    /**
-     * 排号
-     */
-    private Integer rowCode;
-    
-    /**
-     * 列号
-     */
-    private Integer colCode;
+	/**
+	 * 节目表id
+	 */
+	private Long programId;
 
-    /**
-     * 座位类型 详见seatType枚举
-     */
-    private Integer seatType;
+	/**
+	 * 节目票档id
+	 */
+	private Long ticketCategoryId;
 
-    /**
-     * 座位价格
-     */
-    private BigDecimal price;
+	/**
+	 * 排号
+	 */
+	private Integer rowCode;
 
-    /**
-     * 1未售卖 2锁定 3已售卖
-     */
-    private Integer sellStatus;
+	/**
+	 * 列号
+	 */
+	private Integer colCode;
+
+	/**
+	 * 座位类型 详见seatType枚举
+	 */
+	private Integer seatType;
+
+	/**
+	 * 座位价格
+	 */
+	private BigDecimal price;
+
+	/**
+	 * 1未售卖 2锁定 3已售卖
+	 */
+	private Integer sellStatus;
 }

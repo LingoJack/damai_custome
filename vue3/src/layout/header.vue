@@ -3,14 +3,15 @@
 
 </template>
 
-<script setup name="Header">
+<script name="Header" setup>
 //是否是登录界面
 const isLogin = ref(false)
 
 </script>
-<style scoped lang="scss">
-.header{
+<style lang="scss" scoped>
+.header {
   height: 90px;
+
   .topbar {
     width: 1200px;
     margin: 0 auto;

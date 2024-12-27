@@ -6,7 +6,7 @@
         <el-row>
           <el-form ref="registerRef" :model="registerForm" :rules="registerRules">
             <el-col :span="18">
-              <el-form-item label="手机号码:" prop="mobile" label-width="230px">
+              <el-form-item label="手机号码:" label-width="230px" prop="mobile">
                 <el-input v-model="registerForm.mobile" class="input-with-select" maxlength="11">
                   <template #prepend>
                     <el-select v-model="select" placeholder="Select" style="width: 145px">
@@ -17,7 +17,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="18">
-              <el-form-item label="输入密码:" prop="password" label-width="230px">
+              <el-form-item label="输入密码:" label-width="230px" prop="password">
                 <el-input
                     v-model="registerForm.password"
                     class="input-with-select"
@@ -27,7 +27,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="18">
-              <el-form-item label="确认密码:" prop="confirmPassword" label-width="230px">
+              <el-form-item label="确认密码:" label-width="230px" prop="confirmPassword">
                 <el-input
                     v-model="registerForm.confirmPassword"
                     class="input-with-select"
@@ -37,17 +37,17 @@
               </el-form-item>
             </el-col>
             <el-col :span="18">
-              <el-form-item label-width="230px" :style="chkStyle">
+              <el-form-item :style="chkStyle" label-width="230px">
                 <el-checkbox v-model="checkBox" @change="boxChange"/>
                 <span class="chx">{{ agreeOpt }}</span>
               </el-form-item>
             </el-col>
             <el-col :span="5">
               <el-button
-                  size="large"
-                  type="primary"
-                  style="width:100%;"
                   class="btn"
+                  size="large"
+                  style="width:100%;"
+                  type="primary"
                   @click.prevent="handleAgreeLogin"
               >
                 <span>同意并注册</span>
@@ -58,10 +58,10 @@
       </div>
     </div>
     <Verify
-        mode="pop"
+        ref="verify"
         :captchaType="captchaType"
         :imgSize="{width:'400px',height:'200px'}"
-        ref="verify"
+        mode="pop"
         @update:value="handleValueFromChild"
 
     ></Verify>
@@ -73,14 +73,11 @@
 import Header from '@/components/header/index'
 import Footer from '@/components/footer/index'
 import Verify from '@/components/verifition/Verify'
-import {ref, reactive} from 'vue'
+import {getCurrentInstance, reactive, ref} from 'vue'
 import {isCaptcha, register} from '@/api/login'
-import {getCurrentInstance} from 'vue'
 import {ElMessage} from 'element-plus'
 import {useRouter} from 'vue-router'
 import $bus from '../utils/bus'
-import CryptoJS from 'crypto-js'
-import {aesEncrypt} from "../components/verifition/utils/ase";
 
 const {proxy} = getCurrentInstance();
 const router = useRouter();
@@ -175,7 +172,7 @@ function registerInfo() {
       //去掉86区号
       //registerForm.value.mobile = code.value + registerForm.value.mobile
       register(registerForm.value).then(response => {
-        if ( response.code == '0') {
+        if (response.code == '0') {
           ElMessage({
             message: '注册成功',
             type: 'success',
@@ -213,7 +210,7 @@ const onShow = (type) => {
   verify.value.show()
 }
 let secretKey = ref('')
-let captchaVerify= ref('')
+let captchaVerify = ref('')
 
 
 $bus.on('res', (data) => {
@@ -224,23 +221,23 @@ $bus.on('res', (data) => {
 //此处是关闭验证码后，提示注册成功跳转到登录页面
 function handleValueFromChild(value) {
   if (value == '关闭') {
-    registerForm.value.captchaVerification =captchaVerify.value
+    registerForm.value.captchaVerification = captchaVerify.value
     isCaptcha().then(res => {
       let {captchaId} = res.data
       registerForm.value.captchaId = captchaId
       //去掉86区号
       //registerForm.value.mobile = code.value + registerForm.value.mobile
       register(registerForm.value).then(response => {
-        if (response.code == '0'&&response.data === true) {
+        if (response.code == '0' && response.data === true) {
           ElMessage({
             message: '注册成功',
             type: 'success',
           })
           router.push({path: "./login"});
           reset()
-        }else{
+        } else {
           ElMessage({
-            message:response.message,
+            message: response.message,
             type: 'error',
           })
         }
@@ -252,7 +249,7 @@ function handleValueFromChild(value) {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
   width: 100%;
   height: 100%;

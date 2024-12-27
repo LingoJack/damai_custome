@@ -1,7 +1,6 @@
-import { login,logout} from '@/api/login'
-import { getToken, setToken, removeToken,getName,setName,removeName,
-    getUserIdKey,setUserIdKey,removeUserIdKey } from '@/utils/auth'
-import { defineStore } from 'pinia'
+import {login, logout} from '@/api/login'
+import {getName, getToken, getUserIdKey, removeToken, setName, setToken, setUserIdKey} from '@/utils/auth'
+import {defineStore} from 'pinia'
 
 const useUserStore = defineStore(
     'user',
@@ -23,15 +22,15 @@ const useUserStore = defineStore(
                 const password = userInfo.password
                 const code = userInfo.code
                 return new Promise((resolve, reject) => {
-                    login(email,mobile, password, code).then(res => {
-                        if(res.code == 0){
+                    login(email, mobile, password, code).then(res => {
+                        if (res.code == 0) {
                             setToken(res.data.token)
-                            userInfo.mobile? setName(userInfo.mobile):setName(userInfo.email)
+                            userInfo.mobile ? setName(userInfo.mobile) : setName(userInfo.email)
                             setUserIdKey(res.data.userId)
                             this.token = res.data.token
                             this.userId = res.data.userId
                             resolve()
-                        }else{
+                        } else {
                             ElMessage.error(res.message)
                         }
 
@@ -64,7 +63,7 @@ const useUserStore = defineStore(
             // // 退出系统
             logOut() {
                 return new Promise((resolve, reject) => {
-                    logout('0001',this.token).then(() => {
+                    logout('0001', this.token).then(() => {
                         this.token = ''
                         this.roles = []
                         this.permissions = []

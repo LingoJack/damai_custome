@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 控制层
  * @author: 阿星不是程序员
  **/
@@ -28,39 +28,38 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/captcha")
 public class CaptchaController {
 
-    @Autowired
-    private CaptchaService captchaService;
+	@Autowired
+	private CaptchaService captchaService;
 
-    @PostMapping("/get")
-    public ResponseModel get(@RequestBody CaptchaVO data, HttpServletRequest request) {
-        assert request.getRemoteHost()!=null;
-        data.setBrowserInfo(getRemoteId(request));
-        return captchaService.get(data);
-    }
+	public static String getRemoteId(HttpServletRequest request) {
+		String xForward = request.getHeader("X-Forwarded-For");
+		String ip = getRemoteIpFromXfwd(xForward);
+		String ua = request.getHeader("user-agent");
+		if (StringUtils.isNotBlank(ip)) {
+			return ip + ua;
+		}
+		return request.getRemoteAddr() + ua;
+	}
 
-    @PostMapping("/check")
-    public ResponseModel check(@RequestBody CaptchaVO data, HttpServletRequest request) {
-        data.setBrowserInfo(getRemoteId(request));
-        return captchaService.check(data);
-    }
-    
+	private static String getRemoteIpFromXfwd(String xfwd) {
+		if (StringUtils.isNotBlank(xfwd)) {
+			String[] ipList = xfwd.split(",");
+			return StringUtils.trim(ipList[0]);
+		}
+		return null;
+	}
 
-    public static String getRemoteId(HttpServletRequest request) {
-        String xForward = request.getHeader("X-Forwarded-For");
-        String ip = getRemoteIpFromXfwd(xForward);
-        String ua = request.getHeader("user-agent");
-        if (StringUtils.isNotBlank(ip)) {
-            return ip + ua;
-        }
-        return request.getRemoteAddr() + ua;
-    }
+	@PostMapping("/get")
+	public ResponseModel get(@RequestBody CaptchaVO data, HttpServletRequest request) {
+		assert request.getRemoteHost() != null;
+		data.setBrowserInfo(getRemoteId(request));
+		return captchaService.get(data);
+	}
 
-    private static String getRemoteIpFromXfwd(String xfwd) {
-        if (StringUtils.isNotBlank(xfwd)) {
-            String[] ipList = xfwd.split(",");
-            return StringUtils.trim(ipList[0]);
-        }
-        return null;
-    }
+	@PostMapping("/check")
+	public ResponseModel check(@RequestBody CaptchaVO data, HttpServletRequest request) {
+		data.setBrowserInfo(getRemoteId(request));
+		return captchaService.check(data);
+	}
 
 }

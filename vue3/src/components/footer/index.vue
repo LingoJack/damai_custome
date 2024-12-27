@@ -2,47 +2,48 @@
   <div class="footer">
     <div class="footer-sec">
       <ul class="footer-links">
-<!--        <li v-for="item in footerList">{{ item }}<span class="line">|</span></li>-->
-        <li ><a href="https://gitee.com/java-up-up" target="_blank">Gitee地址</a><span class="line">|</span></li>
-        <li ><a href="https://github.com/shining-stars-lk/damai" target="_blank">GitHub地址</a><span class="line">|</span></li>
-        <li ><a href="https://javaup.chat" target="_blank">文档地址</a><span class="line">|</span></li>
+        <!--        <li v-for="item in footerList">{{ item }}<span class="line">|</span></li>-->
+        <li><a href="https://gitee.com/java-up-up" target="_blank">Gitee地址</a><span class="line">|</span></li>
+        <li><a href="https://github.com/shining-stars-lk/damai" target="_blank">GitHub地址</a><span
+            class="line">|</span></li>
+        <li><a href="https://javaup.chat" target="_blank">文档地址</a><span class="line">|</span></li>
       </ul>
-<!--      <div class="footer-ft">-->
-<!--        <router-link to="/index" class="link">-->
-<!--          <img :src="logo2" alt="">-->
-<!--        </router-link>-->
-<!--        <div class="code">-->
-<!--          <img :src="code" alt="">-->
-<!--          <span>APP下载</span>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="footer-ft">-->
+      <!--        <router-link to="/index" class="link">-->
+      <!--          <img :src="logo2" alt="">-->
+      <!--        </router-link>-->
+      <!--        <div class="code">-->
+      <!--          <img :src="code" alt="">-->
+      <!--          <span>APP下载</span>-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div class="footer-rt">
-<!--        <el-button-->
-<!--            type="primary"-->
-<!--            style="width:100%;"-->
-<!--            class="elBtn"-->
-<!--        ><span>在线客服</span>-->
-<!--        </el-button>-->
+        <!--        <el-button-->
+        <!--            type="primary"-->
+        <!--            style="width:100%;"-->
+        <!--            class="elBtn"-->
+        <!--        ><span>在线客服</span>-->
+        <!--        </el-button>-->
         <div class="footer-details-info">
           <ul class="footer-links">
-            <li ><a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024068560号-2</a><span class="line">|</span></li>
-            <li ><a href="https://beian.mps.gov.cn/#/query/webSearch" target="_blank">京公网安备11011402054237号</a></li>
+            <li><a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024068560号-2</a><span
+                class="line">|</span></li>
+            <li><a href="https://beian.mps.gov.cn/#/query/webSearch" target="_blank">京公网安备11011402054237号</a></li>
           </ul>
 
         </div>
-<!--        <ul class="footer-details">-->
-<!--          <li><a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024068560号-1</a></li>-->
-<!--          <li>举报投诉邮箱：damai_tousu@member.alibaba.com</li>-->
-<!--        </ul>-->
+        <!--        <ul class="footer-details">-->
+        <!--          <li><a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024068560号-1</a></li>-->
+        <!--          <li>举报投诉邮箱：damai_tousu@member.alibaba.com</li>-->
+        <!--        </ul>-->
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import logo2 from '@/assets/login/logo2.png'
-import code from '@/assets/login/code.png'
 import {ref} from "vue";
+
 const footerList = ref(
     [
       '帮助中心', '公司介绍', '品牌识别', '公司大事记', '协议及隐私权政策', '廉正举报', '联系合作', '招聘信息', '防骗秘籍'
@@ -50,12 +51,12 @@ const footerList = ref(
 )
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .footer {
   background-color: #f8f8f8;
   width: 100%;
   //height: 298px;
- height: 150px;
+  height: 150px;
   //position: fixed;
 
   .footer-sec {
@@ -164,7 +165,8 @@ const footerList = ref(
           margin-top: 10px;
         }
       }
-      .footer-details-info{
+
+      .footer-details-info {
         width: 1200px;
         height: 20px;
         text-align: center;

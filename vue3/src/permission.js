@@ -1,16 +1,16 @@
 import router from './router/router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { getToken } from '@/utils/auth'
+import {getToken} from '@/utils/auth'
 
-NProgress.configure({ showSpinner: false });
+NProgress.configure({showSpinner: false});
 
 const whiteList = ['/login', '/register'];
 router.beforeEach((to, from, next) => {
     if (getToken()) {
         // to.meta.title&& useSettingsStore().setTitle(to.meta.title)
         if (to.path === '/login') {
-            next({ path: '/' })
+            next({path: '/'})
             NProgress.done()
         } else {
             next()
@@ -38,8 +38,7 @@ router.beforeEach((to, from, next) => {
             //     next()
             // }
         }
-    }
-    else {
+    } else {
         // 没有token
         next()
         NProgress.done()

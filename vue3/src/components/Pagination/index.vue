@@ -1,9 +1,9 @@
 <template>
   <div :class="{ 'hidden': hidden }" class="pagination-container">
     <el-pagination
-        :background="background"
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
+        :background="background"
         :layout="layout"
         :page-sizes="pageSizes"
         :pager-count="pagerCount"
@@ -107,22 +107,25 @@ function handleCurrentChange(val) {
   display: none;
 }
 
-:deep(.el-pagination .is-first)  {
+:deep(.el-pagination .is-first) {
   display: none !important;
 }
 
 :deep(.el-pagination .el-pagination__sizes) {
   display: none !important;
 }
-:deep(.el-icon svg){
+
+:deep(.el-icon svg) {
   display: block !important;
 }
+
 :deep(.el-pagination.is-background .btn-next.is-active),
 :deep( .el-pagination.is-background .btn-prev.is-active),
-:deep(.el-pagination.is-background .el-pager li.is-active){
-  background: rgba(255, 55, 29, 0.85)!important;
+:deep(.el-pagination.is-background .el-pager li.is-active) {
+  background: rgba(255, 55, 29, 0.85) !important;
 }
-:deep(.el-pagination .is-last){
+
+:deep(.el-pagination .is-last) {
   display: none !important;
 }
 </style>

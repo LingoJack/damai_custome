@@ -10,7 +10,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   mvc:
-    pathmatch:  
+    pathmatch:
       matching-strategy: ant_path_matcher
     servlet:
       load-on-startup: 1
@@ -62,7 +62,7 @@ management:
     tags:
       application: ${spring.application.name}
   endpoints:
-    enabled-by-default: true 
+    enabled-by-default: true
     web:
       exposure:
         include: '*'
