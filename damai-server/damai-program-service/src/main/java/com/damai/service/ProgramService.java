@@ -856,7 +856,6 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
                 .stream()
                 .collect(Collectors.toMap(TicketCategoryAggregate::getProgramId, ticketCategory -> ticketCategory, (v1, v2) -> v2));
     }
-<<<<<<< HEAD
 
     /**
      * 根据节目操作数据DTO操作节目数据
@@ -866,11 +865,7 @@ public class ProgramService extends ServiceImpl<ProgramMapper, Program> {
      * @param programOperateDataDto 节目操作数据DTO，包含节目ID、票务类别计数列表和座位ID列表
      * @throws DaMaiFrameException 如果座位不存在、座位已售出或更新操作失败，则抛出异常
      */
-    @RepeatExecuteLimit(name = CANCEL_PROGRAM_ORDER, keys = {"#programOperateDataDto.programId"})
-=======
-    
     @RepeatExecuteLimit(name = CANCEL_PROGRAM_ORDER,keys = {"#programOperateDataDto.programId","#programOperateDataDto.seatIdList"})
->>>>>>> c2113ab8eef18e0be28a4125690a548e65c5bad1
     @Transactional(rollbackFor = Exception.class)
     public void operateProgramData(ProgramOperateDataDto programOperateDataDto) {
         // 获取票务类别计数列表和座位ID列表
