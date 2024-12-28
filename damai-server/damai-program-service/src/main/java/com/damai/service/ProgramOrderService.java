@@ -352,30 +352,39 @@ public class ProgramOrderService {
 	}
 
 	private void updateProgramCacheDataResolution(Long programId, List<SeatVo> seatVoList, OrderStatus orderStatus) {
+		//如果要操作的订单状态不是未支付和取消，那么直接拒绝
 		if (!(Objects.equals(orderStatus.getCode(), OrderStatus.NO_PAY.getCode()) ||
 				Objects.equals(orderStatus.getCode(), OrderStatus.CANCEL.getCode()))) {
 			throw new DaMaiFrameException(BaseCode.OPERATE_ORDER_STATUS_NOT_PERMIT);
 		}
 		List<String> keys = new ArrayList<>();
+		//这里key只是占位，并不起实际作用
 		keys.add("#");
 
 		String[] data = new String[3];
 		Map<Long, Long> ticketCategoryCountMap =
 				seatVoList.stream().collect(Collectors.groupingBy(SeatVo::getTicketCategoryId, Collectors.counting()));
+		//更新票档数据集合
 		JSONArray jsonArray = new JSONArray();
 		ticketCategoryCountMap.forEach((k, v) -> {
+			//这里是计算更新票档数据
 			JSONObject jsonObject = new JSONObject();
+			//票档数量的key
 			jsonObject.put("programTicketRemainNumberHashKey", RedisKeyBuild.createRedisKey(
 					RedisKeyManage.PROGRAM_TICKET_REMAIN_NUMBER_HASH_RESOLUTION, programId, k).getRelKey());
+			//票档id
 			jsonObject.put("ticketCategoryId", String.valueOf(k));
+			//如果是生成订单操作，则将扣减余票数量
 			if (Objects.equals(orderStatus.getCode(), OrderStatus.NO_PAY.getCode())) {
 				jsonObject.put("count", "-" + v);
+				//如果是取消订单操作，则将恢复余票数量
 			}
 			else if (Objects.equals(orderStatus.getCode(), OrderStatus.CANCEL.getCode())) {
 				jsonObject.put("count", v);
 			}
 			jsonArray.add(jsonObject);
 		});
+		//座位map key:票档id  value:座位集合
 		Map<Long, List<SeatVo>> seatVoMap =
 				seatVoList.stream().collect(Collectors.groupingBy(SeatVo::getTicketCategoryId));
 		JSONArray delSeatIdjsonArray = new JSONArray();
@@ -385,36 +394,56 @@ public class ProgramOrderService {
 			JSONObject seatDatajsonObject = new JSONObject();
 			String seatHashKeyDel = "";
 			String seatHashKeyAdd = "";
+			//如果是生成订单操作，则将座位修改为锁定状态
 			if (Objects.equals(orderStatus.getCode(), OrderStatus.NO_PAY.getCode())) {
+				//没有售卖座位的key
 				seatHashKeyDel = (RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_SEAT_NO_SOLD_RESOLUTION_HASH, programId, k).getRelKey());
+				//锁定座位的key
 				seatHashKeyAdd = (RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_SEAT_LOCK_RESOLUTION_HASH, programId, k).getRelKey());
 				for (SeatVo seatVo : v) {
 					seatVo.setSellStatus(SellStatus.LOCK.getCode());
 				}
+				//如果是取消订单操作，则将座位修改为未售卖状态
 			}
 			else if (Objects.equals(orderStatus.getCode(), OrderStatus.CANCEL.getCode())) {
+				//锁定座位的key
 				seatHashKeyDel = (RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_SEAT_LOCK_RESOLUTION_HASH, programId, k).getRelKey());
+				//没有售卖座位的key
 				seatHashKeyAdd = (RedisKeyBuild.createRedisKey(RedisKeyManage.PROGRAM_SEAT_NO_SOLD_RESOLUTION_HASH, programId, k).getRelKey());
 				for (SeatVo seatVo : v) {
 					seatVo.setSellStatus(SellStatus.NO_SOLD.getCode());
 				}
 			}
+			//要进行删除座位的key
 			delSeatIdjsonObject.put("seatHashKeyDel", seatHashKeyDel);
+			//如果是订单创建，那么就扣除未售卖的座位id
+			//如果是订单取消，那么就扣除锁定的座位id
 			delSeatIdjsonObject.put("seatIdList", v.stream().map(SeatVo::getId).map(String::valueOf).collect(Collectors.toList()));
 			delSeatIdjsonArray.add(delSeatIdjsonObject);
+			//要进行添加座位的key
 			seatDatajsonObject.put("seatHashKeyAdd", seatHashKeyAdd);
+			//如果是订单创建的操作，那么添加到锁定的座位数据
+			//如果是订单订单的操作，那么添加到未售卖的座位数据
 			List<String> seatDataList = new ArrayList<>();
+			//循环座位
 			for (SeatVo seatVo : v) {
+				//选放入座位的id
 				seatDataList.add(String.valueOf(seatVo.getId()));
+				//接着放入座位对象
 				seatDataList.add(JSON.toJSONString(seatVo));
 			}
+			//要进行添加座位的数据
 			seatDatajsonObject.put("seatDataList", seatDataList);
 			addSeatDatajsonArray.add(seatDatajsonObject);
 		});
 
+		//票档相关数据
 		data[0] = JSON.toJSONString(jsonArray);
+		//要进行删除座位的key
 		data[1] = JSON.toJSONString(delSeatIdjsonArray);
+		//要进行添加座位的相关数据
 		data[2] = JSON.toJSONString(addSeatDatajsonArray);
+		//执行lua脚本
 		programCacheResolutionOperate.programCacheOperate(keys, data);
 	}
 }

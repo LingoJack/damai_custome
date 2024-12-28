@@ -22,6 +22,7 @@ public class DelayQueueProperties {
 	 * 从队列拉取数据的线程池中的核心线程数量，如果业务过慢可调大
 	 */
 	private Integer corePoolSize = 4;
+
 	/**
 	 * 从队列拉取数据的线程池中的最大线程数量，如果业务过慢可调大
 	 */
@@ -31,10 +32,12 @@ public class DelayQueueProperties {
 	 * 从队列拉取数据的线程池中的最大线程回收时间
 	 */
 	private long keepAliveTime = 30;
+
 	/**
 	 * 从队列拉取数据的线程池中的最大线程回收时间的时间单位
 	 */
 	private TimeUnit unit = TimeUnit.SECONDS;
+
 	/**
 	 * 从队列拉取数据的线程池中的队列数量，如果业务过慢可调大
 	 */
