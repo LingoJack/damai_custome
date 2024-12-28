@@ -1,13 +1,7 @@
 package com.damai.controller;
 
 import com.damai.common.ApiResponse;
-import com.damai.dto.ProgramAddDto;
-import com.damai.dto.ProgramGetDto;
-import com.damai.dto.ProgramInvalidDto;
-import com.damai.dto.ProgramListDto;
-import com.damai.dto.ProgramPageListDto;
-import com.damai.dto.ProgramRecommendListDto;
-import com.damai.dto.ProgramSearchDto;
+import com.damai.dto.*;
 import com.damai.page.PageVo;
 import com.damai.service.ProgramService;
 import com.damai.vo.ProgramHomeVo;

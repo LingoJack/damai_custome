@@ -2,11 +2,7 @@ package com.damai.service.es;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.damai.core.SpringUtil;
-import com.damai.dto.EsDataQueryDto;
-import com.damai.dto.ProgramListDto;
-import com.damai.dto.ProgramPageListDto;
-import com.damai.dto.ProgramRecommendListDto;
-import com.damai.dto.ProgramSearchDto;
+import com.damai.dto.*;
 import com.damai.enums.BusinessStatus;
 import com.damai.page.PageUtil;
 import com.damai.page.PageVo;
@@ -30,7 +26,6 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

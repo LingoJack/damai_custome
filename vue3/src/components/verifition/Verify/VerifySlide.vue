@@ -18,13 +18,15 @@
                                               height: barSize.height,
                                               'line-height':barSize.height}" class="verify-bar-area">
       <span class="verify-msg" v-text="text"></span>
-      <div :style="{width: (leftBarWidth!==undefined)?leftBarWidth: barSize.height, height: barSize.height, 'border-color': leftBarBorderColor, transaction: transitionWidth}"
-           class="verify-left-bar">
+      <div
+          :style="{width: (leftBarWidth!==undefined)?leftBarWidth: barSize.height, height: barSize.height, 'border-color': leftBarBorderColor, transaction: transitionWidth}"
+          class="verify-left-bar">
         <span class="verify-msg" v-text="finishText"></span>
-        <div :style="{width: barSize.height, height: barSize.height, 'background-color': moveBlockBackgroundColor, left: moveBlockLeft, transition: transitionLeft}"
-             class="verify-move-block"
-             @mousedown="start"
-             @touchstart="start">
+        <div
+            :style="{width: barSize.height, height: barSize.height, 'background-color': moveBlockBackgroundColor, left: moveBlockLeft, transition: transitionLeft}"
+            class="verify-move-block"
+            @mousedown="start"
+            @touchstart="start">
           <i :class="['verify-icon iconfont', iconClass]"
              :style="{color: iconColor}"></i>
           <div v-if="type === '2'" :style="{'width':Math.floor(parseInt(setSize.imgWidth)*47/310)+ 'px',

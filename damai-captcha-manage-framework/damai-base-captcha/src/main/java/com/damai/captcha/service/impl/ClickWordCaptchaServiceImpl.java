@@ -12,20 +12,13 @@ import com.damai.captcha.model.common.RepCodeEnum;
 import com.damai.captcha.model.common.ResponseModel;
 import com.damai.captcha.model.vo.CaptchaVO;
 import com.damai.captcha.model.vo.PointVO;
-import com.damai.captcha.util.AesUtil;
-import com.damai.captcha.util.ImageUtils;
-import com.damai.captcha.util.JsonUtil;
-import com.damai.captcha.util.RandomUtils;
-import com.damai.captcha.util.StringUtils;
+import com.damai.captcha.util.*;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import static com.damai.captcha.service.impl.CaptchaConstant.TTF_ENDS_WITH;
 
@@ -44,6 +37,41 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
 	 * 点选文字字体
 	 */
 	protected Font clickWordFont;
+	/**
+	 * 点选文字 字体总个数
+	 */
+	private int wordTotalCount = 4;
+	/**
+	 * 点选文字 字体颜色是否随机
+	 */
+	private boolean fontColorRandom = Boolean.TRUE;
+
+	/**
+	 * 随机字体循环排序下标
+	 *
+	 * @param imageWidth    图片宽度
+	 * @param imageHeight   图片高度
+	 * @param wordSortIndex 字体循环排序下标(i)
+	 * @param wordCount     字数量
+	 * @return
+	 */
+	private static PointVO randomWordPoint(int imageWidth, int imageHeight, int wordSortIndex, int wordCount) {
+		int avgWidth = imageWidth / (wordCount + 1);
+		int x, y;
+		if (avgWidth < HAN_ZI_SIZE_HALF) {
+			x = RandomUtils.getRandomInt(1 + HAN_ZI_SIZE_HALF, imageWidth);
+		}
+		else {
+			if (wordSortIndex == 0) {
+				x = RandomUtils.getRandomInt(1 + HAN_ZI_SIZE_HALF, avgWidth * (wordSortIndex + 1) - HAN_ZI_SIZE_HALF);
+			}
+			else {
+				x = RandomUtils.getRandomInt(avgWidth * wordSortIndex + HAN_ZI_SIZE_HALF, avgWidth * (wordSortIndex + 1) - HAN_ZI_SIZE_HALF);
+			}
+		}
+		y = RandomUtils.getRandomInt(HAN_ZI_SIZE, imageHeight - HAN_ZI_SIZE);
+		return new PointVO(x, y, null);
+	}
 
 	@Override
 	public String captchaType() {
@@ -208,15 +236,6 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
 		this.fontColorRandom = fontColorRandom;
 	}
 
-	/**
-	 * 点选文字 字体总个数
-	 */
-	private int wordTotalCount = 4;
-	/**
-	 * 点选文字 字体颜色是否随机
-	 */
-	private boolean fontColorRandom = Boolean.TRUE;
-
 	private CaptchaVO getImageData(BufferedImage backgroundImage) {
 		CaptchaVO dataVO = new CaptchaVO();
 		List<String> wordList = new ArrayList<String>();
@@ -293,33 +312,6 @@ public class ClickWordCaptchaServiceImpl extends AbstractCaptchaService {
 			}
 		}
 		return words;
-	}
-
-	/**
-	 * 随机字体循环排序下标
-	 *
-	 * @param imageWidth    图片宽度
-	 * @param imageHeight   图片高度
-	 * @param wordSortIndex 字体循环排序下标(i)
-	 * @param wordCount     字数量
-	 * @return
-	 */
-	private static PointVO randomWordPoint(int imageWidth, int imageHeight, int wordSortIndex, int wordCount) {
-		int avgWidth = imageWidth / (wordCount + 1);
-		int x, y;
-		if (avgWidth < HAN_ZI_SIZE_HALF) {
-			x = RandomUtils.getRandomInt(1 + HAN_ZI_SIZE_HALF, imageWidth);
-		}
-		else {
-			if (wordSortIndex == 0) {
-				x = RandomUtils.getRandomInt(1 + HAN_ZI_SIZE_HALF, avgWidth * (wordSortIndex + 1) - HAN_ZI_SIZE_HALF);
-			}
-			else {
-				x = RandomUtils.getRandomInt(avgWidth * wordSortIndex + HAN_ZI_SIZE_HALF, avgWidth * (wordSortIndex + 1) - HAN_ZI_SIZE_HALF);
-			}
-		}
-		y = RandomUtils.getRandomInt(HAN_ZI_SIZE, imageHeight - HAN_ZI_SIZE);
-		return new PointVO(x, y, null);
 	}
 
 

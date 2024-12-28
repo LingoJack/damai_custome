@@ -11,10 +11,7 @@ import org.redisson.api.RedissonClient;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.damai.servicelock.LockType.Fair;
-import static com.damai.servicelock.LockType.Read;
-import static com.damai.servicelock.LockType.Reentrant;
-import static com.damai.servicelock.LockType.Write;
+import static com.damai.servicelock.LockType.*;
 
 /**
  * 分布式锁 锁缓存

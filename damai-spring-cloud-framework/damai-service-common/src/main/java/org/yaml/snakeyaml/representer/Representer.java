@@ -18,26 +18,12 @@ import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeId;
-import org.yaml.snakeyaml.nodes.NodeTuple;
-import org.yaml.snakeyaml.nodes.ScalarNode;
-import org.yaml.snakeyaml.nodes.SequenceNode;
-import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.nodes.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料 
+ * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
  * @description: 解决shardingsphere 使用低版本snakeyaml和Springboot3不兼容问题
  * @author: 阿星不是程序员
  **/
@@ -82,7 +68,7 @@ public class Representer extends SafeRepresenter {
 	 * runtime class
 	 *
 	 * @param properties JavaBean getters
-	 * @param javaBean instance for Node
+	 * @param javaBean   instance for Node
 	 * @return Node to get serialized
 	 */
 	protected MappingNode representJavaBean(Set<Property> properties, Object javaBean) {
@@ -123,10 +109,10 @@ public class Representer extends SafeRepresenter {
 	/**
 	 * Represent one JavaBean property.
 	 *
-	 * @param javaBean - the instance to be represented
-	 * @param property - the property of the instance
+	 * @param javaBean      - the instance to be represented
+	 * @param property      - the property of the instance
 	 * @param propertyValue - value to be represented
-	 * @param customTag - user defined Tag
+	 * @param customTag     - user defined Tag
 	 * @return NodeTuple to be used in a MappingNode. Return null to skip the property
 	 */
 	protected NodeTuple representJavaBeanProperty(Object javaBean, Property property,
@@ -171,8 +157,8 @@ public class Representer extends SafeRepresenter {
 	 * by the JavaBean property
 	 *
 	 * @param property - JavaBean property
-	 * @param node - representation of the property
-	 * @param object - instance represented by the node
+	 * @param node     - representation of the property
+	 * @param object   - instance represented by the node
 	 */
 	@SuppressWarnings("unchecked")
 	protected void checkGlobalTag(Property property, Node node, Object object) {

@@ -2,22 +2,18 @@ package com.damai.filter;
 
 import com.damai.threadlocal.BaseParameterHolder;
 import com.damai.util.StringUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.damai.constant.Constant.CODE;
-import static com.damai.constant.Constant.GRAY_PARAMETER;
-import static com.damai.constant.Constant.TRACE_ID;
-import static com.damai.constant.Constant.USER_ID;
+import static com.damai.constant.Constant.*;
 
 /**
  * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料

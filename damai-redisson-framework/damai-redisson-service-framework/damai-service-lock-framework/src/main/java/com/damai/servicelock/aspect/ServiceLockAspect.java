@@ -44,46 +44,42 @@ public class ServiceLockAspect {
 	 */
 	@Around("@annotation(servicelock)")
 	public Object around(ProceedingJoinPoint joinPoint, ServiceLock servicelock) throws Throwable {
-		// 获取锁信息处理器
+		//获取锁的名字解析处理器
 		LockInfoHandle lockInfoHandle = lockInfoHandleFactory.getLockInfoHandle(LockInfoType.SERVICE_LOCK);
-		// 构建锁名称
+		//拼接锁的名字 LOCK:${name}:${key}
 		String lockName = lockInfoHandle.getLockName(joinPoint, servicelock.name(), servicelock.keys());
-		// 获取锁类型
+		//锁的类型，默认 可重入锁
 		LockType lockType = servicelock.lockType();
-		// 获取等待时间
+		//尝试加锁失败最多等待时间，默认10s
 		long waitTime = servicelock.waitTime();
-		// 获取时间单位
+		//时间单位，默认秒
 		TimeUnit timeUnit = servicelock.timeUnit();
-
-		// 根据锁类型获取锁实例
+		//获得具体的锁类型
 		ServiceLocker lock = serviceLockFactory.getLock(lockType);
-		// 尝试获取锁
+		//进行加锁
 		boolean result = lock.tryLock(lockName, timeUnit, waitTime);
-
+		//如果加锁成功
 		if (result) {
 			try {
-				// 如果获取锁成功，执行目标方法
+				//执行业务逻辑
 				return joinPoint.proceed();
 			}
 			finally {
-				// 释放锁
+				//解锁
 				lock.unlock(lockName);
 			}
 		}
 		else {
-			// 如果获取锁失败，记录日志
 			log.warn("Timeout while acquiring serviceLock:{}", lockName);
-			// 获取自定义锁超时策略
+			//加锁失败,如果设置了自定义处理，则执行
 			String customLockTimeoutStrategy = servicelock.customLockTimeoutStrategy();
 			if (StringUtil.isNotEmpty(customLockTimeoutStrategy)) {
-				// 如果有自定义锁超时策略，则执行自定义策略
 				return handleCustomLockTimeoutStrategy(customLockTimeoutStrategy, joinPoint);
 			}
 			else {
-				// 如果没有自定义锁超时策略，则执行默认策略
+				//默认处理
 				servicelock.lockTimeoutStrategy().handler(lockName);
 			}
-			// 继续执行目标方法
 			return joinPoint.proceed();
 		}
 	}

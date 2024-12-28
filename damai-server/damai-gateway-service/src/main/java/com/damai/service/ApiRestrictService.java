@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.fsg.uid.UidGenerator;
 import com.damai.core.RedisKeyManage;
-import com.damai.util.StringUtil;
 import com.damai.dto.ApiDataDto;
 import com.damai.enums.ApiRuleType;
 import com.damai.enums.BaseCode;
@@ -18,6 +17,7 @@ import com.damai.redis.RedisCache;
 import com.damai.redis.RedisKeyBuild;
 import com.damai.service.lua.ApiRestrictCacheOperate;
 import com.damai.util.DateUtils;
+import com.damai.util.StringUtil;
 import com.damai.vo.DepthRuleVo;
 import com.damai.vo.RuleVo;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

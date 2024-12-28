@@ -8,11 +8,7 @@ import com.baidu.fsg.uid.UidGenerator;
 import com.damai.client.OrderClient;
 import com.damai.common.ApiResponse;
 import com.damai.core.RedisKeyManage;
-import com.damai.dto.DelayOrderCancelDto;
-import com.damai.dto.OrderCreateDto;
-import com.damai.dto.OrderTicketUserCreateDto;
-import com.damai.dto.ProgramOrderCreateDto;
-import com.damai.dto.SeatDto;
+import com.damai.dto.*;
 import com.damai.entity.ProgramShowTime;
 import com.damai.enums.BaseCode;
 import com.damai.enums.OrderStatus;
@@ -35,14 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -50,9 +40,7 @@ import java.util.stream.Collectors;
 import static com.damai.service.constant.ProgramOrderConstant.ORDER_TABLE_COUNT;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
- * @description: 节目订单 service
- * @author: 阿星不是程序员
+ * 节目订单 service
  **/
 @Slf4j
 @Service
@@ -60,12 +48,16 @@ public class ProgramOrderService {
 
 	@Autowired
 	ProgramCacheCreateOrderResolutionOperate programCacheCreateOrderResolutionOperate;
+
 	@Autowired
 	private OrderClient orderClient;
+
 	@Autowired
 	private UidGenerator uidGenerator;
+
 	@Autowired
 	private ProgramCacheResolutionOperate programCacheResolutionOperate;
+
 	@Autowired
 	private DelayOrderCancelSend delayOrderCancelSend;
 

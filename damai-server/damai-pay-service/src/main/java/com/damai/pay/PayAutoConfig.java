@@ -1,10 +1,6 @@
 package com.damai.pay;
 
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.AlipayConfig;
-import com.alipay.api.AlipayConstants;
-import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.*;
 import com.damai.pay.alipay.AlipayStrategyHandler;
 import com.damai.pay.alipay.config.AlipayProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

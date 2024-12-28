@@ -1,13 +1,7 @@
 package com.damai.controller;
 
 import com.damai.common.ApiResponse;
-import com.damai.dto.AccountOrderCountDto;
-import com.damai.dto.OrderCancelDto;
-import com.damai.dto.OrderCreateDto;
-import com.damai.dto.OrderGetDto;
-import com.damai.dto.OrderListDto;
-import com.damai.dto.OrderPayCheckDto;
-import com.damai.dto.OrderPayDto;
+import com.damai.dto.*;
 import com.damai.service.OrderService;
 import com.damai.vo.AccountOrderCountVo;
 import com.damai.vo.OrderGetVo;
@@ -26,9 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
- * @description: 订单 控制层
- * @author: 阿星不是程序员
+ * 订单 控制层
  **/
 @RestController
 @RequestMapping("/order")

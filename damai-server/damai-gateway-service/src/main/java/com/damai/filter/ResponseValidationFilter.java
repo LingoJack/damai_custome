@@ -2,9 +2,9 @@ package com.damai.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.damai.common.ApiResponse;
-import com.damai.util.StringUtil;
 import com.damai.service.ChannelDataService;
 import com.damai.util.RsaTool;
+import com.damai.util.StringUtil;
 import com.damai.vo.GetChannelDataVo;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -32,11 +32,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import static com.damai.constant.GatewayConstant.CODE;
-import static com.damai.constant.GatewayConstant.ENCRYPT;
-import static com.damai.constant.GatewayConstant.NO_VERIFY;
-import static com.damai.constant.GatewayConstant.V2;
-import static com.damai.constant.GatewayConstant.VERIFY_VALUE;
+import static com.damai.constant.GatewayConstant.*;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR;
 
 

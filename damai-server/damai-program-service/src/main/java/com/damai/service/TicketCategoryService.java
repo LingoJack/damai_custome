@@ -33,10 +33,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.damai.core.DistributedLockConstants.GET_REMAIN_NUMBER_LOCK;
-import static com.damai.core.DistributedLockConstants.GET_TICKET_CATEGORY_LOCK;
-import static com.damai.core.DistributedLockConstants.REMAIN_NUMBER_LOCK;
-import static com.damai.core.DistributedLockConstants.TICKET_CATEGORY_LOCK;
+import static com.damai.core.DistributedLockConstants.*;
 
 /**
  * 票档 service

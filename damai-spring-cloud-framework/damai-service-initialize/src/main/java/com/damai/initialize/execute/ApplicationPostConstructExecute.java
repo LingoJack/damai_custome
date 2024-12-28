@@ -1,9 +1,8 @@
 package com.damai.initialize.execute;
 
 import com.damai.initialize.execute.base.AbstractApplicationExecute;
-import org.springframework.context.ConfigurableApplicationContext;
-
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import static com.damai.initialize.constant.InitializeHandlerType.APPLICATION_POST_CONSTRUCT;
 

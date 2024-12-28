@@ -12,11 +12,7 @@ import com.damai.captcha.model.common.ResponseModel;
 import com.damai.captcha.model.vo.CaptchaVO;
 import com.damai.captcha.service.CaptchaCacheService;
 import com.damai.captcha.service.CaptchaService;
-import com.damai.captcha.util.AesUtil;
-import com.damai.captcha.util.CacheUtil;
-import com.damai.captcha.util.ImageUtils;
-import com.damai.captcha.util.Md5Util;
-import com.damai.captcha.util.StringUtils;
+import com.damai.captcha.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,56 +26,96 @@ import java.util.Properties;
 
 public abstract class AbstractCaptchaService implements CaptchaService {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
-
 	protected static final String IMAGE_TYPE_PNG = "png";
-
 	protected static int HAN_ZI_SIZE = 25;
-
 	protected static int HAN_ZI_SIZE_HALF = HAN_ZI_SIZE / 2;
-
 	/**
 	 * check校验坐标
 	 */
 	protected static String REDIS_CAPTCHA_KEY = "RUNNING:CAPTCHA:%s";
-
 	/**
 	 * 后台二次校验坐标
 	 */
 	protected static String REDIS_SECOND_CAPTCHA_KEY = "RUNNING:CAPTCHA:second-%s";
-
 	protected static Long EXPIRE_SIN_SECONDS = 2 * 60L;
-
 	protected static Long EXPIRE_SIN_THREE = 3 * 60L;
-
 	protected static String waterMark = "我的水印";
-
 	protected static String waterMarkFontStr = "WenQuanZhengHei.ttf";
-
+	protected static String slipOffset = "5";
+	protected static Boolean captchaAesStatus = true;
+	protected static String clickWordFontStr = "WenQuanZhengHei.ttf";
+	protected static String cacheType = "local";
+	protected static int captchaInterferenceOptions = 0;
+	protected static String local = "local";
+	protected static String one = "1";
+	protected static String zero = "0";
+	protected static String ttf = ".ttf";
+	protected static String ttc = ".ttc";
+	private static FrequencyLimitHandler limitHandler;
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	/**
 	 * 水印字体
 	 */
 	protected Font waterMarkFont;
 
-	protected static String slipOffset = "5";
+	public static boolean base64StrToImage(String imgStr, String path) {
+		if (imgStr == null) {
+			return false;
+		}
 
-	protected static Boolean captchaAesStatus = true;
+		Base64.Decoder decoder = Base64.getDecoder();
+		try {
+			// 解密
+			byte[] b = decoder.decode(imgStr);
+			// 处理数据
+			for (int i = 0; i < b.length; ++i) {
+				if (b[i] < 0) {
+					b[i] += 256;
+				}
+			}
+			//文件夹不存在则自动创建
+			File tempFile = new File(path);
+			if (!tempFile.getParentFile().exists()) {
+				tempFile.getParentFile().mkdirs();
+			}
+			OutputStream out = new FileOutputStream(tempFile);
+			out.write(b);
+			out.flush();
+			out.close();
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
 
-	protected static String clickWordFontStr = "WenQuanZhengHei.ttf";
+	/**
+	 * 解密前端坐标aes加密
+	 *
+	 * @param point
+	 * @return
+	 * @throws Exception
+	 */
+	public static String decrypt(String point, String key) throws Exception {
+		return AesUtil.aesDecrypt(point, key);
+	}
 
-	protected static String cacheType = "local";
-
-	protected static int captchaInterferenceOptions = 0;
-
-	protected static String local = "local";
-
-	protected static String one = "1";
-
-	protected static String zero = "0";
-
-	protected static String ttf = ".ttf";
-
-	protected static String ttc = ".ttc";
+	protected static int getEnOrChLength(String s) {
+		int enCount = 0;
+		int chCount = 0;
+		for (int i = 0; i < s.length(); i++) {
+			int length = String.valueOf(s.charAt(i)).getBytes(StandardCharsets.UTF_8).length;
+			if (length > 1) {
+				chCount++;
+			}
+			else {
+				enCount++;
+			}
+		}
+		int chOffset = (HAN_ZI_SIZE / 2) * chCount + 5;
+		int enOffset = enCount * 8;
+		return chOffset + enOffset;
+	}
 
 	/**
 	 * 初始化验证码配置
@@ -146,8 +182,6 @@ public abstract class AbstractCaptchaService implements CaptchaService {
 	public void destroy(Properties config) {
 
 	}
-
-	private static FrequencyLimitHandler limitHandler;
 
 	@Override
 	public ResponseModel get(CaptchaVO captchaVO) {
@@ -231,64 +265,5 @@ public abstract class AbstractCaptchaService implements CaptchaService {
 		catch (Exception e) {
 			logger.error("load font error:{}", e);
 		}
-	}
-
-	public static boolean base64StrToImage(String imgStr, String path) {
-		if (imgStr == null) {
-			return false;
-		}
-
-		Base64.Decoder decoder = Base64.getDecoder();
-		try {
-			// 解密
-			byte[] b = decoder.decode(imgStr);
-			// 处理数据
-			for (int i = 0; i < b.length; ++i) {
-				if (b[i] < 0) {
-					b[i] += 256;
-				}
-			}
-			//文件夹不存在则自动创建
-			File tempFile = new File(path);
-			if (!tempFile.getParentFile().exists()) {
-				tempFile.getParentFile().mkdirs();
-			}
-			OutputStream out = new FileOutputStream(tempFile);
-			out.write(b);
-			out.flush();
-			out.close();
-			return true;
-		}
-		catch (Exception e) {
-			return false;
-		}
-	}
-
-	/**
-	 * 解密前端坐标aes加密
-	 *
-	 * @param point
-	 * @return
-	 * @throws Exception
-	 */
-	public static String decrypt(String point, String key) throws Exception {
-		return AesUtil.aesDecrypt(point, key);
-	}
-
-	protected static int getEnOrChLength(String s) {
-		int enCount = 0;
-		int chCount = 0;
-		for (int i = 0; i < s.length(); i++) {
-			int length = String.valueOf(s.charAt(i)).getBytes(StandardCharsets.UTF_8).length;
-			if (length > 1) {
-				chCount++;
-			}
-			else {
-				enCount++;
-			}
-		}
-		int chOffset = (HAN_ZI_SIZE / 2) * chCount + 5;
-		int enOffset = enCount * 8;
-		return chOffset + enOffset;
 	}
 }

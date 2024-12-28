@@ -12,32 +12,45 @@ import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 
 /**
- * @program: 极度真实还原大麦网高并发实战项目。 添加 阿星不是程序员 微信，添加时备注 大麦 来获取项目的完整资料
- * @description: 分布式锁 配置
- * @author: 阿星不是程序员
+ * 分布式锁 配置
  **/
 public class ServiceLockAutoConfiguration {
 
+	/**
+	 * 分布式锁的key解析处理器
+	 */
 	@Bean(LockInfoType.SERVICE_LOCK)
 	public LockInfoHandle serviceLockInfoHandle() {
 		return new ServiceLockInfoHandle();
 	}
 
+	/**
+	 * 锁管理
+	 */
 	@Bean
 	public ManageLocker manageLocker(RedissonClient redissonClient) {
 		return new ManageLocker(redissonClient);
 	}
 
+	/**
+	 * 锁工厂
+	 */
 	@Bean
 	public ServiceLockFactory serviceLockFactory(ManageLocker manageLocker) {
 		return new ServiceLockFactory(manageLocker);
 	}
 
+	/**
+	 * 分布式锁切面
+	 */
 	@Bean
 	public ServiceLockAspect serviceLockAspect(LockInfoHandleFactory lockInfoHandleFactory, ServiceLockFactory serviceLockFactory) {
 		return new ServiceLockAspect(lockInfoHandleFactory, serviceLockFactory);
 	}
 
+	/**
+	 * 分布式锁工具
+	 */
 	@Bean
 	public ServiceLockTool serviceLockUtil(LockInfoHandleFactory lockInfoHandleFactory, ServiceLockFactory serviceLockFactory) {
 		return new ServiceLockTool(lockInfoHandleFactory, serviceLockFactory);

@@ -3,19 +3,16 @@ package com.damai.feign;
 import com.damai.util.StringUtil;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.Objects;
 
-import static com.damai.constant.Constant.CODE;
-import static com.damai.constant.Constant.GRAY_PARAMETER;
-import static com.damai.constant.Constant.TRACE_ID;
+import static com.damai.constant.Constant.*;
 
 
 /**

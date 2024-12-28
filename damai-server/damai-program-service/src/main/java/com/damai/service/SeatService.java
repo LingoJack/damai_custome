@@ -7,11 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.damai.core.RedisKeyManage;
-import com.damai.dto.ProgramGetDto;
-import com.damai.dto.SeatAddDto;
-import com.damai.dto.SeatBatchAddDto;
-import com.damai.dto.SeatBatchRelateInfoAddDto;
-import com.damai.dto.SeatListDto;
+import com.damai.dto.*;
 import com.damai.entity.ProgramShowTime;
 import com.damai.entity.Seat;
 import com.damai.enums.BaseCode;
@@ -37,11 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 

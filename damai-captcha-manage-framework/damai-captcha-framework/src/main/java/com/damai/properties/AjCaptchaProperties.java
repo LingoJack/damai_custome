@@ -116,6 +116,10 @@ public class AjCaptchaProperties {
 	 */
 	private int clickWordCount = 4;
 
+	public static String getPrefix() {
+		return PREFIX;
+	}
+
 	public int getFontStyle() {
 		return fontStyle;
 	}
@@ -198,25 +202,6 @@ public class AjCaptchaProperties {
 
 	public void setReqVerifyMinuteLimit(int reqVerifyMinuteLimit) {
 		this.reqVerifyMinuteLimit = reqVerifyMinuteLimit;
-	}
-
-	public enum StorageType {
-		/**
-		 * 内存.
-		 */
-		local,
-		/**
-		 * redis.
-		 */
-		redis,
-		/**
-		 * 其他.
-		 */
-		other,
-	}
-
-	public static String getPrefix() {
-		return PREFIX;
 	}
 
 	public CaptchaTypeEnum getType() {
@@ -337,5 +322,20 @@ public class AjCaptchaProperties {
 				", reqCheckMinuteLimit=" + reqCheckMinuteLimit +
 				", reqVerifyMinuteLimit=" + reqVerifyMinuteLimit +
 				'}';
+	}
+
+	public enum StorageType {
+		/**
+		 * 内存.
+		 */
+		local,
+		/**
+		 * redis.
+		 */
+		redis,
+		/**
+		 * 其他.
+		 */
+		other,
 	}
 }

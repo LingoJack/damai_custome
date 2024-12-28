@@ -2,12 +2,12 @@ package com.damai.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.damai.core.RedisKeyManage;
-import com.damai.util.StringUtil;
 import com.damai.enums.BaseCode;
 import com.damai.exception.DaMaiFrameException;
 import com.damai.jwt.TokenUtil;
 import com.damai.redis.RedisCache;
 import com.damai.redis.RedisKeyBuild;
+import com.damai.util.StringUtil;
 import com.damai.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

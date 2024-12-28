@@ -16,7 +16,8 @@
               <li :class="item.nameInfoStyle">{{ item.nameInfo }}</li>
               <li class="detail">{{ item.detailInfo }}</li>
               <li class="explain">
-                <router-link v-if="experienceAccountFlag != 1" :class="(item.explainInfo =='立即验证'||item.explainInfo =='立即绑定')? 'pathBtn':'btnColor'"
+                <router-link v-if="experienceAccountFlag != 1"
+                             :class="(item.explainInfo =='立即验证'||item.explainInfo =='立即绑定')? 'pathBtn':'btnColor'"
                              :to="item.path">
                   {{ item.explainInfo }}
                 </router-link>

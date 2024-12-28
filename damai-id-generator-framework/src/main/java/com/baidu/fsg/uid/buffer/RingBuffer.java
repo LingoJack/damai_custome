@@ -15,13 +15,12 @@
  */
 package com.baidu.fsg.uid.buffer;
 
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.baidu.fsg.uid.utils.PaddedAtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.baidu.fsg.uid.utils.PaddedAtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Represents a ring buffer based on array.<br>

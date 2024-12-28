@@ -1,9 +1,9 @@
 package com.damai.config;
 
-import com.damai.properties.AjCaptchaProperties;
 import com.damai.captcha.service.CaptchaCacheService;
 import com.damai.captcha.service.CaptchaService;
 import com.damai.captcha.service.impl.CaptchaServiceFactory;
+import com.damai.properties.AjCaptchaProperties;
 import com.damai.service.CaptchaCacheServiceRedisImpl;
 import com.damai.service.CaptchaHandle;
 import org.springframework.context.annotation.Bean;

@@ -10,7 +10,8 @@
         <span :class="{ active: activeIndexAll === ind }" class="all" @click="allIn(ind,dict)">全部</span>
         <ul>
           <!--          :class="{ active: activeIndex === index }"-->
-          <li v-for="(val,index) in dict.items" :key="index" :class="{active: activeIndex ==getInnerItemKey(ind, index)}"
+          <li v-for="(val,index) in dict.items" :key="index"
+              :class="{active: activeIndex ==getInnerItemKey(ind, index)}"
               @click="activeClick(ind,index)">{{ val.name }}
           </li>
         </ul>

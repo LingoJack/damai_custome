@@ -26,6 +26,226 @@ import static com.damai.captcha.service.impl.CaptchaConstant.TWO;
 
 public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
 
+	private static void extracted(final BufferedImage originalImage, final String jigsawImageBase64, final int originalWidth, final int jigsawWidth, final int x) {
+		if (captchaInterferenceOptions > 0) {
+			int position = 0;
+			if (originalWidth - x - FIVE > jigsawWidth * TWO) {
+				//在原扣图右边插入干扰图
+				position = RandomUtils.getRandomInt(x + jigsawWidth + 5, originalWidth - jigsawWidth);
+			}
+			else {
+				//在原扣图左边插入干扰图
+				position = RandomUtils.getRandomInt(100, x - jigsawWidth - 5);
+			}
+			while (true) {
+				String s = ImageUtils.getslidingBlock();
+				if (!jigsawImageBase64.equals(s)) {
+					interferenceByTemplate(originalImage, Objects.requireNonNull(ImageUtils.getBase64StrToImage(s)), position);
+					break;
+				}
+			}
+		}
+		if (captchaInterferenceOptions > 1) {
+			while (true) {
+				String s = ImageUtils.getslidingBlock();
+				if (!jigsawImageBase64.equals(s)) {
+					Integer randomInt = RandomUtils.getRandomInt(jigsawWidth, 100 - jigsawWidth);
+					interferenceByTemplate(originalImage, Objects.requireNonNull(ImageUtils.getBase64StrToImage(s)),
+							randomInt);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * 随机生成拼图坐标
+	 *
+	 * @param originalWidth  originalWidth
+	 * @param originalHeight originalHeight
+	 * @param jigsawWidth    jigsawWidth
+	 * @param jigsawHeight   jigsawHeight
+	 * @return PointVO
+	 */
+	private static PointVO generateJigsawPoint(int originalWidth, int originalHeight, int jigsawWidth, int jigsawHeight) {
+		Random random = new Random();
+		int widthDifference = originalWidth - jigsawWidth;
+		int heightDifference = originalHeight - jigsawHeight;
+		int x, y;
+		if (widthDifference <= 0) {
+			x = 5;
+		}
+		else {
+			x = random.nextInt(originalWidth - jigsawWidth - 100) + 100;
+		}
+		if (heightDifference <= 0) {
+			y = 5;
+		}
+		else {
+			y = random.nextInt(originalHeight - jigsawHeight) + 5;
+		}
+		String key = null;
+		if (captchaAesStatus) {
+			key = AesUtil.getKey();
+		}
+		return new PointVO(x, y, key);
+	}
+
+	/**
+	 * @param oriImage      原图
+	 * @param templateImage 模板图
+	 * @param newImage      新抠出的小图
+	 * @param x             随机扣取坐标X
+	 */
+	private static void cutByTemplate(BufferedImage oriImage, BufferedImage templateImage, BufferedImage newImage, int x) {
+		//临时数组遍历用于高斯模糊存周边像素值
+		int[][] martrix = new int[3][3];
+		int[] values = new int[9];
+
+		int xLength = templateImage.getWidth();
+		int yLength = templateImage.getHeight();
+		// 模板图像宽度
+		for (int i = 0; i < xLength; i++) {
+			// 模板图片高度
+			for (int j = 0; j < yLength; j++) {
+				// 如果模板图像当前像素点不是透明色 copy源文件信息到目标图片中
+				int rgb = templateImage.getRGB(i, j);
+				if (rgb < 0) {
+					newImage.setRGB(i, j, oriImage.getRGB(x + i, j));
+
+					//抠图区域高斯模糊
+					readPixel(oriImage, x + i, j, values);
+					fillMatrix(martrix, values);
+					oriImage.setRGB(x + i, j, avgMatrix(martrix));
+				}
+
+				//防止数组越界判断
+				if (i == (xLength - 1) || j == (yLength - 1)) {
+					continue;
+				}
+				int rightRgb = templateImage.getRGB(i + 1, j);
+				int downRgb = templateImage.getRGB(i, j + 1);
+				//描边处理，,取带像素和无像素的界点，判断该点是不是临界轮廓点,如果是设置该坐标像素是白色
+				if (case1(rgb, rightRgb) || case2(rgb, rightRgb) || case3(rgb, downRgb) || case4(rgb, downRgb)) {
+					newImage.setRGB(i, j, Color.white.getRGB());
+					oriImage.setRGB(x + i, j, Color.white.getRGB());
+				}
+			}
+		}
+
+	}
+
+	public static boolean case1(int rgb, int rightRgb) {
+		return rgb >= 0 && rightRgb < 0;
+	}
+
+	public static boolean case2(int rgb, int rightRgb) {
+		return rgb < 0 && rightRgb >= 0;
+	}
+
+	public static boolean case3(int rgb, int downRgb) {
+		return rgb >= 0 && downRgb < 0;
+	}
+
+	public static boolean case4(int rgb, int downRgb) {
+		return rgb < 0 && downRgb >= 0;
+	}
+
+	/**
+	 * 干扰抠图处理
+	 *
+	 * @param oriImage      原图
+	 * @param templateImage 模板图
+	 * @param x             随机扣取坐标X
+	 */
+	private static void interferenceByTemplate(BufferedImage oriImage, BufferedImage templateImage, int x) {
+		//临时数组遍历用于高斯模糊存周边像素值
+		int[][] martrix = new int[3][3];
+		int[] values = new int[9];
+
+		int xLength = templateImage.getWidth();
+		int yLength = templateImage.getHeight();
+		// 模板图像宽度
+		for (int i = 0; i < xLength; i++) {
+			// 模板图片高度
+			for (int j = 0; j < yLength; j++) {
+				// 如果模板图像当前像素点不是透明色 copy源文件信息到目标图片中
+				int rgb = templateImage.getRGB(i, j);
+				if (rgb < 0) {
+					//抠图区域高斯模糊
+					readPixel(oriImage, x + i, j, values);
+					fillMatrix(martrix, values);
+					oriImage.setRGB(x + i, j, avgMatrix(martrix));
+				}
+				//防止数组越界判断
+				if (i == (xLength - 1) || j == (yLength - 1)) {
+					continue;
+				}
+				int rightRgb = templateImage.getRGB(i + 1, j);
+				int downRgb = templateImage.getRGB(i, j + 1);
+				//描边处理，,取带像素和无像素的界点，判断该点是不是临界轮廓点,如果是设置该坐标像素是白色
+				if (case1(rgb, rightRgb) || case2(rgb, rightRgb) || case3(rgb, downRgb) || case4(rgb, downRgb)) {
+					oriImage.setRGB(x + i, j, Color.white.getRGB());
+				}
+			}
+		}
+
+	}
+
+	private static void readPixel(BufferedImage img, int x, int y, int[] pixels) {
+		int xStart = x - 1;
+		int yStart = y - 1;
+		int current = 0;
+		for (int i = xStart; i < THREE + xStart; i++) {
+			for (int j = yStart; j < THREE + yStart; j++) {
+				int tx = i;
+				if (tx < 0) {
+					tx = -tx;
+
+				}
+				else if (tx >= img.getWidth()) {
+					tx = x;
+				}
+				int ty = j;
+				if (ty < 0) {
+					ty = -ty;
+				}
+				else if (ty >= img.getHeight()) {
+					ty = y;
+				}
+				pixels[current++] = img.getRGB(tx, ty);
+
+			}
+		}
+	}
+
+	private static void fillMatrix(int[][] matrix, int[] values) {
+		int filled = 0;
+		for (int[] x : matrix) {
+			for (int j = 0; j < x.length; j++) {
+				x[j] = values[filled++];
+			}
+		}
+	}
+
+	private static int avgMatrix(int[][] matrix) {
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		for (int[] x : matrix) {
+			for (int j = 0; j < x.length; j++) {
+				if (j == 1) {
+					continue;
+				}
+				Color c = new Color(x[j]);
+				r += c.getRed();
+				g += c.getGreen();
+				b += c.getBlue();
+			}
+		}
+		return new Color(r / 8, g / 8, b / 8).getRGB();
+	}
+
 	@Override
 	public void init(Properties config) {
 		super.init(config);
@@ -216,227 +436,6 @@ public class BlockPuzzleCaptchaServiceImpl extends AbstractCaptchaService {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	private static void extracted(final BufferedImage originalImage, final String jigsawImageBase64, final int originalWidth, final int jigsawWidth, final int x) {
-		if (captchaInterferenceOptions > 0) {
-			int position = 0;
-			if (originalWidth - x - FIVE > jigsawWidth * TWO) {
-				//在原扣图右边插入干扰图
-				position = RandomUtils.getRandomInt(x + jigsawWidth + 5, originalWidth - jigsawWidth);
-			}
-			else {
-				//在原扣图左边插入干扰图
-				position = RandomUtils.getRandomInt(100, x - jigsawWidth - 5);
-			}
-			while (true) {
-				String s = ImageUtils.getslidingBlock();
-				if (!jigsawImageBase64.equals(s)) {
-					interferenceByTemplate(originalImage, Objects.requireNonNull(ImageUtils.getBase64StrToImage(s)), position);
-					break;
-				}
-			}
-		}
-		if (captchaInterferenceOptions > 1) {
-			while (true) {
-				String s = ImageUtils.getslidingBlock();
-				if (!jigsawImageBase64.equals(s)) {
-					Integer randomInt = RandomUtils.getRandomInt(jigsawWidth, 100 - jigsawWidth);
-					interferenceByTemplate(originalImage, Objects.requireNonNull(ImageUtils.getBase64StrToImage(s)),
-							randomInt);
-					break;
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * 随机生成拼图坐标
-	 *
-	 * @param originalWidth  originalWidth
-	 * @param originalHeight originalHeight
-	 * @param jigsawWidth    jigsawWidth
-	 * @param jigsawHeight   jigsawHeight
-	 * @return PointVO
-	 */
-	private static PointVO generateJigsawPoint(int originalWidth, int originalHeight, int jigsawWidth, int jigsawHeight) {
-		Random random = new Random();
-		int widthDifference = originalWidth - jigsawWidth;
-		int heightDifference = originalHeight - jigsawHeight;
-		int x, y;
-		if (widthDifference <= 0) {
-			x = 5;
-		}
-		else {
-			x = random.nextInt(originalWidth - jigsawWidth - 100) + 100;
-		}
-		if (heightDifference <= 0) {
-			y = 5;
-		}
-		else {
-			y = random.nextInt(originalHeight - jigsawHeight) + 5;
-		}
-		String key = null;
-		if (captchaAesStatus) {
-			key = AesUtil.getKey();
-		}
-		return new PointVO(x, y, key);
-	}
-
-	/**
-	 * @param oriImage      原图
-	 * @param templateImage 模板图
-	 * @param newImage      新抠出的小图
-	 * @param x             随机扣取坐标X
-	 */
-	private static void cutByTemplate(BufferedImage oriImage, BufferedImage templateImage, BufferedImage newImage, int x) {
-		//临时数组遍历用于高斯模糊存周边像素值
-		int[][] martrix = new int[3][3];
-		int[] values = new int[9];
-
-		int xLength = templateImage.getWidth();
-		int yLength = templateImage.getHeight();
-		// 模板图像宽度
-		for (int i = 0; i < xLength; i++) {
-			// 模板图片高度
-			for (int j = 0; j < yLength; j++) {
-				// 如果模板图像当前像素点不是透明色 copy源文件信息到目标图片中
-				int rgb = templateImage.getRGB(i, j);
-				if (rgb < 0) {
-					newImage.setRGB(i, j, oriImage.getRGB(x + i, j));
-
-					//抠图区域高斯模糊
-					readPixel(oriImage, x + i, j, values);
-					fillMatrix(martrix, values);
-					oriImage.setRGB(x + i, j, avgMatrix(martrix));
-				}
-
-				//防止数组越界判断
-				if (i == (xLength - 1) || j == (yLength - 1)) {
-					continue;
-				}
-				int rightRgb = templateImage.getRGB(i + 1, j);
-				int downRgb = templateImage.getRGB(i, j + 1);
-				//描边处理，,取带像素和无像素的界点，判断该点是不是临界轮廓点,如果是设置该坐标像素是白色
-				if (case1(rgb, rightRgb) || case2(rgb, rightRgb) || case3(rgb, downRgb) || case4(rgb, downRgb)) {
-					newImage.setRGB(i, j, Color.white.getRGB());
-					oriImage.setRGB(x + i, j, Color.white.getRGB());
-				}
-			}
-		}
-
-	}
-
-	public static boolean case1(int rgb, int rightRgb) {
-		return rgb >= 0 && rightRgb < 0;
-	}
-
-	public static boolean case2(int rgb, int rightRgb) {
-		return rgb < 0 && rightRgb >= 0;
-	}
-
-	public static boolean case3(int rgb, int downRgb) {
-		return rgb >= 0 && downRgb < 0;
-	}
-
-	public static boolean case4(int rgb, int downRgb) {
-		return rgb < 0 && downRgb >= 0;
-	}
-
-	/**
-	 * 干扰抠图处理
-	 *
-	 * @param oriImage      原图
-	 * @param templateImage 模板图
-	 * @param x             随机扣取坐标X
-	 */
-	private static void interferenceByTemplate(BufferedImage oriImage, BufferedImage templateImage, int x) {
-		//临时数组遍历用于高斯模糊存周边像素值
-		int[][] martrix = new int[3][3];
-		int[] values = new int[9];
-
-		int xLength = templateImage.getWidth();
-		int yLength = templateImage.getHeight();
-		// 模板图像宽度
-		for (int i = 0; i < xLength; i++) {
-			// 模板图片高度
-			for (int j = 0; j < yLength; j++) {
-				// 如果模板图像当前像素点不是透明色 copy源文件信息到目标图片中
-				int rgb = templateImage.getRGB(i, j);
-				if (rgb < 0) {
-					//抠图区域高斯模糊
-					readPixel(oriImage, x + i, j, values);
-					fillMatrix(martrix, values);
-					oriImage.setRGB(x + i, j, avgMatrix(martrix));
-				}
-				//防止数组越界判断
-				if (i == (xLength - 1) || j == (yLength - 1)) {
-					continue;
-				}
-				int rightRgb = templateImage.getRGB(i + 1, j);
-				int downRgb = templateImage.getRGB(i, j + 1);
-				//描边处理，,取带像素和无像素的界点，判断该点是不是临界轮廓点,如果是设置该坐标像素是白色
-				if (case1(rgb, rightRgb) || case2(rgb, rightRgb) || case3(rgb, downRgb) || case4(rgb, downRgb)) {
-					oriImage.setRGB(x + i, j, Color.white.getRGB());
-				}
-			}
-		}
-
-	}
-
-	private static void readPixel(BufferedImage img, int x, int y, int[] pixels) {
-		int xStart = x - 1;
-		int yStart = y - 1;
-		int current = 0;
-		for (int i = xStart; i < THREE + xStart; i++) {
-			for (int j = yStart; j < THREE + yStart; j++) {
-				int tx = i;
-				if (tx < 0) {
-					tx = -tx;
-
-				}
-				else if (tx >= img.getWidth()) {
-					tx = x;
-				}
-				int ty = j;
-				if (ty < 0) {
-					ty = -ty;
-				}
-				else if (ty >= img.getHeight()) {
-					ty = y;
-				}
-				pixels[current++] = img.getRGB(tx, ty);
-
-			}
-		}
-	}
-
-	private static void fillMatrix(int[][] matrix, int[] values) {
-		int filled = 0;
-		for (int[] x : matrix) {
-			for (int j = 0; j < x.length; j++) {
-				x[j] = values[filled++];
-			}
-		}
-	}
-
-	private static int avgMatrix(int[][] matrix) {
-		int r = 0;
-		int g = 0;
-		int b = 0;
-		for (int[] x : matrix) {
-			for (int j = 0; j < x.length; j++) {
-				if (j == 1) {
-					continue;
-				}
-				Color c = new Color(x[j]);
-				r += c.getRed();
-				g += c.getGreen();
-				b += c.getBlue();
-			}
-		}
-		return new Color(r / 8, g / 8, b / 8).getRGB();
 	}
 
 

@@ -127,15 +127,6 @@ public class SnowflakeIdGenerator {
 	}
 
 	/**
-	 * 初始化日志，记录数据中⼼ID和工作节点ID。
-	 */
-	private void initLog() {
-		if (log.isDebugEnabled()) {
-			log.debug("初始化 SnowflakeIdGenerator 数据中⼼ID:" + this.datacenterId + " 工作节点ID:" + this.workerId);
-		}
-	}
-
-	/**
 	 * 构造函数，使用指定的工作节点ID和数据中⼼ID初始化 SnowflakeIdGenerator。
 	 * 检查工作节点ID和数据中⼼ID是否在有效范围内。
 	 *
@@ -150,6 +141,25 @@ public class SnowflakeIdGenerator {
 		this.workerId = workerId;
 		this.datacenterId = datacenterId;
 		initLog();
+	}
+
+	/**
+	 * 解析ID中的时间戳。
+	 *
+	 * @param id 唯一ID
+	 * @return 解析出的时间戳
+	 */
+	public static long parseIdTimestamp(long id) {
+		return (id >> 22) + BASIS_TIME;
+	}
+
+	/**
+	 * 初始化日志，记录数据中⼼ID和工作节点ID。
+	 */
+	private void initLog() {
+		if (log.isDebugEnabled()) {
+			log.debug("初始化 SnowflakeIdGenerator 数据中⼼ID:" + this.datacenterId + " 工作节点ID:" + this.workerId);
+		}
 	}
 
 	/**
@@ -208,7 +218,6 @@ public class SnowflakeIdGenerator {
 		// 返回计算得到的数据中心ID
 		return id;
 	}
-
 
 	/**
 	 * 获取基础时间戳。
@@ -346,16 +355,6 @@ public class SnowflakeIdGenerator {
 	 */
 	protected long timeGen() {
 		return SystemClock.now();
-	}
-
-	/**
-	 * 解析ID中的时间戳。
-	 *
-	 * @param id 唯一ID
-	 * @return 解析出的时间戳
-	 */
-	public static long parseIdTimestamp(long id) {
-		return (id >> 22) + BASIS_TIME;
 	}
 
 	/**

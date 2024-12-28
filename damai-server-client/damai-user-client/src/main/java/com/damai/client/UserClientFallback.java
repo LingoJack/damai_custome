@@ -5,8 +5,8 @@ import com.damai.dto.TicketUserListDto;
 import com.damai.dto.UserGetAndTicketUserListDto;
 import com.damai.dto.UserIdDto;
 import com.damai.enums.BaseCode;
-import com.damai.vo.UserGetAndTicketUserListVo;
 import com.damai.vo.TicketUserVo;
+import com.damai.vo.UserGetAndTicketUserListVo;
 import com.damai.vo.UserVo;
 import org.springframework.stereotype.Component;
 

@@ -3,14 +3,13 @@ package com.damai.service.lua;
 import com.alibaba.fastjson.JSON;
 import com.damai.redis.RedisCache;
 import com.damai.service.ApiRestrictData;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
 
 import java.util.List;
 

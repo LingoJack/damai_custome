@@ -3,9 +3,8 @@ package com.damai.service.cache.local;
 import com.damai.entity.ProgramCategory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.stereotype.Component;
-
 import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
