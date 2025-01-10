@@ -23,7 +23,6 @@ public class BusinessThreadPool extends BaseThreadPool {
 	static {
 		// 创建线程池执行器实例
 		execute = new ThreadPoolExecutor(
-
 				// 核心线程数：当前设备的可用处理器数量加一，旨在充分利用CPU资源
 				Runtime.getRuntime().availableProcessors() + 1,
 				// 最大线程数：调用自定义方法maximumPoolSize()确定
@@ -40,17 +39,14 @@ public class BusinessThreadPool extends BaseThreadPool {
 				new ThreadPoolRejectedExecutionHandler.BusinessAbortPolicy());
 	}
 
-
 	private static Integer maximumPoolSize() {
 		return new BigDecimal(Runtime.getRuntime().availableProcessors())
 				.divide(new BigDecimal("0.2"), 0, RoundingMode.HALF_UP).intValue();
 	}
 
-
 	public static void execute(Runnable r) {
 		execute.execute(wrapTask(r, getContextForTask(), getContextForHold()));
 	}
-
 
 	public static <T> Future<T> submit(Callable<T> c) {
 		return execute.submit(wrapTask(c, getContextForTask(), getContextForHold()));
